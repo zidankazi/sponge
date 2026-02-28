@@ -12,89 +12,96 @@ export default function HomePage() {
                         <span className="home-nav-logo">S</span>
                         <span className="home-nav-name">Sponge</span>
                     </div>
-                    <div className="home-nav-links">
-                        <a href="#features" className="home-nav-link">Features</a>
-                        <a href="#how" className="home-nav-link">How It Works</a>
-                        <button className="home-nav-cta" onClick={() => setView('idle')}>
-                            View Demo
-                        </button>
-                    </div>
+                    <button className="home-nav-cta" onClick={() => setView('idle')}>
+                        Try Now
+                    </button>
                 </div>
             </nav>
 
             {/* ── Hero ─────────────────────────────────────── */}
             <section className="home-hero">
                 <div className="home-hero-inner">
-                    <h1 className="home-hero-title">
-                        AI changed how we code.
-                        <span className="home-hero-highlight">We measure it.</span>
-                    </h1>
-                    <p className="home-hero-sub">
-                        Assess how developers actually collaborate with AI — not whether they
-                        can memorize algorithms. Real codebases, real tools, real signal.
-                    </p>
-                    <div className="home-hero-actions">
-                        <button className="home-hero-btn" onClick={() => setView('idle')}>
-                            View Demo
-                        </button>
-                        <button className="home-hero-btn-secondary" onClick={() => setView('leaderboard')}>
-                            View Leaderboard
-                        </button>
+                    <div className="home-hero-text">
+                        <h1 className="home-hero-title">
+                            Measure how developers <span className="home-hero-highlight">collaborate with AI</span>
+                        </h1>
+                        <p className="home-hero-sub">
+                            Give candidates a real codebase, a real AI assistant, and a real task.
+                            Our scoring engine analyzes every interaction to measure collaboration
+                            quality — not just whether the code compiles.
+                        </p>
+                        <div className="home-hero-actions">
+                            <button className="home-hero-btn" onClick={() => setView('idle')}>
+                                View Demo
+                            </button>
+                        </div>
+                    </div>
+                    <div className="home-hero-visual">
+                        <div className="home-hero-video-placeholder">
+                            <div className="home-hero-video-icon">▶</div>
+                            <span>Product Demo</span>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            {/* ── Features ─────────────────────────────────── */}
-            <section className="home-features" id="features">
-                <h2 className="home-features-title">
-                    Built for the AI-native engineering era.
-                </h2>
-                <div className="home-features-grid">
-                    <div className="home-feature-card">
-                        <div className="home-feature-icon">⌨️</div>
-                        <h3>Real Codebases</h3>
-                        <p>
-                            Candidates work inside actual open-source projects — not toy problems.
-                            They read, navigate, and extend real code with a full IDE experience.
-                        </p>
-                    </div>
-                    <div className="home-feature-card">
-                        <div className="home-feature-icon">🤖</div>
-                        <h3>AI Collaboration Scoring</h3>
-                        <p>
-                            We analyze how candidates prompt, validate, and iterate with an AI
-                            assistant. Copy-paste coders score low. Thoughtful collaborators shine.
-                        </p>
-                    </div>
-                    <div className="home-feature-card">
-                        <div className="home-feature-icon">📊</div>
-                        <h3>Transparent Metrics</h3>
-                        <p>
-                            Detailed breakdowns of prompting quality, verification discipline,
-                            and iterative collaboration — not just "pass/fail".
-                        </p>
-                    </div>
+            {/* ── Trusted By ───────────────────────────────── */}
+            <section className="home-trust">
+                <p className="home-trust-label">Built for teams that evaluate engineering talent</p>
+                <div className="home-trust-logos">
+                    <span>YC</span>
+                    <span>Stanford</span>
+                    <span>Google</span>
+                    <span>Meta</span>
+                    <span>Stripe</span>
                 </div>
             </section>
 
             {/* ── How It Works ─────────────────────────────── */}
             <section className="home-how" id="how">
-                <h2 className="home-how-title">How It Works</h2>
-                <div className="home-how-steps">
-                    <div className="home-how-step">
-                        <div className="home-how-number">1</div>
-                        <h3>Open the IDE</h3>
-                        <p>Candidates get a full editor with a real codebase and an AI assistant panel.</p>
+                <h2 className="home-how-title">How it works</h2>
+                <div className="home-how-grid">
+                    <div className="home-how-card">
+                        <div className="home-how-card-visual">
+                            <div className="home-how-card-mock">
+                                <div className="home-how-tag">Python</div>
+                                <div className="home-how-tag">Redis</div>
+                                <div className="home-how-tag">Open Source</div>
+                            </div>
+                        </div>
+                        <h3>Pick a challenge</h3>
+                        <p>Candidates get a real open-source codebase with a feature to implement in 60 minutes.</p>
                     </div>
-                    <div className="home-how-step">
-                        <div className="home-how-number">2</div>
-                        <h3>Solve the Task</h3>
-                        <p>They implement a feature using the AI — prompting, reading, and writing code.</p>
+                    <div className="home-how-card">
+                        <div className="home-how-card-visual">
+                            <div className="home-how-card-mock">
+                                <div className="home-how-chat-line home-how-chat-line--user" />
+                                <div className="home-how-chat-line home-how-chat-line--ai" />
+                                <div className="home-how-chat-line home-how-chat-line--user home-how-chat-line--short" />
+                            </div>
+                        </div>
+                        <h3>Code with an AI assistant</h3>
+                        <p>They use a Gemini-powered assistant to explore, ask questions, and write code.</p>
                     </div>
-                    <div className="home-how-step">
-                        <div className="home-how-number">3</div>
-                        <h3>Get Scored</h3>
-                        <p>Our engine analyzes every interaction to produce a collaboration quality score.</p>
+                    <div className="home-how-card">
+                        <div className="home-how-card-visual">
+                            <div className="home-how-card-mock">
+                                <div className="home-how-score-row">
+                                    <span>Prompt Quality</span>
+                                    <div className="home-how-score-bar"><div className="home-how-score-fill" style={{ width: '85%' }} /></div>
+                                </div>
+                                <div className="home-how-score-row">
+                                    <span>Verification</span>
+                                    <div className="home-how-score-bar"><div className="home-how-score-fill" style={{ width: '60%' }} /></div>
+                                </div>
+                                <div className="home-how-score-row">
+                                    <span>Iteration</span>
+                                    <div className="home-how-score-bar"><div className="home-how-score-fill" style={{ width: '92%' }} /></div>
+                                </div>
+                            </div>
+                        </div>
+                        <h3>Get detailed scoring</h3>
+                        <p>Our engine breaks down collaboration quality across 6 dimensions with actionable insights.</p>
                     </div>
                 </div>
             </section>
@@ -102,7 +109,7 @@ export default function HomePage() {
             {/* ── CTA ──────────────────────────────────────── */}
             <section className="home-cta-section">
                 <h2>Ready to see it in action?</h2>
-                <p>Try the full coding exercise — 60 minutes, real codebase, AI assistant included.</p>
+                <p>Try the full 60-minute coding exercise with a real AI assistant.</p>
                 <button className="home-hero-btn" onClick={() => setView('idle')}>
                     View Demo
                 </button>
@@ -112,7 +119,7 @@ export default function HomePage() {
             <footer className="home-footer">
                 <div className="home-footer-inner">
                     <span className="home-footer-brand">Sponge</span>
-                    <span className="home-footer-copy">AI-Assisted Coding Assessment Platform</span>
+                    <span className="home-footer-copy">© 2025 Sponge · AI-Assisted Coding Assessment</span>
                 </div>
             </footer>
         </div>
