@@ -17,9 +17,18 @@ export default function LandingScreen() {
   }
 
   const companies = [
-    'Nvidia', 'Meta', 'Canva', 'Shopify', 'Google',
-    'Rippling', 'OpenAI', 'Cursor', 'LangChain',
-    'ElevenLabs', 'Atlassian', 'Oracle'
+    { name: 'Nvidia', logo: '/logos/nvidia.svg' },
+    { name: 'Meta', logo: '/logos/meta.svg' },
+    { name: 'Canva', logo: '/logos/canva.svg' },
+    { name: 'Shopify', logo: '/logos/shopify.svg' },
+    { name: 'Google', logo: '/logos/google.svg' },
+    { name: 'Rippling', logo: '/logos/rippling.svg' },
+    { name: 'OpenAI', logo: '/logos/openai.svg' },
+    { name: 'Cursor', logo: '/logos/cursor.svg' },
+    { name: 'LangChain', logo: '/logos/langchain.png' },
+    { name: 'ElevenLabs', logo: '/logos/elevenlabs.svg' },
+    { name: 'Atlassian', logo: '/logos/atlassian.svg' },
+    { name: 'Oracle', logo: '/logos/oracle.svg' }
   ]
 
   return (
@@ -32,7 +41,7 @@ export default function LandingScreen() {
             <span className="hero-logo-text">sponge</span>
           </div>
           <div className="hero-nav">
-            <button className="hero-nav-link" onClick={handleStart}>Login &rarr;</button>
+            <button className="hero-nav-link" onClick={handleStart}>View demo &rarr;</button>
           </div>
         </div>
 
@@ -54,11 +63,15 @@ export default function LandingScreen() {
           <div className="marquee-container">
             <div className="marquee-content">
               {companies.map((company, i) => (
-                <span key={i} className="marquee-item">{company}</span>
+                <div key={i} className="marquee-item">
+                  <img src={company.logo} alt={`${company.name} logo`} className="marquee-logo" />
+                </div>
               ))}
               {/* Duplicate for infinite seamless scrolling */}
               {companies.map((company, i) => (
-                <span key={`dup-${i}`} className="marquee-item">{company}</span>
+                <div key={`dup-${i}`} className="marquee-item">
+                  <img src={company.logo} alt={`${company.name} logo`} className="marquee-logo" />
+                </div>
               ))}
             </div>
           </div>
