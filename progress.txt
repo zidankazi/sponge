@@ -1,0 +1,19 @@
+## Sponge — Ralph Loop Progress Log (josh/game branch)
+Append-only. Each entry: [story-id] what was done, what was learned, any gotchas.
+
+## Context (read before starting)
+
+Branch: josh/game. This branch builds the game layer on top of Zidan's core product.
+
+Key facts:
+- All session state lives in hooks/useSession.jsx — import useSession() to get username, results, resetSession
+- results shape from submit: { total_score, breakdown, headline_metrics, interpretation, badge }
+- badge is one of: "AI Collaborator", "On Your Way", "Needs Work", "Just Vibing"
+- leaderboard entries shape: [{ username, score, time_completed, badge }]
+- fetchLeaderboard() is in api/client.js — already imported in LeaderboardPage.jsx
+- ResultsScreen already works fully (score circle, breakdown bars, metrics). Stories here ADD to it, not replace it.
+- DO NOT touch: App.jsx, hooks/useSession.jsx, api/client.js, components/editor/*, components/chat/*
+- index.css append-only — add new rules at the very end only
+- Validation: cd frontend && npm run build (0 errors required before committing)
+- useSession.jsx contains JSX so it uses .jsx extension — don't rename it
+- The design system uses CSS custom properties: --green-light (#52b788), --blue (#5588cc), --yellow (#e0b555), --red (#e05555), --bg-surface, --bg-surface-2, --border, --text, --text-secondary, --cream

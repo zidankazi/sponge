@@ -1,0 +1,146 @@
+{
+  "project": "Sponge — game layer (josh/game branch)",
+  "branch": "josh/game",
+  "instructions": [
+    "Read AGENTS.md and FRONTEND_AGENTS.md first. Then read progress.txt for context.",
+    "Pick the first story with status 'pending'. Implement it completely.",
+    "STRICT FILE SCOPE: Only modify files listed in a story's 'files' array. If you think you need to touch an unlisted file, log it as a blocker in progress.txt instead.",
+    "CSS rule: when editing index.css, ONLY append new rules at the very end. Never modify or reorder existing rules.",
+    "Do NOT touch: App.jsx, hooks/useSession.jsx, api/client.js, components/editor/*, components/chat/*",
+    "Validate with: cd frontend && npm run build — must produce 0 errors.",
+    "After passing: (1) set status to 'complete' in prd.json, (2) append to progress.txt, (3) commit only the story's files + prd.json + progress.txt.",
+    "Move to next pending story. Stop when all complete or on unresolvable blocker."
+  ],
+  "stories": [
+    {
+      "id": "G-01",
+      "title": "Badge component",
+      "status": "pending",
+      "branch": "josh/game",
+      "files": [
+        "frontend/src/components/game/Badge.jsx",
+        "frontend/src/index.css"
+      ],
+      "description": "Build a visual Badge component for the four scoring tiers. Each tier has a distinct color and a small icon prefix. Used in ResultsScreen, Leaderboard, and LeaderboardPage.",
+      "tiers": {
+        "AI Collaborator": { "range": "85-100", "color": "green" },
+        "On Your Way":     { "range": "70-84",  "color": "blue" },
+        "Needs Work":      { "range": "50-69",  "color": "yellow" },
+        "Just Vibing":     { "range": "0-49",   "color": "red" }
+      },
+      "acceptance": [
+        "Badge renders a styled pill/chip with the badge text",
+        "Each tier has a visually distinct color using existing CSS vars (--green-light, --blue, --yellow, --red)",
+        "Badge has a small icon or colored dot prefix to make tiers scannable at a glance",
+        "Accepts a single `badge` string prop",
+        "Gracefully renders unknown badge values without crashing",
+        "CSS appended at END of index.css only",
+        "npm run build passes with 0 errors"
+      ]
+    },
+    {
+      "id": "G-02",
+      "title": "Wire Badge into ResultsScreen",
+      "status": "pending",
+      "branch": "josh/game",
+      "depends_on": "G-01",
+      "files": [
+        "frontend/src/components/game/ResultsScreen.jsx"
+      ],
+      "description": "ResultsScreen currently shows a grade letter (A, B+, etc.) but never renders the badge from results. Add the Badge component below the score circle. Keep the grade letter — both are useful.",
+      "acceptance": [
+        "Badge component is imported and rendered below the score circle using results.badge",
+        "Grade letter is still shown inside the score circle",
+        "Layout doesn't break — badge sits cleanly below the SVG ring",
+        "npm run build passes with 0 errors"
+      ]
+    },
+    {
+      "id": "G-03",
+      "title": "Leaderboard component",
+      "status": "pending",
+      "branch": "josh/game",
+      "depends_on": "G-01",
+      "files": [
+        "frontend/src/components/game/Leaderboard.jsx",
+        "frontend/src/index.css"
+      ],
+      "description": "Build a functional leaderboard table. Takes an `entries` prop (array from GET /leaderboard). Each row shows rank, username, score, badge, and time completed. The current user's row is highlighted if their username matches.",
+      "data_shape": {
+        "entries": [
+          { "username": "zidan", "score": 85, "time_completed": "2024-03-01T12:34:56Z", "badge": "AI Collaborator" }
+        ]
+      },
+      "acceptance": [
+        "Renders a table/list with columns: Rank (#), Name, Score, Badge, Time",
+        "Uses Badge component for the badge column",
+        "Accepts optional `currentUser` prop — highlights that row with a subtle background",
+        "Empty state: renders a message like 'No scores yet' when entries is empty or null",
+        "Time formatted as a readable string (e.g. '2:34 PM' or relative — pick one)",
+        "CSS appended at END of index.css only",
+        "npm run build passes with 0 errors"
+      ]
+    },
+    {
+      "id": "G-04",
+      "title": "LeaderboardPage — header, loading state, empty state",
+      "status": "pending",
+      "branch": "josh/game",
+      "depends_on": "G-03",
+      "files": [
+        "frontend/src/pages/LeaderboardPage.jsx",
+        "frontend/src/index.css"
+      ],
+      "description": "LeaderboardPage already fetches data and passes it to Leaderboard. It needs a proper page header, a loading state while fetching, and passing the current username for row highlighting. Do NOT add routing — LeaderboardPage will be rendered inline from ResultsScreen.",
+      "acceptance": [
+        "Page has a header with 'Leaderboard' title and sponge branding (consistent with design system)",
+        "Loading state shown while fetchLeaderboard() is in flight (spinner or skeleton)",
+        "Passes username from useSession() as currentUser to Leaderboard for row highlighting",
+        "Has a back/close mechanism: accepts an optional `onBack` prop, renders a back button if provided",
+        "CSS appended at END of index.css only",
+        "npm run build passes with 0 errors"
+      ]
+    },
+    {
+      "id": "G-05",
+      "title": "ScoreReveal skeleton",
+      "status": "pending",
+      "branch": "josh/game",
+      "files": [
+        "frontend/src/components/game/ScoreReveal.jsx",
+        "frontend/src/index.css"
+      ],
+      "description": "Build the ScoreReveal component as a functional skeleton — no animation yet, just correct structure and content. It receives score, badge, interpretation, and an onComplete callback. Shows the score large, the badge, a one-line summary of the interpretation, and a Continue button that calls onComplete. Animation comes in a later pass.",
+      "acceptance": [
+        "Renders score prominently (large number, centered)",
+        "Renders the Badge component with the badge prop",
+        "Renders a short interpretation summary (first sentence of interpretation string, or the full string if short)",
+        "Has a 'See Full Breakdown' or 'Continue' button that calls onComplete()",
+        "Fullscreen or near-fullscreen centered layout — this is the hero moment",
+        "CSS appended at END of index.css only",
+        "npm run build passes with 0 errors"
+      ]
+    },
+    {
+      "id": "G-06",
+      "title": "Wire ScoreReveal + Leaderboard into ResultsScreen",
+      "status": "pending",
+      "branch": "josh/game",
+      "depends_on": ["G-02", "G-04", "G-05"],
+      "files": [
+        "frontend/src/components/game/ResultsScreen.jsx"
+      ],
+      "description": "ResultsScreen currently shows the full breakdown immediately. Update it to: (1) show ScoreReveal first, (2) after Continue is clicked show the full breakdown, (3) add a View Leaderboard button at the bottom that shows LeaderboardPage inline. All state managed locally in ResultsScreen with useState — do NOT touch useSession.jsx.",
+      "acceptance": [
+        "On first render: shows ScoreReveal (score, badge, continue button)",
+        "After Continue: shows the full breakdown (existing ResultsScreen content)",
+        "Full breakdown has a 'View Leaderboard' button at the bottom",
+        "Clicking View Leaderboard renders LeaderboardPage with onBack={() => setShowLeaderboard(false)}",
+        "Back button on LeaderboardPage returns to the full breakdown",
+        "All transitions are instant (no animation) — framework only",
+        "Local state only: useState for revealed (false → true) and showLeaderboard (false → true)",
+        "npm run build passes with 0 errors"
+      ]
+    }
+  ]
+}
