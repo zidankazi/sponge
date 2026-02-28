@@ -1,0 +1,47 @@
+import { useSession } from '../../hooks/useSession'
+
+export default function LandingScreen() {
+  const { beginSession } = useSession()
+
+  return (
+    <div className="landing">
+      <div className="landing-content">
+        <div className="landing-logo">
+          <span className="landing-logo-icon">S</span>
+        </div>
+        <h1 className="landing-title">sponge</h1>
+        <p className="landing-subtitle">AI-Assisted Coding Interview Practice</p>
+
+        <div className="landing-card">
+          <h2>Add Delayed Job Execution</h2>
+          <p>
+            You'll work inside a real codebase with an AI assistant. At the end, you'll be scored
+            on <em>how</em> you collaborated — not whether the code compiles.
+          </p>
+          <div className="landing-details">
+            <div className="landing-detail">
+              <span className="landing-detail-label">Codebase</span>
+              <span className="landing-detail-value">Redis Queue</span>
+            </div>
+            <div className="landing-detail">
+              <span className="landing-detail-label">Duration</span>
+              <span className="landing-detail-value">60 minutes</span>
+            </div>
+            <div className="landing-detail">
+              <span className="landing-detail-label">AI Assistant</span>
+              <span className="landing-detail-value">Gemini</span>
+            </div>
+          </div>
+        </div>
+
+        <button className="landing-start" onClick={beginSession}>
+          Start Session
+        </button>
+
+        <p className="landing-footnote">
+          Your interactions with AI will be analyzed for collaboration quality.
+        </p>
+      </div>
+    </div>
+  )
+}
