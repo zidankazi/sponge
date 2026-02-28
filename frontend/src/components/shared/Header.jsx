@@ -10,7 +10,7 @@ export default function Header() {
   const { timeLeft, totalTime, submit, isSubmitting } = useSession()
 
   const pct = (timeLeft / totalTime) * 100
-  const urgent = timeLeft < 300 // under 5 min
+  const timerClass = timeLeft <= 10 ? 'timer--critical' : timeLeft <= 60 ? 'timer--urgent' : ''
 
   return (
     <header className="header">
@@ -24,7 +24,7 @@ export default function Header() {
       </div>
 
       <div className="header-center">
-        <div className={`timer ${urgent ? 'timer--urgent' : ''}`}>
+        <div className={`timer ${timerClass}`}>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
             <path d="M8 4.5V8L10.5 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />

@@ -4,6 +4,16 @@ import { useSession } from '../../hooks/useSession'
 export default function LandingScreen() {
   const { beginSession } = useSession()
   const [name, setName] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleStart = async () => {
+    setLoading(true)
+    try {
+      await beginSession(name)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="landing">
@@ -49,8 +59,8 @@ export default function LandingScreen() {
           />
         </div>
 
-        <button className="landing-start" onClick={() => beginSession(name)}>
-          Start Session
+        <button className="landing-start" onClick={handleStart} disabled={loading}>
+          {loading ? 'Starting...' : 'Start Session'}
         </button>
 
         <p className="landing-footnote">

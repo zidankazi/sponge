@@ -1601,3 +1601,26 @@ a {
 .error-banner-close:hover {
   opacity: 1;
 }
+
+/* ── Timer urgency states ─────────────────────────────────────────── */
+
+.timer--urgent {
+  color: var(--yellow);
+}
+
+.timer--critical {
+  color: var(--red);
+  animation: timer-pulse 0.5s ease-in-out infinite;
+}
+
+@keyframes timer-pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
