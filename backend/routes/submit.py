@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 import store
 from models.score import Score
+from models.session import Session
 from scoring.engine import compute_score
 
 router = APIRouter(tags=["submit"])
@@ -29,7 +30,9 @@ async def submit_session(body: SubmitRequest):
     """
     session = store.sessions.get(body.session_id)
     if session is None:
-        raise HTTPException(status_code=404, detail="Session not found")
+        # Serverless: auto-create so submission works across cold starts
+        session = Session(session_id=body.session_id)
+        store.sessions[body.session_id] = session
 
     if session.score is not None:
         # Already scored — return cached result

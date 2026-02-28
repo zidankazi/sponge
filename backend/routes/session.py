@@ -53,7 +53,9 @@ async def log_event(body: LogEventRequest):
     """
     session = store.sessions.get(body.session_id)
     if session is None:
-        raise HTTPException(status_code=404, detail="Session not found")
+        # Serverless: auto-create so events aren't lost
+        session = Session(session_id=body.session_id)
+        store.sessions[body.session_id] = session
 
     event = Event(
         session_id=body.session_id,
