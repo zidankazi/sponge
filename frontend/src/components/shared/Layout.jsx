@@ -3,8 +3,11 @@ import ProblemStatement from '../editor/ProblemStatement'
 import FileTree from '../editor/FileTree'
 import CodeEditor from '../editor/CodeEditor'
 import ChatTerminal from '../chat/ChatTerminal'
+import { useSession } from '../../hooks/useSession'
 
 export default function Layout() {
+  const { isSubmitting } = useSession()
+
   return (
     <div className="layout">
       <Header />
@@ -22,6 +25,12 @@ export default function Layout() {
           </div>
         </main>
       </div>
+      {isSubmitting && (
+        <div className="submitting-overlay">
+          <div className="submitting-spinner"></div>
+          Grading your session...
+        </div>
+      )}
     </div>
   )
 }
