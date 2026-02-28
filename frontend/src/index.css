@@ -621,8 +621,7 @@ a {
   align-items: center;
   justify-content: center;
   width: 14px;
-  font-size: 10px;
-  color: var(--text-dim);
+  height: 14px;
   flex-shrink: 0;
   margin-left: 14px;
 }

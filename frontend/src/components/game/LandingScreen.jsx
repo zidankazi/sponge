@@ -17,8 +17,9 @@ export default function LandingScreen() {
         <div className="landing-card">
           <h2>Add Delayed Job Execution</h2>
           <p>
-            You'll work inside a real codebase with an AI assistant. At the end, you'll be scored
-            on <em>how</em> you collaborated — not whether the code compiles.
+            You'll work inside a real codebase with an AI assistant. You'll be scored
+            on <em>how</em> you collaborated with AI. Working code is the baseline —
+            it won't save a bad score, but broken code is an automatic zero.
           </p>
           <div className="landing-details">
             <div className="landing-detail">
