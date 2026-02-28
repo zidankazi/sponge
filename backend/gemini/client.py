@@ -296,7 +296,7 @@ async def call_gemini(
 
     try:
         response = await client.aio.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3-flash-preview",
             contents=contents,
             config=_make_config(),
         )
@@ -318,7 +318,7 @@ async def call_gemini(
             )
         if "not found" in err or "404" in err:
             return (
-                "**Model not available** — `gemini-2.5-flash` may not be accessible "
+                "**Model not available** — `gemini-3-flash-preview` may not be accessible "
                 "with your API key. Check your Google AI Studio plan."
             )
         if "timeout" in err or "deadline" in err or "504" in err:
