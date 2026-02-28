@@ -16,9 +16,11 @@ Two people work on the frontend. They do NOT touch each other's components.
 | `chat/ChatTerminal.jsx` | AI chat panel — message list, input bar, typing indicator |
 | `chat/ChatMessage.jsx` | Single chat message renderer (markdown, code blocks, inline code) |
 
-Also owns: `pages/SessionPage.jsx`, `hooks/useSession.jsx`, `hooks/useTimer.js`, `api/client.js`
+Also owns: `pages/SessionPage.jsx`, `hooks/useSession.jsx`, `hooks/useTimer.js`, `api/client.js`, `components/game/LandingScreen.jsx`
 
-### Designer — Game Layer (`components/game/`)
+> **Note on LandingScreen:** it lives in `components/game/` but is owned by **Zidan**, not Josh. It's session flow (start screen, username input), not game UI. Josh does not touch it.
+
+### Designer — Game Layer (`components/game/`, except LandingScreen)
 
 | Component | Purpose |
 |-----------|---------|
