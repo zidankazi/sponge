@@ -73,17 +73,24 @@ export default function ResultsScreen() {
         score={total_score}
         badge={badge}
         interpretation={interpretation}
+        breakdown={breakdown}
         onComplete={() => setRevealed(true)}
+        onViewLeaderboard={() => setShowLeaderboard(true)}
       />
     )
   }
 
-  // Phase 3: Leaderboard view
+  // Leaderboard page (from ScoreReveal or full breakdown)
   if (showLeaderboard) {
-    return <LeaderboardPage onBack={() => setShowLeaderboard(false)} />
+    return (
+      <LeaderboardPage
+        onBack={() => setShowLeaderboard(false)}
+        onStartNewSession={resetSession}
+      />
+    )
   }
 
-  // Phase 2: Full breakdown
+  // Full breakdown
   const grade =
     total_score >= 90 ? 'A' :
       total_score >= 80 ? 'B+' :
@@ -153,13 +160,18 @@ export default function ResultsScreen() {
           <p>{interpretation}</p>
         </div>
 
-        <button className="results-leaderboard-btn" onClick={() => setShowLeaderboard(true)}>
-          View Leaderboard
-        </button>
-
-        <button className="results-restart" onClick={resetSession}>
-          Start New Session
-        </button>
+        <div className="results-actions">
+          <h3 className="results-actions-title">What&apos;s next?</h3>
+          <button className="results-leaderboard-btn" onClick={() => setShowLeaderboard(true)}>
+            View Leaderboard
+          </button>
+          <button className="results-bottleneck-btn" onClick={() => setRevealed(false)}>
+            Re-attempt Bottleneck
+          </button>
+          <button className="results-restart" onClick={resetSession}>
+            Start New Session
+          </button>
+        </div>
       </div>
     </div>
   )

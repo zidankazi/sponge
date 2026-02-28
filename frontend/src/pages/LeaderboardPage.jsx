@@ -7,7 +7,7 @@ import { fetchLeaderboard } from '../api/client'
 import { useSession } from '../hooks/useSession'
 import Leaderboard from '../components/game/Leaderboard'
 
-export default function LeaderboardPage({ onBack }) {
+export default function LeaderboardPage({ onBack, onStartNewSession }) {
   const [entries, setEntries] = useState(null)
   const [loading, setLoading] = useState(true)
   const { username } = useSession()
@@ -33,10 +33,19 @@ export default function LeaderboardPage({ onBack }) {
             ← Back
           </button>
         )}
+        {onStartNewSession && (
+          <button type="button" className="leaderboard-home-btn" onClick={onStartNewSession}>
+            Start New Session
+          </button>
+        )}
         <div className="leaderboard-page-title">
           <div className="leaderboard-logo-icon">S</div>
           <h1>Leaderboard</h1>
         </div>
+      </div>
+      <div className="leaderboard-cup-bar">
+        <span className="leaderboard-cup-title">SPONGE POP-UP CUP</span>
+        <span className="leaderboard-session-label">Session 6</span>
       </div>
       <div className="leaderboard-page-content">
         {loading ? (
