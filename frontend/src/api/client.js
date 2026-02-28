@@ -2,7 +2,7 @@
 // When the backend is ready, replace mock implementations with real fetch calls.
 // Every function signature matches the API contract in AGENTS.md.
 
-const API_BASE = 'http://localhost:8000'
+const API_BASE = import.meta.env.VITE_API_URL || 'https://sponge-backend.vercel.app'
 
 // Flip individual flags as Sri's endpoints go live
 const MOCK = {
