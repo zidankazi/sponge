@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 import store
 from gemini.client import call_gemini
+from models.session import Session
 
 router = APIRouter(tags=["prompt"])
 
@@ -38,7 +39,10 @@ async def handle_prompt(body: PromptRequest):
     """
     session = store.sessions.get(body.session_id)
     if session is None:
-        raise HTTPException(status_code=404, detail="Session not found")
+        # Serverless (Vercel): session may not survive across invocations.
+        # Auto-create so the prompt flow works even if the container restarted.
+        session = Session(session_id=body.session_id)
+        store.sessions[body.session_id] = session
 
     history = [msg.model_dump() for msg in body.conversation_history]
 
