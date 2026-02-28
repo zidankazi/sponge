@@ -40,15 +40,20 @@ export function SessionProvider({ children }) {
   const beginSession = useCallback(async (name) => {
     const resolvedName = name && name.trim() ? name.trim() : 'Anonymous'
     setUsername(resolvedName)
-    const { session_id } = await startSession(resolvedName)
-    setSessionId(session_id)
-    setView('session')
-    setTimeLeft(TOTAL_TIME)
-    setChatHistory([])
-    setResults(null)
-    setActiveFile('rq/job.py')
-    setOpenFiles(['rq/job.py'])
-    setFileBuffers({ ...fileContents })
+    try {
+      const { session_id } = await startSession(resolvedName)
+      setSessionId(session_id)
+      setView('session')
+      setTimeLeft(TOTAL_TIME)
+      setChatHistory([])
+      setResults(null)
+      setActiveFile('rq/job.py')
+      setOpenFiles(['rq/job.py'])
+      setFileBuffers({ ...fileContents })
+    } catch {
+      // ErrorBanner already showing via onApiError — stay on landing screen
+      setUsername('')
+    }
   }, [])
 
   const openFile = useCallback((path) => {
@@ -115,7 +120,7 @@ export function SessionProvider({ children }) {
       setResults(res)
       setView('results')
     } catch {
-      // fallback
+      // ErrorBanner shows via onApiError — stay in session so user can retry
     } finally {
       setIsSubmitting(false)
     }

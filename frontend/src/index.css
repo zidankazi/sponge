@@ -1563,3 +1563,41 @@ a {
   background: var(--bg-hover);
   border-color: var(--green);
 }
+
+/* ── Error Banner ─────────────────────────────────────────────────── */
+
+.error-banner {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px;
+  background: var(--red, #e74c3c);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 0 0 8px 8px;
+  transition: transform 0.3s ease;
+}
+
+.error-banner--visible {
+  transform: translateX(-50%) translateY(0);
+}
+
+.error-banner-close {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 2px;
+  opacity: 0.7;
+}
+
+.error-banner-close:hover {
+  opacity: 1;
+}
