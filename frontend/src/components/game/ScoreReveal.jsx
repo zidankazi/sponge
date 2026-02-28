@@ -81,7 +81,7 @@ export default function ScoreReveal({ score, badge, interpretation, breakdown, o
           </div>
           <div className="score-reveal-hero-text">
             <h2 className="score-reveal-title">System Integrity Score</h2>
-            <p className="score-reveal-subtitle">Your session was evaluated against problem solving, code quality, verification, and communication.</p>
+            <p className="score-reveal-subtitle">Your session was evaluated against the Meta-style rubric: Problem Solving, Code Quality, Verification, and Communication.</p>
             <div className={`score-reveal-badge score-reveal-badge--stagger ${badgeVisible ? 'score-reveal-badge--visible' : ''}`}>
               <Badge badge={badge} />
             </div>

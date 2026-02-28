@@ -8,7 +8,7 @@ const TOTAL_TIME = 60 * 60 // 60 minutes in seconds
 
 export function SessionProvider({ children }) {
   const [sessionId, setSessionId] = useState(null)
-  const [view, setView] = useState('idle') // idle | session | results
+  const [view, setView] = useState('idle') // idle | session | results | leaderboard
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME)
   const [activeFile, setActiveFile] = useState('rq/job.py')
   const [openFiles, setOpenFiles] = useState(['rq/job.py'])
@@ -140,6 +140,7 @@ export function SessionProvider({ children }) {
       value={{
         sessionId,
         view,
+        setView,
         timeLeft,
         totalTime: TOTAL_TIME,
         activeFile,

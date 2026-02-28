@@ -43,10 +43,6 @@ export default function LeaderboardPage({ onBack, onStartNewSession }) {
           <h1>Leaderboard</h1>
         </div>
       </div>
-      <div className="leaderboard-cup-bar">
-        <span className="leaderboard-cup-title">SPONGE POP-UP CUP</span>
-        <span className="leaderboard-session-label">Session 6</span>
-      </div>
       <div className="leaderboard-page-content">
         {loading ? (
           <div className="leaderboard-loading">
@@ -57,7 +53,7 @@ export default function LeaderboardPage({ onBack, onStartNewSession }) {
             <span>Loading scores...</span>
           </div>
         ) : (
-          <Leaderboard entries={entries} currentUser={username} />
+          <Leaderboard entries={entries} currentUser={username} sessionLabel="Session 6" />
         )}
       </div>
     </div>

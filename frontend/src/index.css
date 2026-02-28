@@ -240,6 +240,24 @@ a {
   transform: scale(0.98);
 }
 
+.landing-leaderboard-link {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 24px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.landing-leaderboard-link:hover {
+  color: var(--green-mid);
+}
+
 .landing-footnote {
   margin-top: 16px;
   color: var(--text-dim);
@@ -1917,39 +1935,58 @@ a {
   font-weight: 700;
 }
 
-/* Fortnite-style leaderboard: two-column + cup bar */
-.leaderboard-cup-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 20px;
-  background: var(--bg-surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  margin-bottom: 16px;
-}
-
-.leaderboard-cup-title {
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: var(--cream);
-}
-
-.leaderboard-session-label {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
+/* Fortnite-style leaderboard: vertical cup strip + list + stats (Paper) */
 .leaderboard--fortnite {
   display: grid;
-  grid-template-columns: 1fr 280px;
+  grid-template-columns: 1fr 300px;
   gap: 24px;
   align-items: start;
 }
 
+.leaderboard-left {
+  display: flex;
+  min-width: 0;
+  gap: 16px;
+}
+
+.leaderboard-cup-strip {
+  flex-shrink: 0;
+  width: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px 10px;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  min-height: 140px;
+}
+
+.leaderboard-cup-strip-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--cream);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.leaderboard-cup-strip-session {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 20px;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+}
+
 .leaderboard-list-panel {
   min-width: 0;
+  flex: 1;
 }
 
 .leaderboard-row--selected {
@@ -1966,12 +2003,24 @@ a {
   top: 16px;
 }
 
+.leaderboard-stats-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
 .leaderboard-stats-title {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: var(--text-dim);
-  margin-bottom: 20px;
+}
+
+.leaderboard-stats-with {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--green-mid);
 }
 
 .leaderboard-stats-radial {
@@ -2026,11 +2075,78 @@ a {
   font-size: 13px;
   color: var(--text-secondary);
   text-align: center;
+  margin-bottom: 20px;
+}
+
+.leaderboard-general-stats {
+  margin-bottom: 16px;
+}
+
+.leaderboard-general-stats-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+
+.leaderboard-general-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.leaderboard-general-stat {
+  background: var(--bg-root);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.leaderboard-general-stat-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.leaderboard-general-stat-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cream);
+}
+
+.leaderboard-stats-hint {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.45;
+  margin: 0;
 }
 
 @media (max-width: 720px) {
   .leaderboard--fortnite {
     grid-template-columns: 1fr;
+  }
+  .leaderboard-left {
+    flex-direction: column;
+  }
+  .leaderboard-cup-strip {
+    width: 100%;
+    min-height: auto;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .leaderboard-cup-strip-title,
+  .leaderboard-cup-strip-session {
+    writing-mode: horizontal-tb;
+    transform: none;
+  }
+  .leaderboard-cup-strip-session {
+    margin-top: 0;
   }
   .leaderboard-stats-panel {
     position: static;
