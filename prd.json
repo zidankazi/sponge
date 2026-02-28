@@ -15,7 +15,7 @@
     {
       "id": "G-01",
       "title": "Badge component",
-      "status": "pending",
+      "status": "complete",
       "branch": "josh/game",
       "files": [
         "frontend/src/components/game/Badge.jsx",
@@ -23,10 +23,22 @@
       ],
       "description": "Build a visual Badge component for the four scoring tiers. Each tier has a distinct color and a small icon prefix. Used in ResultsScreen, Leaderboard, and LeaderboardPage.",
       "tiers": {
-        "AI Collaborator": { "range": "85-100", "color": "green" },
-        "On Your Way":     { "range": "70-84",  "color": "blue" },
-        "Needs Work":      { "range": "50-69",  "color": "yellow" },
-        "Just Vibing":     { "range": "0-49",   "color": "red" }
+        "AI Collaborator": {
+          "range": "85-100",
+          "color": "green"
+        },
+        "On Your Way": {
+          "range": "70-84",
+          "color": "blue"
+        },
+        "Needs Work": {
+          "range": "50-69",
+          "color": "yellow"
+        },
+        "Just Vibing": {
+          "range": "0-49",
+          "color": "red"
+        }
       },
       "acceptance": [
         "Badge renders a styled pill/chip with the badge text",
@@ -41,7 +53,7 @@
     {
       "id": "G-02",
       "title": "Wire Badge into ResultsScreen",
-      "status": "pending",
+      "status": "complete",
       "branch": "josh/game",
       "depends_on": "G-01",
       "files": [
@@ -58,7 +70,7 @@
     {
       "id": "G-03",
       "title": "Leaderboard component",
-      "status": "pending",
+      "status": "complete",
       "branch": "josh/game",
       "depends_on": "G-01",
       "files": [
@@ -68,7 +80,12 @@
       "description": "Build a functional leaderboard table. Takes an `entries` prop (array from GET /leaderboard). Each row shows rank, username, score, badge, and time completed. The current user's row is highlighted if their username matches.",
       "data_shape": {
         "entries": [
-          { "username": "zidan", "score": 85, "time_completed": "2024-03-01T12:34:56Z", "badge": "AI Collaborator" }
+          {
+            "username": "zidan",
+            "score": 85,
+            "time_completed": "2024-03-01T12:34:56Z",
+            "badge": "AI Collaborator"
+          }
         ]
       },
       "acceptance": [
@@ -84,7 +101,7 @@
     {
       "id": "G-04",
       "title": "LeaderboardPage — header, loading state, empty state",
-      "status": "pending",
+      "status": "complete",
       "branch": "josh/game",
       "depends_on": "G-03",
       "files": [
@@ -104,7 +121,7 @@
     {
       "id": "G-05",
       "title": "ScoreReveal skeleton",
-      "status": "pending",
+      "status": "complete",
       "branch": "josh/game",
       "files": [
         "frontend/src/components/game/ScoreReveal.jsx",
@@ -124,9 +141,13 @@
     {
       "id": "G-06",
       "title": "Wire ScoreReveal + Leaderboard into ResultsScreen",
-      "status": "pending",
+      "status": "complete",
       "branch": "josh/game",
-      "depends_on": ["G-02", "G-04", "G-05"],
+      "depends_on": [
+        "G-02",
+        "G-04",
+        "G-05"
+      ],
       "files": [
         "frontend/src/components/game/ResultsScreen.jsx"
       ],
