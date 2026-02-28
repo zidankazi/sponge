@@ -1,13 +1,13 @@
 // LeaderboardPage — standalone leaderboard view
 // Designer's domain.
-// Header, loading state, back button, passes currentUser for row highlight.
+// Header, loading state (branded spinner), back button, passes currentUser for row highlight.
 
 import { useState, useEffect } from 'react'
 import { fetchLeaderboard } from '../api/client'
 import { useSession } from '../hooks/useSession'
 import Leaderboard from '../components/game/Leaderboard'
 
-export default function LeaderboardPage({ onBack }) {
+export default function LeaderboardPage({ onBack, onStartNewSession }) {
   const [entries, setEntries] = useState(null)
   const [loading, setLoading] = useState(true)
   const { username } = useSession()
@@ -33,6 +33,11 @@ export default function LeaderboardPage({ onBack }) {
             ← Back
           </button>
         )}
+        {onStartNewSession && (
+          <button type="button" className="leaderboard-home-btn" onClick={onStartNewSession}>
+            Start New Session
+          </button>
+        )}
         <div className="leaderboard-page-title">
           <div className="leaderboard-logo-icon">S</div>
           <h1>Leaderboard</h1>
@@ -41,11 +46,14 @@ export default function LeaderboardPage({ onBack }) {
       <div className="leaderboard-page-content">
         {loading ? (
           <div className="leaderboard-loading">
-            <div className="leaderboard-spinner"></div>
+            <div className="leaderboard-spinner">
+              <div className="leaderboard-spinner-ring" aria-hidden />
+              <div className="leaderboard-spinner-logo">S</div>
+            </div>
             <span>Loading scores...</span>
           </div>
         ) : (
-          <Leaderboard entries={entries} currentUser={username} />
+          <Leaderboard entries={entries} currentUser={username} sessionLabel="Session 6" />
         )}
       </div>
     </div>
