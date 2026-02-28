@@ -94,6 +94,8 @@ export function SessionProvider({ children }) {
         session_id: sessionId,
         prompt_text: text,
         conversation_history: [...chatHistory, userMsg],
+        active_file: activeFile,
+        file_contents: fileBuffers,
       })
       const aiMsg = { role: 'assistant', content: response_text }
       setChatHistory((prev) => [...prev, aiMsg])

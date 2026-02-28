@@ -7,10 +7,10 @@ const API_BASE = 'http://localhost:8000'
 // Flip individual flags as Sri's endpoints go live
 const MOCK = {
   startSession: false,   // ✅ Sri done
-  logEvent:     false,   // ✅ Sri done
-  leaderboard:  false,   // ✅ Sri done
-  sendPrompt:   true,    // ⏳ waiting on Gemini
-  submit:       true,    // ⏳ waiting on scoring engine
+  logEvent: false,   // ✅ Sri done
+  leaderboard: false,   // ✅ Sri done
+  sendPrompt: true,    // ⏳ waiting on Gemini
+  submit: true,    // ⏳ waiting on scoring engine
 }
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms))
@@ -62,7 +62,7 @@ export async function startSession(username) {
 
 // ─── POST /prompt ────────────────────────────────────────────────────
 
-export async function sendPrompt({ session_id, prompt_text, conversation_history }) {
+export async function sendPrompt({ session_id, prompt_text, conversation_history, active_file, file_contents }) {
   if (MOCK.sendPrompt) {
     await delay(800 + Math.random() * 1200)
     return { response_text: getMockResponse(prompt_text) }
@@ -71,7 +71,7 @@ export async function sendPrompt({ session_id, prompt_text, conversation_history
     const res = await safeFetch(`${API_BASE}/prompt`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ session_id, prompt_text, conversation_history }),
+      body: JSON.stringify({ session_id, prompt_text, conversation_history, active_file, file_contents }),
     }, { endpoint: 'prompt' })
     return res.json()
   } catch {
