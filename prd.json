@@ -1,0 +1,81 @@
+{
+  "project": "Sponge — frontend core (zidan/editor branch)",
+  "instructions": "Read AGENTS.md and FRONTEND_AGENTS.md first. Each story must be implemented completely, then verified with `cd frontend && npm run build` (must produce 0 errors). After a story passes: mark it complete here, append learnings to progress.txt, commit. Move to the next pending story.",
+  "stories": [
+    {
+      "id": "S-01",
+      "title": "Auto-submit when timer expires",
+      "status": "pending",
+      "files": ["frontend/src/hooks/useSession.jsx"],
+      "description": "When the countdown timer reaches 0, automatically call submit() so the session ends and the user sees their results. Currently the timer stops at 0 but nothing happens.",
+      "acceptance": [
+        "When timeLeft hits 0, submit() is called automatically",
+        "The submit is not called if isSubmitting is already true (guard against double-submit)",
+        "The existing manual Submit button still works unchanged",
+        "npm run build passes with 0 errors"
+      ]
+    },
+    {
+      "id": "S-02",
+      "title": "Username capture on landing screen",
+      "status": "pending",
+      "files": [
+        "frontend/src/components/game/LandingScreen.jsx",
+        "frontend/src/hooks/useSession.jsx",
+        "frontend/src/index.css"
+      ],
+      "description": "Add a name input field to the LandingScreen before the Start button. The username is optional — if left blank, default to 'Anonymous'. Store it in session state and include it when calling submitSession so the backend can put it on the leaderboard.",
+      "acceptance": [
+        "LandingScreen has a text input labeled 'Your name' above the Start button",
+        "Input is optional — blank defaults to 'Anonymous'",
+        "Username is stored in useSession state",
+        "submitSession is called with { session_id, final_code, username }",
+        "api/client.js startSession and submitSession signatures updated to include username",
+        "Styled consistently with existing landing card (use existing CSS vars, no inline styles)",
+        "npm run build passes with 0 errors"
+      ]
+    },
+    {
+      "id": "S-03",
+      "title": "Debounce file_edit event logging",
+      "status": "pending",
+      "files": ["frontend/src/hooks/useSession.jsx"],
+      "description": "updateFileContent currently calls logEvent('file_edit') on every single keystroke. This would flood the backend with thousands of events. Debounce it so file_edit is only logged after the user stops typing for 1500ms.",
+      "acceptance": [
+        "logEvent for file_edit fires at most once per 1500ms of inactivity per file",
+        "The debounce timer resets if the user keeps typing",
+        "fileBuffers still update immediately on every keystroke (only the logEvent is debounced)",
+        "No additional libraries added — implement with useRef and setTimeout/clearTimeout",
+        "npm run build passes with 0 errors"
+      ]
+    },
+    {
+      "id": "S-04",
+      "title": "Fix missing ProblemStatement CSS classes",
+      "status": "pending",
+      "files": [
+        "frontend/src/components/editor/ProblemStatement.jsx",
+        "frontend/src/index.css"
+      ],
+      "description": "Read ProblemStatement.jsx and identify every CSS class it uses. Cross-reference with index.css and add any missing classes so the problem statement renders correctly with proper spacing and typography.",
+      "acceptance": [
+        "Every className used in ProblemStatement.jsx has a corresponding rule in index.css",
+        "The .problem-context section is styled like .problem-requirements (same heading style, same body text style)",
+        "No visual regressions to other components",
+        "npm run build passes with 0 errors"
+      ]
+    },
+    {
+      "id": "S-05",
+      "title": "Username shown in user chat avatar",
+      "status": "pending",
+      "files": ["frontend/src/components/chat/ChatTerminal.jsx"],
+      "description": "The user's chat avatar currently shows a hardcoded 'Y'. It should show the first letter of the username from session state. Requires S-02 to be complete first.",
+      "acceptance": [
+        "User avatar shows first character of username (uppercased), e.g. 'Z' for 'zidan'",
+        "Falls back to 'Y' if username is not set",
+        "npm run build passes with 0 errors"
+      ]
+    }
+  ]
+}
