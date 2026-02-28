@@ -28,7 +28,7 @@
     {
       "id": "S-02",
       "title": "Username capture on landing screen",
-      "status": "pending",
+      "status": "complete",
       "branch": "zidan/editor",
       "ownership_note": "LandingScreen.jsx is physically in components/game/ but is owned by Zidan for session flow. Josh does not touch LandingScreen.",
       "files": [

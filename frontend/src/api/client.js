@@ -52,7 +52,7 @@ export async function logEvent({ session_id, event, file, ts }) {
 
 // ─── POST /submit ────────────────────────────────────────────────────
 
-export async function submitSession({ session_id, final_code }) {
+export async function submitSession({ session_id, final_code, username }) {
   if (USE_MOCK) {
     await delay(1500)
     return {
@@ -81,7 +81,7 @@ export async function submitSession({ session_id, final_code }) {
   const res = await fetch(`${API_BASE}/submit`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ session_id, final_code }),
+    body: JSON.stringify({ session_id, final_code, username }),
   })
   return res.json()
 }
