@@ -38,16 +38,22 @@ export function SessionProvider({ children }) {
   }, [view])
 
   const beginSession = useCallback(async (name) => {
-    setUsername(name && name.trim() ? name.trim() : 'Anonymous')
-    const { session_id } = await startSession()
-    setSessionId(session_id)
-    setView('session')
-    setTimeLeft(TOTAL_TIME)
-    setChatHistory([])
-    setResults(null)
-    setActiveFile('rq/job.py')
-    setOpenFiles(['rq/job.py'])
-    setFileBuffers({ ...fileContents })
+    const resolvedName = name && name.trim() ? name.trim() : 'Anonymous'
+    setUsername(resolvedName)
+    try {
+      const { session_id } = await startSession(resolvedName)
+      setSessionId(session_id)
+      setView('session')
+      setTimeLeft(TOTAL_TIME)
+      setChatHistory([])
+      setResults(null)
+      setActiveFile('rq/job.py')
+      setOpenFiles(['rq/job.py'])
+      setFileBuffers({ ...fileContents })
+    } catch {
+      // ErrorBanner already showing via onApiError — stay on landing screen
+      setUsername('')
+    }
   }, [])
 
   const openFile = useCallback((path) => {
@@ -88,6 +94,8 @@ export function SessionProvider({ children }) {
         session_id: sessionId,
         prompt_text: text,
         conversation_history: [...chatHistory, userMsg],
+        active_file: activeFile,
+        file_contents: fileBuffers,
       })
       const aiMsg = { role: 'assistant', content: response_text }
       setChatHistory((prev) => [...prev, aiMsg])
@@ -114,7 +122,7 @@ export function SessionProvider({ children }) {
       setResults(res)
       setView('results')
     } catch {
-      // fallback
+      // ErrorBanner shows via onApiError — stay in session so user can retry
     } finally {
       setIsSubmitting(false)
     }

@@ -184,6 +184,12 @@ export default function ChatTerminal() {
           placeholder="Ask the AI for help..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+              e.preventDefault()
+              handleSubmit(e)
+            }
+          }}
           disabled={isAiLoading}
         />
         <button

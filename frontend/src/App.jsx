@@ -3,6 +3,7 @@ import LandingScreen from './components/game/LandingScreen'
 import Layout from './components/shared/Layout'
 import ResultsScreen from './components/game/ResultsScreen'
 import LeaderboardPage from './pages/LeaderboardPage'
+import ErrorBanner from './components/ErrorBanner'
 
 function AppInner() {
   const { view, setView, resetSession } = useSession()
@@ -23,6 +24,7 @@ function AppInner() {
 export default function App() {
   return (
     <SessionProvider>
+      <ErrorBanner />
       <AppInner />
     </SessionProvider>
   )

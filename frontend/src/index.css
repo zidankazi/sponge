@@ -2152,3 +2152,90 @@ a {
     position: static;
   }
 }
+
+/* ── Error Banner ─────────────────────────────────────────────────── */
+
+.error-banner {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px;
+  background: var(--red, #e74c3c);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 0 0 8px 8px;
+  transition: transform 0.3s ease;
+}
+
+.error-banner--visible {
+  transform: translateX(-50%) translateY(0);
+}
+
+.error-banner-close {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 2px;
+  opacity: 0.7;
+}
+
+.error-banner-close:hover {
+  opacity: 1;
+}
+
+/* ── Timer urgency states ─────────────────────────────────────────── */
+
+.timer--urgent {
+  color: var(--yellow);
+}
+
+.timer--critical {
+  color: var(--red);
+  animation: timer-pulse 0.5s ease-in-out infinite;
+}
+
+@keyframes timer-pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ── Submitting overlay ───────────────────────────────────────────── */
+
+.submitting-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.submitting-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--green-light);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}

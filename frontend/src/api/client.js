@@ -7,40 +7,77 @@ const API_BASE = 'http://localhost:8000'
 // Flip individual flags as Sri's endpoints go live
 const MOCK = {
   startSession: false,   // ✅ Sri done
-  logEvent:     false,   // ✅ Sri done
-  leaderboard:  false,   // ✅ Sri done
-  sendPrompt:   true,    // ⏳ waiting on Gemini
-  submit:       true,    // ⏳ waiting on scoring engine
+  logEvent: false,   // ✅ Sri done
+  leaderboard: false,   // ✅ Sri done
+  sendPrompt: true,    // ⏳ waiting on Gemini
+  submit: true,    // ⏳ waiting on scoring engine
 }
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms))
 
 let eventLog = []
 
+// ─── Error handling ───────────────────────────────────────────────────
+
+// Subscribers get called with { message, endpoint, retriable }
+const errorListeners = new Set()
+export function onApiError(fn) {
+  errorListeners.add(fn)
+  return () => errorListeners.delete(fn)
+}
+function emitError(message, endpoint, retriable = false) {
+  errorListeners.forEach((fn) => fn({ message, endpoint, retriable }))
+}
+
+async function safeFetch(url, options, { endpoint, silent = false } = {}) {
+  const res = await fetch(url, options)
+  if (!res.ok) {
+    const text = await res.text().catch(() => '')
+    const msg = `${endpoint} failed (${res.status})`
+    if (!silent) emitError(msg, endpoint)
+    throw new Error(msg + ': ' + text)
+  }
+  return res
+}
+
 // ─── POST /session/start ─────────────────────────────────────────────
 
-export async function startSession() {
+export async function startSession(username) {
   if (MOCK.startSession) {
     await delay(300)
     return { session_id: 'sponge_' + Math.random().toString(36).slice(2, 10) }
   }
-  const res = await fetch(`${API_BASE}/session/start`, { method: 'POST' })
-  return res.json()
+  try {
+    const res = await safeFetch(`${API_BASE}/session/start`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username }),
+    }, { endpoint: 'session/start' })
+    return res.json()
+  } catch (err) {
+    emitError('Could not start session — is the backend running?', 'session/start')
+    throw err
+  }
 }
 
 // ─── POST /prompt ────────────────────────────────────────────────────
 
-export async function sendPrompt({ session_id, prompt_text, conversation_history }) {
+export async function sendPrompt({ session_id, prompt_text, conversation_history, active_file, file_contents }) {
   if (MOCK.sendPrompt) {
     await delay(800 + Math.random() * 1200)
     return { response_text: getMockResponse(prompt_text) }
   }
-  const res = await fetch(`${API_BASE}/prompt`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ session_id, prompt_text, conversation_history }),
-  })
-  return res.json()
+  try {
+    const res = await safeFetch(`${API_BASE}/prompt`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id, prompt_text, conversation_history, active_file, file_contents }),
+    }, { endpoint: 'prompt' })
+    return res.json()
+  } catch {
+    emitError('AI assistant unavailable — try again', 'prompt', true)
+    return { response_text: '_The AI assistant is temporarily unavailable. Please try again._' }
+  }
 }
 
 // ─── POST /session/event ─────────────────────────────────────────────
@@ -50,11 +87,15 @@ export async function logEvent({ session_id, event, file, ts }) {
     eventLog.push({ session_id, event, file, ts })
     return {}
   }
-  await fetch(`${API_BASE}/session/event`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ session_id, event, file, ts }),
-  })
+  try {
+    await safeFetch(`${API_BASE}/session/event`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id, event, file, ts }),
+    }, { endpoint: 'session/event', silent: true })
+  } catch {
+    // Non-critical — swallow silently so the session doesn't break
+  }
   return {}
 }
 
@@ -86,12 +127,17 @@ export async function submitSession({ session_id, final_code, username }) {
       badge: 'On Your Way',
     }
   }
-  const res = await fetch(`${API_BASE}/submit`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ session_id, final_code, username }),
-  })
-  return res.json()
+  try {
+    const res = await safeFetch(`${API_BASE}/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id, final_code, username }),
+    }, { endpoint: 'submit' })
+    return res.json()
+  } catch (err) {
+    emitError('Submission failed — please try again', 'submit', true)
+    throw err
+  }
 }
 
 // ─── GET /leaderboard ────────────────────────────────────────────────
@@ -105,8 +151,13 @@ export async function fetchLeaderboard() {
       { username: 'bob', score: 58, time_completed: '2024-03-01T14:30:00Z', badge: 'Needs Work' },
     ]
   }
-  const res = await fetch(`${API_BASE}/leaderboard`)
-  return res.json()
+  try {
+    const res = await safeFetch(`${API_BASE}/leaderboard`, {}, { endpoint: 'leaderboard' })
+    return res.json()
+  } catch {
+    emitError('Could not load leaderboard', 'leaderboard')
+    return []
+  }
 }
 
 // ─── Mock response generator ─────────────────────────────────────────
