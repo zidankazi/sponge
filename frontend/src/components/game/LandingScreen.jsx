@@ -16,19 +16,17 @@ export default function LandingScreen() {
     }
   }
 
+  // SVG-only logos — consistent color treatment on dark background
   const companies = [
-    { name: 'Nvidia', logo: '/logos/nvidia.svg' },
-    { name: 'Meta', logo: '/logos/meta.svg' },
-    { name: 'Canva', logo: '/logos/canva.svg' },
-    { name: 'Shopify', logo: '/logos/shopify.svg' },
-    { name: 'Google', logo: '/logos/google.svg' },
-    { name: 'Rippling', logo: '/logos/rippling.png' },
-    { name: 'OpenAI', logo: '/logos/openai.svg' },
-    { name: 'Cursor', logo: '/logos/cursor.png' },
-    { name: 'LangChain', logo: '/logos/langchain.png' },
-    { name: 'ElevenLabs', logo: '/logos/elevenlabs.png' },
+    { name: 'Google',    logo: '/logos/google.svg' },
+    { name: 'Meta',      logo: '/logos/meta.svg' },
+    { name: 'OpenAI',    logo: '/logos/openai.svg' },
+    { name: 'Shopify',   logo: '/logos/shopify.svg' },
+    { name: 'Nvidia',    logo: '/logos/nvidia.svg' },
     { name: 'Atlassian', logo: '/logos/atlassian.svg' },
-    { name: 'Oracle', logo: '/logos/oracle.svg' }
+    { name: 'Canva',     logo: '/logos/canva.svg' },
+    { name: 'Oracle',    logo: '/logos/oracle.svg' },
+    { name: 'Cursor',    logo: '/logos/cursor.svg' },
   ]
 
   return (

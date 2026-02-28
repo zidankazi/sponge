@@ -290,20 +290,21 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.6;
-  transition: opacity 0.2s;
-}
-
-.marquee-item:hover {
-  opacity: 1;
 }
 
 .marquee-logo {
-  height: 28px;
+  height: 22px;
   width: auto;
-  max-width: 140px;
+  max-width: 120px;
   object-fit: contain;
-  filter: grayscale(100%) brightness(2) contrast(0.8);
+  /* Force all logos to pure white, then pull back opacity for muted look */
+  filter: brightness(0) invert(1);
+  opacity: 0.45;
+  transition: opacity 0.2s;
+}
+
+.marquee-item:hover .marquee-logo {
+  opacity: 0.85;
 }
 
 @keyframes scroll-left {
