@@ -48,7 +48,7 @@ Starts a new interview session.
 ```
 
 ### `POST /prompt`
-Sends a user prompt to the AI assistant.
+Sends a user prompt to the AI assistant with codebase context.
 ```json
 // Request
 {
@@ -57,7 +57,9 @@ Sends a user prompt to the AI assistant.
   "conversation_history": [
     { "role": "user", "content": "..." },
     { "role": "assistant", "content": "..." }
-  ]
+  ],
+  "active_file": "rq/worker.py",
+  "file_contents": { "rq/worker.py": "...", "rq/queue.py": "..." }
 }
 
 // Response
@@ -86,7 +88,8 @@ Submits the session for scoring.
 // Request
 {
   "session_id": "sponge_abc123",
-  "final_code": "// all file contents concatenated"
+  "final_code": "// all file contents concatenated",
+  "username": "alice"
 }
 
 // Response
@@ -123,14 +126,16 @@ Returns the leaderboard.
 ]
 ```
 
-## Scoring System (6 categories, 0-100 final score)
+## Scoring System (5 categories + penalties, 0-100 final score)
 
-1. **Request Timing** (15pts) — Did they engage with the problem before prompting AI?
-2. **Request Quality** (20pts) — Were prompts specific, contextual, bounded?
-3. **Response Handling** (20pts) — Did they modify AI code or blindly paste it?
-4. **Verification Discipline** (20pts) — Did they run tests after AI output?
-5. **Iterative Collaboration** (15pts) — Did they work in prompt > action > result loops?
-6. **Misuse Penalties** (up to -10pts) — Prompt spam, blind adoption, failure outsourcing
+Each positive category is scored 0-10, summed to 0-50, then scaled to 0-100.
+
+1. **Request Timing** (0-10) — Did they engage with the problem before prompting AI?
+2. **Request Quality** (0-10) — Were prompts specific, contextual, bounded?
+3. **Response Handling** (0-10) — Did they modify AI code or blindly paste it?
+4. **Verification Discipline** (0-10) — Did they run tests after AI output?
+5. **Iterative Collaboration** (0-10) — Did they work in prompt > action > result loops?
+6. **Penalties** (0 to -10 on 0-50 scale) — Blind AI adoption, never running tests
 
 ## Badges
 

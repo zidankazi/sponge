@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from pydantic import BaseModel, Field
 
@@ -6,10 +6,15 @@ from models.event import Event
 from models.score import Score
 
 
+def _utcnow():
+    return datetime.now(timezone.utc)
+
+
 class Session(BaseModel):
     session_id: str
     username: Optional[str] = None
-    started_at: datetime = Field(default_factory=datetime.utcnow)
+    started_at: datetime = Field(default_factory=_utcnow)
+    completed_at: Optional[datetime] = None
     events: list[Event] = Field(default_factory=list)
     conversation_history: list[dict] = Field(default_factory=list)
     final_code: Optional[str] = None

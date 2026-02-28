@@ -403,12 +403,14 @@ def _score_verification_discipline(session: Session) -> int:
         score += 1      # ran once near end
     # else 0: never ran
 
-    # C3 — validated AI output (test_run after prompt window)
+    # C3 — validated AI output (test_run within each prompt's window, not just "any later test")
     if prompt_events and test_events:
-        tests_after_ai = sum(
-            1 for p_event in prompt_events
-            if any(t.ts > p_event.ts for t in test_events)
-        )
+        tests_after_ai = 0
+        for i, p_event in enumerate(prompt_events):
+            window_start = p_event.ts
+            window_end = prompt_events[i + 1].ts if i + 1 < len(prompt_events) else float("inf")
+            if any(window_start < t.ts < window_end for t in test_events):
+                tests_after_ai += 1
         if tests_after_ai >= 2:
             score += 3
         elif tests_after_ai == 1:
@@ -493,25 +495,31 @@ def _score_penalties(session: Session, metrics: HeadlineMetrics) -> int:
     """
     Rubric penalties P1 and P2, capped at -10 to fit the breakdown field.
 
-    P1 (over-reliance on AI):
-      -5  if blind_adoption_rate > 0.5  (copies without review regularly)
-      -10 if blind_adoption_rate > 0.8  (copies almost always)
+    The engine works on a 0-50 raw scale that maps to 0-100 via (raw/50)*100,
+    so rubric penalty values are halved:
 
-    P2 (no-run):
-      -5 if zero test_run events (partial — full -10 would push total below 0)
+    P1 (over-reliance on AI) — rubric: 0 / -5 / -10 / -15 on 0-100:
+      -3  if blind_adoption_rate > 0.4  (copies without review regularly)     → ~-6 on 0-100
+      -5  if blind_adoption_rate > 0.6  (AI decides core algorithm)           → -10 on 0-100
+      -8  if blind_adoption_rate > 0.8  (accepts with minimal understanding)  → -16 on 0-100
+
+    P2 (no-run) — rubric: -10 on 0-100:
+      -5  if zero test_run events  → -10 on 0-100
     """
     penalty = 0
     test_events = _events_of(session, "test_run")
 
-    # P2 — never ran tests
+    # P2 — never ran tests (rubric: -10 on 0-100 → -5 on 0-50)
     if not test_events:
         penalty -= 5
 
-    # P1 — over-reliance
+    # P1 — over-reliance on AI (rubric: -5/-10/-15 on 0-100)
     if metrics.blind_adoption_rate > 0.8:
-        penalty -= 5
-    elif metrics.blind_adoption_rate > 0.5:
-        penalty -= 2
+        penalty -= 8    # worst tier: accepts AI with minimal understanding
+    elif metrics.blind_adoption_rate > 0.6:
+        penalty -= 5    # mid tier: AI decides core algorithm without justification
+    elif metrics.blind_adoption_rate > 0.4:
+        penalty -= 3    # mild tier: repeatedly copies without review
 
     return max(-10, penalty)
 
@@ -579,7 +587,7 @@ def _build_interpretation(total: int, breakdown: ScoreBreakdown, metrics: Headli
         parts.append("Lean more into iterative AI dialogue — ask for clarification, challenge suggestions, and refine your approach across turns.")
 
     # Penalties note
-    if metrics.blind_adoption_rate > 0.5:
+    if metrics.blind_adoption_rate > 0.4:
         parts.append(f"Penalty applied: {round(metrics.blind_adoption_rate * 100)}% of AI responses were applied without any code edits.")
     if not _has_any_tests_signal(breakdown):
         parts.append("Penalty applied: no test runs were detected during the session.")

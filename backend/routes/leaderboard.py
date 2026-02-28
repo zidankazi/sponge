@@ -34,7 +34,7 @@ async def get_leaderboard():
                 username=session.username or "Anonymous",
                 score=session.score.total_score,
                 badge=session.score.badge,
-                time_completed=session.started_at.isoformat() + "Z",
+                time_completed=(session.completed_at or session.started_at).isoformat() + "Z",
             )
         )
 
