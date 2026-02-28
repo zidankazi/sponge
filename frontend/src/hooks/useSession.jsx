@@ -38,8 +38,9 @@ export function SessionProvider({ children }) {
   }, [view])
 
   const beginSession = useCallback(async (name) => {
-    setUsername(name && name.trim() ? name.trim() : 'Anonymous')
-    const { session_id } = await startSession()
+    const resolvedName = name && name.trim() ? name.trim() : 'Anonymous'
+    setUsername(resolvedName)
+    const { session_id } = await startSession(resolvedName)
     setSessionId(session_id)
     setView('session')
     setTimeLeft(TOTAL_TIME)

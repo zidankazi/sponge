@@ -19,12 +19,16 @@ let eventLog = []
 
 // ─── POST /session/start ─────────────────────────────────────────────
 
-export async function startSession() {
+export async function startSession(username) {
   if (MOCK.startSession) {
     await delay(300)
     return { session_id: 'sponge_' + Math.random().toString(36).slice(2, 10) }
   }
-  const res = await fetch(`${API_BASE}/session/start`, { method: 'POST' })
+  const res = await fetch(`${API_BASE}/session/start`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username }),
+  })
   return res.json()
 }
 
