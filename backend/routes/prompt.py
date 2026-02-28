@@ -49,8 +49,14 @@ async def handle_prompt(body: PromptRequest):
         file_contents=body.file_contents,
     )
 
-    # Persist the new exchange so the scoring engine can read it later
-    session.conversation_history = history + [
+    # Persist the exchange for the scoring engine.
+    # The frontend includes the current user message in conversation_history,
+    # so strip it to avoid duplication before appending the full exchange.
+    prior_history = history
+    if history and history[-1].get("role") == "user":
+        prior_history = history[:-1]
+
+    session.conversation_history = prior_history + [
         {"role": "user", "content": body.prompt_text},
         {"role": "assistant", "content": response_text},
     ]
