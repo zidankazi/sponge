@@ -22,3 +22,5 @@ Key architecture facts (read before implementing):
 [S-02] Username capture on landing screen — added username state to useSession, beginSession(name) accepts name param, defaults to 'Anonymous' if blank. LandingScreen has local state for input, passes to beginSession on click. submitSession now passes username field. CSS for input appended to end of index.css.
 
 [S-03] Debounce file_edit event logging — added editDebounceRef = useRef(null), clearTimeout/setTimeout(1500ms) wrapping logEvent in updateFileContent. fileBuffers still update immediately on every keystroke.
+
+[S-04] Fix missing ProblemStatement CSS — .problem-context was the only missing class. Added h4 and p rules matching .problem-requirements style. Appended to end of index.css. ProblemStatement.jsx needed no changes.

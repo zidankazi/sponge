@@ -67,7 +67,7 @@
     {
       "id": "S-04",
       "title": "Fix missing ProblemStatement CSS classes",
-      "status": "pending",
+      "status": "complete",
       "branch": "zidan/editor",
       "files": [
         "frontend/src/components/editor/ProblemStatement.jsx",
