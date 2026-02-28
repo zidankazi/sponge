@@ -17,6 +17,7 @@ export function SessionProvider({ children }) {
   const [isAiLoading, setIsAiLoading] = useState(false)
   const [results, setResults] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [username, setUsername] = useState('Anonymous')
   const timerRef = useRef(null)
 
   // Start countdown timer
@@ -42,7 +43,8 @@ export function SessionProvider({ children }) {
     }
   }, [timeLeft, view, isSubmitting, submit])
 
-  const beginSession = useCallback(async () => {
+  const beginSession = useCallback(async (name) => {
+    setUsername(name && name.trim() ? name.trim() : 'Anonymous')
     const { session_id } = await startSession()
     setSessionId(session_id)
     setView('session')
@@ -111,7 +113,7 @@ export function SessionProvider({ children }) {
       .join('\n\n')
 
     try {
-      const res = await submitSession({ session_id: sessionId, final_code: allCode })
+      const res = await submitSession({ session_id: sessionId, final_code: allCode, username })
       setResults(res)
       setView('results')
     } catch {
@@ -119,7 +121,7 @@ export function SessionProvider({ children }) {
     } finally {
       setIsSubmitting(false)
     }
-  }, [sessionId, fileBuffers])
+  }, [sessionId, fileBuffers, username])
 
   const resetSession = useCallback(() => {
     setView('idle')
@@ -143,6 +145,7 @@ export function SessionProvider({ children }) {
         isAiLoading,
         results,
         isSubmitting,
+        username,
         beginSession,
         openFile,
         closeFile,

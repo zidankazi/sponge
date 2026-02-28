@@ -1177,3 +1177,39 @@ a {
   background: var(--bg-surface-3);
   color: var(--text);
 }
+
+/* S-02: Username input on landing screen */
+.landing-name-input {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 16px;
+}
+
+.landing-name-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.landing-name-field {
+  padding: 10px 14px;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.landing-name-field::placeholder {
+  color: var(--text-dim);
+}
+
+.landing-name-field:focus {
+  border-color: var(--green);
+}

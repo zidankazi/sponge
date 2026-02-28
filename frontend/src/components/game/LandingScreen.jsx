@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { useSession } from '../../hooks/useSession'
 
 export default function LandingScreen() {
   const { beginSession } = useSession()
+  const [name, setName] = useState('')
 
   return (
     <div className="landing">
@@ -34,7 +36,19 @@ export default function LandingScreen() {
           </div>
         </div>
 
-        <button className="landing-start" onClick={beginSession}>
+        <div className="landing-name-input">
+          <label className="landing-name-label" htmlFor="username-input">Your name</label>
+          <input
+            id="username-input"
+            className="landing-name-field"
+            type="text"
+            placeholder="Anonymous"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+
+        <button className="landing-start" onClick={() => beginSession(name)}>
           Start Session
         </button>
 

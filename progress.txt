@@ -18,3 +18,5 @@ Key architecture facts (read before implementing):
 - fileContents.js is large (~3300 lines) — don't read it in full unless necessary
 
 [S-01] Auto-submit when timer expires — added useEffect watching timeLeft===0 to call submit(). Guarded with !isSubmitting to prevent double-submit. Clean approach: separate effect from the timer countdown effect.
+
+[S-02] Username capture on landing screen — added username state to useSession, beginSession(name) accepts name param, defaults to 'Anonymous' if blank. LandingScreen has local state for input, passes to beginSession on click. submitSession now passes username field. CSS for input appended to end of index.css.
