@@ -37,13 +37,6 @@ export function SessionProvider({ children }) {
     }
   }, [view])
 
-  // Auto-submit when timer expires
-  useEffect(() => {
-    if (view === 'session' && timeLeft === 0 && !isSubmitting) {
-      submit()
-    }
-  }, [timeLeft, view, isSubmitting, submit])
-
   const beginSession = useCallback(async (name) => {
     setUsername(name && name.trim() ? name.trim() : 'Anonymous')
     const { session_id } = await startSession()
@@ -126,6 +119,13 @@ export function SessionProvider({ children }) {
       setIsSubmitting(false)
     }
   }, [sessionId, fileBuffers, username])
+
+  // Auto-submit when timer expires (must be after submit is declared)
+  useEffect(() => {
+    if (view === 'session' && timeLeft === 0 && !isSubmitting) {
+      submit()
+    }
+  }, [timeLeft, view, isSubmitting, submit])
 
   const resetSession = useCallback(() => {
     setView('idle')
