@@ -22,11 +22,11 @@ export default function LandingScreen() {
     { name: 'Canva', logo: '/logos/canva.svg' },
     { name: 'Shopify', logo: '/logos/shopify.svg' },
     { name: 'Google', logo: '/logos/google.svg' },
-    { name: 'Rippling', logo: '/logos/rippling.svg' },
+    { name: 'Rippling', logo: '/logos/rippling.png' },
     { name: 'OpenAI', logo: '/logos/openai.svg' },
-    { name: 'Cursor', logo: '/logos/cursor.svg' },
+    { name: 'Cursor', logo: '/logos/cursor.png' },
     { name: 'LangChain', logo: '/logos/langchain.png' },
-    { name: 'ElevenLabs', logo: '/logos/elevenlabs.svg' },
+    { name: 'ElevenLabs', logo: '/logos/elevenlabs.png' },
     { name: 'Atlassian', logo: '/logos/atlassian.svg' },
     { name: 'Oracle', logo: '/logos/oracle.svg' }
   ]
