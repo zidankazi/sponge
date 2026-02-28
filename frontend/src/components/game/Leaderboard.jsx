@@ -1,7 +1,7 @@
 // Leaderboard — rankings table
 // Designer's domain.
 // Renders rank, username, score, badge, and time for each entry.
-// Highlights current user's row if currentUser prop matches.
+// Highlights current user's row; gold/silver/bronze for top 3; row hover.
 
 import Badge from './Badge'
 
@@ -35,12 +35,21 @@ export default function Leaderboard({ entries, currentUser }) {
         </div>
         {entries.map((entry, i) => {
           const isCurrentUser = currentUser && entry.username === currentUser
+          const rank = i + 1
+          const rankClass =
+            rank === 1
+              ? 'leaderboard-col--rank-1'
+              : rank === 2
+                ? 'leaderboard-col--rank-2'
+                : rank === 3
+                  ? 'leaderboard-col--rank-3'
+                  : ''
           return (
             <div
               key={entry.username + i}
               className={`leaderboard-row ${isCurrentUser ? 'leaderboard-row--current' : ''}`}
             >
-              <span className="leaderboard-col leaderboard-col--rank">{i + 1}</span>
+              <span className={`leaderboard-col leaderboard-col--rank ${rankClass}`}>{rank}</span>
               <span className="leaderboard-col leaderboard-col--name">{entry.username}</span>
               <span className="leaderboard-col leaderboard-col--score">{entry.score}</span>
               <span className="leaderboard-col leaderboard-col--badge">

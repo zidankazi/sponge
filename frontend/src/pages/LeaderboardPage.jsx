@@ -1,6 +1,6 @@
 // LeaderboardPage — standalone leaderboard view
 // Designer's domain.
-// Header, loading state, back button, passes currentUser for row highlight.
+// Header, loading state (branded spinner), back button, passes currentUser for row highlight.
 
 import { useState, useEffect } from 'react'
 import { fetchLeaderboard } from '../api/client'
@@ -41,7 +41,10 @@ export default function LeaderboardPage({ onBack }) {
       <div className="leaderboard-page-content">
         {loading ? (
           <div className="leaderboard-loading">
-            <div className="leaderboard-spinner"></div>
+            <div className="leaderboard-spinner">
+              <div className="leaderboard-spinner-ring" aria-hidden />
+              <div className="leaderboard-spinner-logo">S</div>
+            </div>
             <span>Loading scores...</span>
           </div>
         ) : (

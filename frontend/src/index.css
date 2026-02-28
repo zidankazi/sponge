@@ -1473,12 +1473,36 @@ a {
 }
 
 .leaderboard-spinner {
-  width: 24px;
-  height: 24px;
+  position: relative;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.leaderboard-spinner-ring {
+  position: absolute;
+  inset: 0;
   border: 3px solid var(--border);
   border-top-color: var(--green-light);
   border-radius: 50%;
-  animation: spin 0.6s linear infinite;
+  animation: spin 0.8s linear infinite;
+}
+
+.leaderboard-spinner-logo {
+  position: relative;
+  z-index: 1;
+  font-size: 20px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--cream);
+  animation: leaderboard-spinner-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes leaderboard-spinner-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 
 /* ═══════════════════════════════════════
@@ -1562,4 +1586,101 @@ a {
 .results-leaderboard-btn:hover {
   background: var(--bg-hover);
   border-color: var(--green);
+}
+
+/* ═══════════════════════════════════════
+   GAME POLISH: ScoreReveal animations
+   ═══════════════════════════════════════ */
+
+.score-reveal-number--animate {
+  animation: score-reveal-pop 0.5s ease-out;
+}
+
+@keyframes score-reveal-pop {
+  0% { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.score-reveal-label--stagger,
+.score-reveal-summary--stagger,
+.score-reveal-continue--stagger {
+  opacity: 0;
+  animation: score-reveal-fade-in 0.45s ease-out forwards;
+}
+
+.score-reveal-label--stagger { animation-delay: 0.18s; }
+.score-reveal-summary--stagger { animation-delay: 0.55s; }
+.score-reveal-continue--stagger { animation-delay: 0.85s; }
+
+@keyframes score-reveal-fade-in {
+  to { opacity: 1; }
+}
+
+.score-reveal-badge--stagger {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.45s ease-out, transform 0.45s ease-out;
+}
+
+.score-reveal-badge--stagger.score-reveal-badge--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══════════════════════════════════════
+   GAME POLISH: Badge tier icons
+   ═══════════════════════════════════════ */
+
+.badge-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.badge-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.badge .badge-icon-wrap {
+  color: inherit;
+}
+
+/* ═══════════════════════════════════════
+   GAME POLISH: Leaderboard styling
+   ═══════════════════════════════════════ */
+
+.leaderboard-row:not(.leaderboard-row--header) {
+  transition: background 0.15s ease;
+}
+
+.leaderboard-row:not(.leaderboard-row--header):hover {
+  background: var(--bg-hover);
+}
+
+.leaderboard-row--current {
+  background: var(--green-faint);
+  box-shadow: inset 3px 0 0 var(--green);
+}
+
+.leaderboard-row--current:hover {
+  background: rgba(64, 145, 108, 0.12);
+}
+
+.leaderboard-col--rank-1 {
+  color: #d4af37 !important;
+  font-weight: 700;
+}
+
+.leaderboard-col--rank-2 {
+  color: #c0c0c0 !important;
+  font-weight: 700;
+}
+
+.leaderboard-col--rank-3 {
+  color: #cd7f32 !important;
+  font-weight: 700;
 }
