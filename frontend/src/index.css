@@ -293,10 +293,11 @@ a {
 }
 
 .marquee-logo {
-  height: 22px;
-  width: auto;
-  max-width: 120px;
+  display: block;
+  width: 120px;
+  height: 28px;
   object-fit: contain;
+  object-position: center;
   /* Force all logos to pure white, then pull back opacity for muted look */
   filter: brightness(0) invert(1);
   opacity: 0.45;
