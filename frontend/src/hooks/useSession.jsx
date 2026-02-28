@@ -18,6 +18,8 @@ export function SessionProvider({ children }) {
   const [results, setResults] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [username, setUsername] = useState('Anonymous')
+  const [checkpoints, setCheckpoints] = useState([])
+  const [showHistory, setShowHistory] = useState(false)
   const timerRef = useRef(null)
   const editDebounceRef = useRef(null)
 
@@ -81,6 +83,20 @@ export function SessionProvider({ children }) {
       logEvent({ session_id: sessionId, event: 'file_edit', file: path, ts: Date.now() })
     }, 1500)
   }, [sessionId])
+
+  const saveCheckpoint = useCallback((label) => {
+    const id = Date.now()
+    const resolvedLabel = label || `Checkpoint ${checkpoints.length + 1}`
+    const cp = { id, label: resolvedLabel, ts: id, buffers: { ...fileBuffers } }
+    setCheckpoints((prev) => [cp, ...prev].slice(0, 30))
+  }, [fileBuffers, checkpoints.length])
+
+  const restoreCheckpoint = useCallback((id) => {
+    const cp = checkpoints.find((c) => c.id === id)
+    if (!cp) return
+    setFileBuffers({ ...cp.buffers })
+    setActiveFile((prev) => (cp.buffers[prev] !== undefined ? prev : 'rq/queue.py'))
+  }, [checkpoints])
 
   const sendChat = useCallback(async (text) => {
     const userMsg = { role: 'user', content: text }
@@ -159,6 +175,9 @@ export function SessionProvider({ children }) {
         results,
         isSubmitting,
         username,
+        checkpoints,
+        showHistory,
+        setShowHistory,
         beginSession,
         openFile,
         closeFile,
@@ -166,6 +185,8 @@ export function SessionProvider({ children }) {
         sendChat,
         submit,
         resetSession,
+        saveCheckpoint,
+        restoreCheckpoint,
       }}
     >
       {children}

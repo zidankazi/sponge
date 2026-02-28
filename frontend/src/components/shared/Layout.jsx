@@ -1,4 +1,5 @@
 import Header from './Header'
+import SaveHistory from './SaveHistory'
 import ProblemStatement from '../editor/ProblemStatement'
 import FileTree from '../editor/FileTree'
 import CodeEditor from '../editor/CodeEditor'
@@ -6,7 +7,7 @@ import ChatTerminal from '../chat/ChatTerminal'
 import { useSession } from '../../hooks/useSession'
 
 export default function Layout() {
-  const { isSubmitting } = useSession()
+  const { isSubmitting, showHistory, setShowHistory } = useSession()
 
   return (
     <div className="layout">
@@ -31,6 +32,7 @@ export default function Layout() {
           Grading your session...
         </div>
       )}
+      <SaveHistory open={showHistory} onClose={() => setShowHistory(false)} />
     </div>
   )
 }
