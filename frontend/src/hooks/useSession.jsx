@@ -35,6 +35,13 @@ export function SessionProvider({ children }) {
     }
   }, [view])
 
+  // Auto-submit when timer expires
+  useEffect(() => {
+    if (view === 'session' && timeLeft === 0 && !isSubmitting) {
+      submit()
+    }
+  }, [timeLeft, view, isSubmitting, submit])
+
   const beginSession = useCallback(async () => {
     const { session_id } = await startSession()
     setSessionId(session_id)

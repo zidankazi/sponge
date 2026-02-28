@@ -16,3 +16,5 @@ Key architecture facts (read before implementing):
 - useSession.jsx contains JSX so it must use .jsx extension (learned during setup)
 - No router installed — App.jsx uses view state ('idle' | 'session' | 'results') to switch screens
 - fileContents.js is large (~3300 lines) — don't read it in full unless necessary
+
+[S-01] Auto-submit when timer expires — added useEffect watching timeLeft===0 to call submit(). Guarded with !isSubmitting to prevent double-submit. Clean approach: separate effect from the timer countdown effect.

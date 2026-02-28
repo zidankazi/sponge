@@ -14,7 +14,7 @@
     {
       "id": "S-01",
       "title": "Auto-submit when timer expires",
-      "status": "pending",
+      "status": "complete",
       "branch": "zidan/editor",
       "files": ["frontend/src/hooks/useSession.jsx"],
       "description": "When the countdown timer reaches 0, automatically call submit() so the session ends and the user sees their results. Currently the timer stops at 0 but nothing happens.",
