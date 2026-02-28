@@ -84,7 +84,7 @@
     {
       "id": "S-05",
       "title": "Username initial in chat avatar",
-      "status": "pending",
+      "status": "complete",
       "branch": "zidan/editor",
       "depends_on": "S-02",
       "files": ["frontend/src/components/chat/ChatTerminal.jsx"],

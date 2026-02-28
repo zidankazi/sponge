@@ -113,7 +113,8 @@ function renderInline(text) {
 }
 
 export default function ChatTerminal() {
-  const { chatHistory, isAiLoading, sendChat } = useSession()
+  const { chatHistory, isAiLoading, sendChat, username } = useSession()
+  const userInitial = username ? username[0].toUpperCase() : 'Y'
   const [input, setInput] = useState('')
   const scrollRef = useRef(null)
   const inputRef = useRef(null)
@@ -156,7 +157,7 @@ export default function ChatTerminal() {
         {chatHistory.map((msg, i) => (
           <div key={i} className={`chat-msg chat-msg--${msg.role}`}>
             <div className="chat-msg-avatar">
-              {msg.role === 'user' ? 'Y' : 'AI'}
+              {msg.role === 'user' ? userInitial : 'AI'}
             </div>
             <div className="chat-msg-body">
               {msg.role === 'assistant' ? renderMarkdown(msg.content) : <p>{msg.content}</p>}
