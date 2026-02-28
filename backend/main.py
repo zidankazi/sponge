@@ -10,7 +10,7 @@ app = FastAPI(title="Sponge API", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "https://sponge-alpha.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
