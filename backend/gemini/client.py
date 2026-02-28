@@ -2,53 +2,92 @@
 Gemini API client.
 
 Reads GEMINI_API_KEY from the environment (set in backend/.env).
-Wraps google-generativeai to send conversation history and return response text.
+Wraps google-generativeai to send conversation history, codebase context,
+and active file to Gemini, returning structured guidance as response text.
 """
 
 import os
+from typing import Optional
 
 # TODO: uncomment once google-generativeai is installed and key is set
 # import google.generativeai as genai
 
 SYSTEM_PROMPT = """
-You are an expert AI assistant helping a developer explore and extend the RQ (Redis Queue) codebase.
+You are an AIDE (AI-assisted Development Environment) helping a developer work through a timed coding exercise on the RQ (Redis Queue) codebase.
+
+You have access to the full codebase and the file the developer is currently viewing.
 
 Your role:
-- Answer questions about how RQ works internally (workers, queues, jobs, connections)
-- Help the developer think through implementing a new feature or fixing a bug
-- Reference specific files and functions when possible (e.g. rq/worker.py, rq/job.py)
-- Be concise but precise — this is a timed coding exercise
+- Guide the developer toward understanding and implementing the solution themselves
+- Reference specific files, classes, and functions from the actual codebase provided
+- Ask clarifying questions when the intent is unclear
+- Suggest the next small step rather than the complete solution
+- When the developer asks you to make a change, describe what needs to change and where, then let them implement it — do not write the entire implementation unprompted
 
 What you should NOT do:
-- Write complete implementations for the developer unprompted
-- Give away answers without explanation
-- Make up API details that don't exist in RQ
+- Provide a complete, copy-pasteable solution to the main task in one shot
+- Write large blocks of new code without the developer requesting it
+- Skip explanation in favor of just dumping code
+- Make up file paths or function signatures that don't exist in the codebase
 
-When the developer asks you to look at code, reason from the file paths and function names
-they mention. Guide them toward understanding rather than just handing them solutions.
+When referencing code, use file paths and line numbers (e.g. rq/worker.py line 437).
+Be concise — this is a timed exercise. Guide, don't solve.
 """.strip()
+
+
+def _build_context_block(
+    active_file: Optional[str],
+    file_contents: Optional[dict[str, str]],
+) -> str:
+    """Build a codebase context string to prepend to the user prompt."""
+    if not file_contents:
+        return ""
+
+    parts = ["=== CODEBASE CONTEXT ==="]
+
+    # Active file first for prominence
+    if active_file and active_file in file_contents:
+        parts.append(f"\n--- ACTIVE FILE: {active_file} ---")
+        parts.append(file_contents[active_file])
+
+    # Remaining files
+    for path, content in file_contents.items():
+        if path == active_file:
+            continue
+        parts.append(f"\n--- {path} ---")
+        parts.append(content)
+
+    parts.append("\n=== END CODEBASE CONTEXT ===\n")
+    return "\n".join(parts)
 
 
 async def call_gemini(
     prompt: str,
     conversation_history: list[dict],
+    active_file: Optional[str] = None,
+    file_contents: Optional[dict[str, str]] = None,
 ) -> str:
     """
-    Send a prompt to Gemini with full conversation history and return the response text.
+    Send a prompt to Gemini with full conversation history and codebase context.
 
     Args:
         prompt: The latest user message.
         conversation_history: Prior turns as [{"role": "user"|"assistant", "content": str}].
+        active_file: The file path currently open in the editor.
+        file_contents: Dict mapping file paths to their current contents.
 
     Returns:
         The model's response as a plain string.
-
-    TODO: Replace the placeholder return with real Gemini API call below.
     """
+    context_block = _build_context_block(active_file, file_contents)
+    prompt_with_context = f"{context_block}{prompt}" if context_block else prompt
 
     # --- Placeholder (remove when implementing) ---
+    active_label = f" (viewing {active_file})" if active_file else ""
+    file_count = len(file_contents) if file_contents else 0
     return (
-        "[Gemini placeholder] I can see your question about the RQ codebase. "
+        f"[Gemini placeholder{active_label}] "
+        f"Received codebase context ({file_count} files). "
         "Once the GEMINI_API_KEY is configured this will return a real response. "
         f"You asked: {prompt!r}"
     )
@@ -67,5 +106,5 @@ async def call_gemini(
     #     gemini_history.append({"role": role, "parts": [turn["content"]]})
     #
     # chat = model.start_chat(history=gemini_history)
-    # response = chat.send_message(prompt)
+    # response = chat.send_message(prompt_with_context)
     # return response.text

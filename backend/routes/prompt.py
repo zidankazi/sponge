@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
@@ -18,6 +20,8 @@ class PromptRequest(BaseModel):
     session_id: str
     prompt_text: str
     conversation_history: list[ConversationMessage] = []
+    active_file: Optional[str] = None
+    file_contents: Optional[dict[str, str]] = None
 
 
 class PromptResponse(BaseModel):
@@ -29,7 +33,7 @@ class PromptResponse(BaseModel):
 @router.post("/prompt", response_model=PromptResponse)
 async def handle_prompt(body: PromptRequest):
     """
-    Forwards the user prompt to Gemini with conversation history.
+    Forwards the user prompt to Gemini with conversation history and codebase context.
     Persists the new turn to the session and returns the AI response.
     """
     session = store.sessions.get(body.session_id)
@@ -38,10 +42,11 @@ async def handle_prompt(body: PromptRequest):
 
     history = [msg.model_dump() for msg in body.conversation_history]
 
-    # TODO: replace stub with real Gemini call once gemini/client.py is implemented
     response_text = await call_gemini(
         prompt=body.prompt_text,
         conversation_history=history,
+        active_file=body.active_file,
+        file_contents=body.file_contents,
     )
 
     # Persist the new exchange so the scoring engine can read it later
