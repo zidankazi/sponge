@@ -2,8 +2,8 @@
 Gemini AIDE client.
 
 Provides codebase-aware AI assistance for the Sponge coding exercise.
-Uses Google's Gemini API with full codebase context, conversation history,
-and behavioral guardrails to guide (not solve) the developer's work.
+Uses the google-genai library (replaces deprecated google-generativeai)
+with native async support — no asyncio.to_thread needed.
 
 Edge cases handled:
   - Missing / invalid / expired API key
@@ -14,15 +14,14 @@ Edge cases handled:
   - Large codebase payloads (token budget + per-file truncation)
   - Long conversation history (trimming + alternating-role enforcement)
   - Duplicate user message in history (frontend includes current msg)
-  - Concurrent requests (thread-safe via asyncio.to_thread)
 """
 
-import asyncio
 import logging
 import os
 from typing import Optional
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 logger = logging.getLogger(__name__)
 
@@ -78,48 +77,45 @@ Be concise — this is a timed exercise.
 """.strip()
 
 
-# ─── Safety settings (relaxed for code content) ───────────────────────
+# ─── Lazy client initialization ────────────────────────────────────────
 
-SAFETY_SETTINGS = [
-    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-]
+_client: Optional[genai.Client] = None
+_configured_key: Optional[str] = None
 
 
-# ─── Lazy model initialization ────────────────────────────────────────
-
-_model = None
-_configured_key = None
-
-
-def _get_model():
+def _get_client() -> Optional[genai.Client]:
     """
-    Lazily initialize and cache the GenerativeModel.
-    Reconfigures only if the API key changes (e.g. .env hot-reload).
+    Lazily initialize and cache the Gemini Client.
+    Recreates the client only if the API key changes.
     Returns None if GEMINI_API_KEY is not set.
     """
-    global _model, _configured_key
+    global _client, _configured_key
 
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         return None
 
     if api_key != _configured_key:
-        genai.configure(api_key=api_key)
+        _client = genai.Client(api_key=api_key)
         _configured_key = api_key
-        _model = genai.GenerativeModel(
-            model_name="gemini-2.5-flash",
-            system_instruction=SYSTEM_PROMPT,
-            safety_settings=SAFETY_SETTINGS,
-            generation_config={
-                "max_output_tokens": MAX_OUTPUT_TOKENS,
-                "temperature": 0.4,
-            },
-        )
 
-    return _model
+    return _client
+
+
+# ─── Generation config ─────────────────────────────────────────────────
+
+def _make_config() -> types.GenerateContentConfig:
+    return types.GenerateContentConfig(
+        system_instruction=SYSTEM_PROMPT,
+        max_output_tokens=MAX_OUTPUT_TOKENS,
+        temperature=0.4,
+        safety_settings=[
+            types.SafetySetting(category="HARM_CATEGORY_HARASSMENT",        threshold="BLOCK_NONE"),
+            types.SafetySetting(category="HARM_CATEGORY_HATE_SPEECH",        threshold="BLOCK_NONE"),
+            types.SafetySetting(category="HARM_CATEGORY_SEXUALLY_EXPLICIT",  threshold="BLOCK_NONE"),
+            types.SafetySetting(category="HARM_CATEGORY_DANGEROUS_CONTENT",  threshold="BLOCK_NONE"),
+        ],
+    )
 
 
 # ─── Context builder ──────────────────────────────────────────────────
@@ -184,15 +180,15 @@ def _build_context_block(
 
 def _sanitize_history(conversation_history: list[dict]) -> list[dict]:
     """
-    Convert conversation history to Gemini's required format.
+    Convert conversation history to Gemini's required Content format.
 
     Handles:
       - Role mapping: "assistant" → "model"
       - Empty/whitespace-only messages: dropped
       - Consecutive same-role messages: merged (Gemini requires alternation)
       - Over-long history: trimmed to MAX_HISTORY_TURNS
-      - Last message must be "model" (since send_message sends the new user turn)
-      - First message must be "user" (Gemini requirement)
+      - Must start with "user", end with "model"
+        (new user turn is appended directly to contents in call_gemini)
     """
     if not conversation_history:
         return []
@@ -209,17 +205,18 @@ def _sanitize_history(conversation_history: list[dict]) -> list[dict]:
 
         gemini_role = "user" if role == "user" else "model"
 
-        # Merge consecutive same-role messages (Gemini rejects non-alternating)
+        # Merge consecutive same-role messages
         if sanitized and sanitized[-1]["role"] == gemini_role:
-            sanitized[-1]["parts"] = [sanitized[-1]["parts"][0] + "\n\n" + content]
+            prev_text = sanitized[-1]["parts"][0]["text"]
+            sanitized[-1]["parts"] = [{"text": prev_text + "\n\n" + content}]
         else:
-            sanitized.append({"role": gemini_role, "parts": [content]})
+            sanitized.append({"role": gemini_role, "parts": [{"text": content}]})
 
     # Must start with "user"
     while sanitized and sanitized[0]["role"] != "user":
         sanitized.pop(0)
 
-    # Must end with "model" — the new user message goes via send_message()
+    # Must end with "model" — the new user message is appended in call_gemini
     while sanitized and sanitized[-1]["role"] != "model":
         sanitized.pop()
 
@@ -267,26 +264,6 @@ def _extract_response(response) -> str:
     return "I wasn't able to generate a response. Could you try rephrasing your question?"
 
 
-# ─── Sync Gemini call (run in thread) ─────────────────────────────────
-
-def _call_gemini_sync(
-    prompt_with_context: str,
-    conversation_history: list[dict],
-) -> str:
-    """Synchronous Gemini call — invoked via asyncio.to_thread."""
-    model = _get_model()
-    if model is None:
-        return (
-            "**Gemini unavailable** — `GEMINI_API_KEY` is not set. "
-            "Add it to `backend/.env` and restart the server."
-        )
-
-    gemini_history = _sanitize_history(conversation_history)
-    chat = model.start_chat(history=gemini_history)
-    response = chat.send_message(prompt_with_context)
-    return _extract_response(response)
-
-
 # ─── Public async entry point ──────────────────────────────────────────
 
 async def call_gemini(
@@ -298,16 +275,32 @@ async def call_gemini(
     """
     Send a prompt to Gemini with codebase context and conversation history.
 
+    Uses native async (client.aio) — no thread executor needed.
     Returns the AI response text. On ANY failure, returns a user-friendly
-    error message (never raises — the frontend always gets a displayable string).
+    error message (never raises).
     """
+    client = _get_client()
+    if client is None:
+        return (
+            "**Gemini unavailable** — `GEMINI_API_KEY` is not set. "
+            "Add it to `backend/.env` and restart the server."
+        )
+
     context_block = _build_context_block(active_file, file_contents)
     prompt_with_context = f"{context_block}{prompt}" if context_block else prompt
 
+    # Build full contents: sanitized history + new user message
+    gemini_history = _sanitize_history(conversation_history)
+    contents = gemini_history + [{"role": "user", "parts": [{"text": prompt_with_context}]}]
+
     try:
-        return await asyncio.to_thread(
-            _call_gemini_sync, prompt_with_context, conversation_history
+        response = await client.aio.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=contents,
+            config=_make_config(),
         )
+        return _extract_response(response)
+
     except Exception as exc:
         logger.exception("Gemini API call failed")
         err = str(exc).lower()
