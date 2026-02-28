@@ -3,7 +3,15 @@
 // Every function signature matches the API contract in AGENTS.md.
 
 const API_BASE = 'http://localhost:8000'
-const USE_MOCK = true // flip to false when backend is live
+
+// Flip individual flags as Sri's endpoints go live
+const MOCK = {
+  startSession: false,   // ✅ Sri done
+  logEvent:     false,   // ✅ Sri done
+  leaderboard:  false,   // ✅ Sri done
+  sendPrompt:   true,    // ⏳ waiting on Gemini
+  submit:       true,    // ⏳ waiting on scoring engine
+}
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms))
 
@@ -12,7 +20,7 @@ let eventLog = []
 // ─── POST /session/start ─────────────────────────────────────────────
 
 export async function startSession() {
-  if (USE_MOCK) {
+  if (MOCK.startSession) {
     await delay(300)
     return { session_id: 'sponge_' + Math.random().toString(36).slice(2, 10) }
   }
@@ -23,7 +31,7 @@ export async function startSession() {
 // ─── POST /prompt ────────────────────────────────────────────────────
 
 export async function sendPrompt({ session_id, prompt_text, conversation_history }) {
-  if (USE_MOCK) {
+  if (MOCK.sendPrompt) {
     await delay(800 + Math.random() * 1200)
     return { response_text: getMockResponse(prompt_text) }
   }
@@ -38,7 +46,7 @@ export async function sendPrompt({ session_id, prompt_text, conversation_history
 // ─── POST /session/event ─────────────────────────────────────────────
 
 export async function logEvent({ session_id, event, file, ts }) {
-  if (USE_MOCK) {
+  if (MOCK.logEvent) {
     eventLog.push({ session_id, event, file, ts })
     return {}
   }
@@ -53,7 +61,7 @@ export async function logEvent({ session_id, event, file, ts }) {
 // ─── POST /submit ────────────────────────────────────────────────────
 
 export async function submitSession({ session_id, final_code, username }) {
-  if (USE_MOCK) {
+  if (MOCK.submit) {
     await delay(1500)
     return {
       total_score: 72,
@@ -89,7 +97,7 @@ export async function submitSession({ session_id, final_code, username }) {
 // ─── GET /leaderboard ────────────────────────────────────────────────
 
 export async function fetchLeaderboard() {
-  if (USE_MOCK) {
+  if (MOCK.leaderboard) {
     await delay(400)
     return [
       { username: 'zidan', score: 85, time_completed: '2024-03-01T12:34:56Z', badge: 'AI Collaborator' },
