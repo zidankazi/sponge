@@ -20,21 +20,21 @@ The codebase lives at `rq-v1.0/` in the repo root. Do not modify it.
 
 - **Frontend**: React + Vite (no Tailwind yet — using vanilla CSS with CSS custom properties)
 - **Backend**: FastAPI + Python
-- **AI**: Gemini API (hackathon sponsor, free)
+- **AI**: Gemini API
 
 ## Team & Ownership
 
 | Person | Domain | Branch |
 |--------|--------|--------|
 | Zidan | Core product frontend — editor, file tree, AI chat, session flow | `zidan/editor` |
-| Designer | Game layer frontend — results screen, leaderboard, score reveal, badges | `designer/game` |
-| Backend partner | FastAPI backend — Gemini API, scoring, session storage, leaderboard | `backend/core` |
+| Josh | Game layer frontend — results screen, leaderboard, score reveal, badges | `josh/game` |
+| Sri partner | FastAPI backend — Gemini API, scoring, session storage, leaderboard | `Sri/core` |
 
 **Branch strategy:**
 - `main` — stable, demo-ready only. PRs to main when something is fully working.
 - `zidan/editor` — Zidan's working branch
-- `designer/game` — Designer's working branch
-- `backend/core` — Backend partner's working branch
+- `josh/game` — Josh's working branch
+- `Sri/core` — Sri's working branch
 
 ## API Contract
 
