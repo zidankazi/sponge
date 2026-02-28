@@ -1541,8 +1541,15 @@ a {
 }
 
 @keyframes leaderboard-spinner-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
 }
 
 /* ═══════════════════════════════════════
@@ -1637,8 +1644,15 @@ a {
 }
 
 @keyframes score-reveal-pop {
-  0% { opacity: 0; transform: scale(0.92); }
-  100% { opacity: 1; transform: scale(1); }
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .score-reveal-label--stagger,
@@ -1648,12 +1662,22 @@ a {
   animation: score-reveal-fade-in 0.45s ease-out forwards;
 }
 
-.score-reveal-label--stagger { animation-delay: 0.18s; }
-.score-reveal-summary--stagger { animation-delay: 0.55s; }
-.score-reveal-continue--stagger { animation-delay: 0.85s; }
+.score-reveal-label--stagger {
+  animation-delay: 0.18s;
+}
+
+.score-reveal-summary--stagger {
+  animation-delay: 0.55s;
+}
+
+.score-reveal-continue--stagger {
+  animation-delay: 0.85s;
+}
 
 @keyframes score-reveal-fade-in {
-  to { opacity: 1; }
+  to {
+    opacity: 1;
+  }
 }
 
 .score-reveal-badge--stagger {
@@ -1759,8 +1783,13 @@ a {
   display: inline;
 }
 
-.score-reveal-category-value--good { color: var(--green-light); }
-.score-reveal-category-value--warn { color: #e9c46a; }
+.score-reveal-category-value--good {
+  color: var(--green-light);
+}
+
+.score-reveal-category-value--warn {
+  color: #e9c46a;
+}
 
 .score-reveal-category-max {
   font-size: 14px;
@@ -1805,8 +1834,13 @@ a {
   animation: score-reveal-fade-in 0.45s ease-out forwards;
 }
 
-.score-reveal-socratic--stagger { animation-delay: 0.4s; }
-.score-reveal-continue--stagger { animation-delay: 0.7s; }
+.score-reveal-socratic--stagger {
+  animation-delay: 0.4s;
+}
+
+.score-reveal-continue--stagger {
+  animation-delay: 0.7s;
+}
 
 .score-reveal-secondary {
   display: block;
@@ -1827,8 +1861,14 @@ a {
 }
 
 @media (max-width: 560px) {
-  .score-reveal-hero { flex-direction: column; text-align: center; }
-  .score-reveal-categories { grid-template-columns: 1fr; }
+  .score-reveal-hero {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .score-reveal-categories {
+    grid-template-columns: 1fr;
+  }
 }
 
 .results-bottleneck-btn {
@@ -2130,9 +2170,11 @@ a {
   .leaderboard--fortnite {
     grid-template-columns: 1fr;
   }
+
   .leaderboard-left {
     flex-direction: column;
   }
+
   .leaderboard-cup-strip {
     width: 100%;
     min-height: auto;
@@ -2140,14 +2182,17 @@ a {
     justify-content: space-between;
     padding: 12px 16px;
   }
+
   .leaderboard-cup-strip-title,
   .leaderboard-cup-strip-session {
     writing-mode: horizontal-tb;
     transform: none;
   }
+
   .leaderboard-cup-strip-session {
     margin-top: 0;
   }
+
   .leaderboard-stats-panel {
     position: static;
   }
@@ -2238,4 +2283,59 @@ a {
   border-top-color: var(--green-light);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+}
+
+/* ── Apply code block ─────────────────────────────────────────────── */
+
+.chat-code-apply-wrapper {
+  margin: 6px 0;
+}
+
+.chat-code-apply-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  font-size: 12px;
+}
+
+.chat-code-apply-filename {
+  color: var(--text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+
+.chat-code-apply-btn {
+  padding: 3px 10px;
+  background: var(--green-dark);
+  color: var(--cream);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  border: none;
+}
+
+.chat-code-apply-btn:hover:not(:disabled) {
+  background: var(--green);
+}
+
+.chat-code-apply-btn--applied {
+  background: transparent;
+  color: var(--green-light);
+  cursor: default;
+}
+
+.chat-code-apply-btn--applied:hover {
+  background: transparent;
+}
+
+.chat-code-block--with-bar {
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  margin-top: 0;
 }

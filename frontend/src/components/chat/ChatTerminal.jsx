@@ -1,8 +1,63 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useSession } from '../../hooks/useSession'
 
-function renderMarkdown(text) {
-  // Minimal markdown: code blocks, inline code, bold, bullet lists
+/**
+ * Try to extract a target filename from a code fence.
+ * Patterns checked:
+ *   1. ```python rq/queue.py   (language + filename on fence line)
+ *   2. First line: # rq/queue.py  or  # --- rq/queue.py ---
+ */
+function extractFilename(codeLang, codeLines, fileBufferKeys) {
+  // Pattern 1: fence line has a filename after the language  e.g. "python rq/queue.py"
+  const fenceParts = codeLang.split(/\s+/)
+  if (fenceParts.length >= 2) {
+    const candidate = fenceParts.slice(1).join(' ').trim()
+    if (fileBufferKeys.includes(candidate)) return candidate
+  }
+
+  // Pattern 2: first line is a comment with a filename
+  if (codeLines.length > 0) {
+    const first = codeLines[0].trim()
+    // Match: # rq/queue.py  or  # --- rq/queue.py ---
+    const commentMatch = first.match(/^#\s*(?:---\s*)?(.+?)(?:\s*---)?$/)
+    if (commentMatch) {
+      const candidate = commentMatch[1].trim()
+      if (fileBufferKeys.includes(candidate)) return candidate
+    }
+  }
+
+  return null
+}
+
+function ApplyCodeBlock({ filename, code, onApply, reactKey }) {
+  const [applied, setApplied] = useState(false)
+
+  const handleApply = () => {
+    onApply(filename, code)
+    setApplied(true)
+  }
+
+  return (
+    <div key={reactKey} className="chat-code-apply-wrapper">
+      <div className="chat-code-apply-bar">
+        <span className="chat-code-apply-filename">{filename}</span>
+        <button
+          className={`chat-code-apply-btn ${applied ? 'chat-code-apply-btn--applied' : ''}`}
+          onClick={handleApply}
+          disabled={applied}
+        >
+          {applied ? 'Applied ✓' : 'Apply'}
+        </button>
+      </div>
+      <pre className="chat-code-block chat-code-block--with-bar">
+        <code>{code}</code>
+      </pre>
+    </div>
+  )
+}
+
+function renderMarkdown(text, { fileBuffers, onApplyCode } = {}) {
+  const fileBufferKeys = fileBuffers ? Object.keys(fileBuffers) : []
   const lines = text.split('\n')
   const result = []
   let inCodeBlock = false
@@ -14,11 +69,26 @@ function renderMarkdown(text) {
 
     if (line.startsWith('```')) {
       if (inCodeBlock) {
-        result.push(
-          <pre key={`code-${i}`} className="chat-code-block">
-            <code>{codeBuffer.join('\n')}</code>
-          </pre>
-        )
+        const codeContent = codeBuffer.join('\n')
+        const targetFile = extractFilename(codeLang, codeBuffer, fileBufferKeys)
+
+        if (targetFile && onApplyCode) {
+          result.push(
+            <ApplyCodeBlock
+              key={`code-${i}`}
+              reactKey={`code-${i}`}
+              filename={targetFile}
+              code={codeContent}
+              onApply={onApplyCode}
+            />
+          )
+        } else {
+          result.push(
+            <pre key={`code-${i}`} className="chat-code-block">
+              <code>{codeContent}</code>
+            </pre>
+          )
+        }
         codeBuffer = []
         inCodeBlock = false
       } else {
@@ -113,7 +183,7 @@ function renderInline(text) {
 }
 
 export default function ChatTerminal() {
-  const { chatHistory, isAiLoading, sendChat, username } = useSession()
+  const { chatHistory, isAiLoading, sendChat, username, fileBuffers, updateFileContent, openFile } = useSession()
   const userInitial = username ? username[0].toUpperCase() : 'Y'
   const [input, setInput] = useState('')
   const scrollRef = useRef(null)
@@ -124,6 +194,11 @@ export default function ChatTerminal() {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
   }, [chatHistory, isAiLoading])
+
+  const onApplyCode = useCallback((filename, code) => {
+    updateFileContent(filename, code)
+    openFile(filename)
+  }, [updateFileContent, openFile])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -160,7 +235,9 @@ export default function ChatTerminal() {
               {msg.role === 'user' ? userInitial : 'AI'}
             </div>
             <div className="chat-msg-body">
-              {msg.role === 'assistant' ? renderMarkdown(msg.content) : <p>{msg.content}</p>}
+              {msg.role === 'assistant'
+                ? renderMarkdown(msg.content, { fileBuffers, onApplyCode })
+                : <p>{msg.content}</p>}
             </div>
           </div>
         ))}
