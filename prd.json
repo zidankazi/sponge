@@ -52,7 +52,7 @@
     {
       "id": "S-03",
       "title": "Debounce file_edit event logging",
-      "status": "pending",
+      "status": "complete",
       "branch": "zidan/editor",
       "files": ["frontend/src/hooks/useSession.jsx"],
       "description": "updateFileContent currently calls logEvent('file_edit') on every keystroke, which would flood the backend. Debounce it so file_edit only logs after the user stops typing for 1500ms.",

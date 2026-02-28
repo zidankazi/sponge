@@ -19,6 +19,7 @@ export function SessionProvider({ children }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [username, setUsername] = useState('Anonymous')
   const timerRef = useRef(null)
+  const editDebounceRef = useRef(null)
 
   // Start countdown timer
   useEffect(() => {
@@ -76,7 +77,10 @@ export function SessionProvider({ children }) {
 
   const updateFileContent = useCallback((path, content) => {
     setFileBuffers((prev) => ({ ...prev, [path]: content }))
-    logEvent({ session_id: sessionId, event: 'file_edit', file: path, ts: Date.now() })
+    clearTimeout(editDebounceRef.current)
+    editDebounceRef.current = setTimeout(() => {
+      logEvent({ session_id: sessionId, event: 'file_edit', file: path, ts: Date.now() })
+    }, 1500)
   }, [sessionId])
 
   const sendChat = useCallback(async (text) => {
