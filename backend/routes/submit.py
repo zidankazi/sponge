@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
@@ -12,7 +14,8 @@ router = APIRouter(tags=["submit"])
 
 class SubmitRequest(BaseModel):
     session_id: str
-    final_code: str     # all edited file contents concatenated / serialised
+    final_code: str             # all edited file contents concatenated / serialised
+    username: Optional[str] = None
 
 
 # ---------- Endpoint ----------
@@ -32,6 +35,8 @@ async def submit_session(body: SubmitRequest):
         return session.score
 
     session.final_code = body.final_code
+    if body.username:
+        session.username = body.username
 
     # TODO: scoring engine implements real logic; returns placeholder Score for now
     score = compute_score(session)

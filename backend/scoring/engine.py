@@ -4,15 +4,17 @@ Scoring engine.
 Receives a completed Session (with all events and conversation history)
 and returns a Score object.
 
-Scoring categories (from AGENTS.md):
-  - request_timing           (0–10)  Did they ask AI early enough?
-  - request_quality          (0–10)  Were prompts specific and grounded?
-  - response_handling        (0–10)  Did they critically evaluate AI output?
-  - verification_discipline  (0–10)  Did they run tests after AI suggestions?
-  - iterative_collaboration  (0–10)  Did they refine through dialogue?
+Scoring categories (each 0–10):
+  - request_timing           Did they ask AI early enough?
+  - request_quality          Were prompts specific and grounded?
+  - response_handling        Did they critically evaluate AI output?
+  - verification_discipline  Did they run tests after AI suggestions?
+  - iterative_collaboration  Did they refine through dialogue?
   - penalties                (0 to -10)  Blind copy-paste, passive re-prompting, etc.
 
-Total max: 50 points (penalties can reduce it).
+The five positive categories sum to max 50. total_score is scaled to 0–100 so it
+matches the frontend grade thresholds (50/60/70/80/90):
+  total_score = clamp(round((positives + penalties) / 50 * 100), 0, 100)
 
 TODO: Replace placeholder logic with real metric computation.
 """
@@ -24,13 +26,14 @@ from models.session import Session
 # ---------- Badge thresholds ----------
 
 def _assign_badge(total: int) -> str:
-    if total >= 45:
+    """total is on the 0–100 scale. Tiers must match Badge.jsx exactly."""
+    if total >= 85:
         return "AI Collaborator"
-    if total >= 35:
+    if total >= 70:
         return "On Your Way"
-    if total >= 20:
-        return "Getting Started"
-    return "Solo Coder"
+    if total >= 50:
+        return "Needs Work"
+    return "Just Vibing"
 
 
 # ---------- Placeholder metric helpers ----------
@@ -135,14 +138,15 @@ def compute_score(session: Session) -> Score:
         penalties=_compute_penalties(session),
     )
 
-    total = (
+    positives = (
         breakdown.request_timing
         + breakdown.request_quality
         + breakdown.response_handling
         + breakdown.verification_discipline
         + breakdown.iterative_collaboration
-        + breakdown.penalties
     )
+    # Scale to 0–100 to match frontend grade thresholds
+    total = max(0, min(100, round((positives + breakdown.penalties) / 50 * 100)))
 
     metrics = _compute_headline_metrics(session)
     badge = _assign_badge(total)

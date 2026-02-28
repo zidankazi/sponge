@@ -1,7 +1,7 @@
 import uuid
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Body, HTTPException
 from pydantic import BaseModel
 
 import store
@@ -31,14 +31,15 @@ class LogEventRequest(BaseModel):
 # ---------- Endpoints ----------
 
 @router.post("/session/start", response_model=StartSessionResponse)
-async def start_session(body: StartSessionRequest = StartSessionRequest()):
+async def start_session(body: Optional[StartSessionRequest] = Body(default=None)):
     """
     Creates a new session.
     Returns a unique session_id that the frontend uses for all subsequent calls.
     """
     session_id = f"sponge_{uuid.uuid4().hex[:8]}"
 
-    session = Session(session_id=session_id, username=body.username)
+    username = body.username if body else None
+    session = Session(session_id=session_id, username=username)
     store.sessions[session_id] = session
 
     return StartSessionResponse(session_id=session_id)
