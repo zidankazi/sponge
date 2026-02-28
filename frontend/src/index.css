@@ -2538,3 +2538,335 @@ a {
   padding: 32px 16px;
   line-height: 1.6;
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   HOMEPAGE — CoderPad-style marketing page
+   ══════════════════════════════════════════════════════════════════════ */
+
+.home {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--cream);
+  overflow-x: hidden;
+}
+
+/* ── Nav ──────────────────────────────────────────────────────────── */
+
+.home-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--green-dark);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.home-nav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 56px;
+}
+
+.home-nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-nav-logo {
+  width: 32px;
+  height: 32px;
+  background: var(--green);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--cream);
+}
+
+.home-nav-name {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.home-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.home-nav-link {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.home-nav-link:hover {
+  color: var(--cream);
+}
+
+.home-nav-cta {
+  background: var(--cream);
+  color: var(--green-dark);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.home-nav-cta:hover {
+  opacity: 0.9;
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────── */
+
+.home-hero {
+  padding: 100px 24px 80px;
+  text-align: center;
+  background: linear-gradient(180deg, var(--green-dark) 0%, var(--bg) 100%);
+}
+
+.home-hero-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.home-hero-title {
+  font-size: clamp(36px, 5.5vw, 64px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin-bottom: 24px;
+}
+
+.home-hero-highlight {
+  display: block;
+  background: var(--green);
+  color: var(--cream);
+  padding: 4px 16px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.home-hero-sub {
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  max-width: 540px;
+  margin: 0 auto 40px;
+}
+
+.home-hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.home-hero-btn {
+  background: var(--cream);
+  color: var(--bg);
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px 36px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.home-hero-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
+}
+
+.home-hero-btn-secondary {
+  background: transparent;
+  color: var(--cream);
+  font-size: 16px;
+  font-weight: 500;
+  padding: 14px 36px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.home-hero-btn-secondary:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* ── Features ─────────────────────────────────────────────────────── */
+
+.home-features {
+  padding: 80px 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.home-features-title {
+  text-align: center;
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 48px;
+}
+
+.home-features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .home-features-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.home-feature-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px 24px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.home-feature-card:hover {
+  border-color: var(--green);
+  transform: translateY(-2px);
+}
+
+.home-feature-icon {
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+
+.home-feature-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.home-feature-card p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ── How It Works ──────────────────────────────────────────────────── */
+
+.home-how {
+  padding: 80px 24px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.home-how-title {
+  text-align: center;
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 48px;
+}
+
+.home-how-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+@media (max-width: 768px) {
+  .home-how-steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+.home-how-step {
+  text-align: center;
+}
+
+.home-how-number {
+  width: 40px;
+  height: 40px;
+  background: var(--green);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.home-how-step h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.home-how-step p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ── CTA Section ──────────────────────────────────────────────────── */
+
+.home-cta-section {
+  text-align: center;
+  padding: 80px 24px;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.home-cta-section h2 {
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.home-cta-section p {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+/* ── Footer ───────────────────────────────────────────────────────── */
+
+.home-footer {
+  padding: 32px 24px;
+}
+
+.home-footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.home-footer-brand {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--cream);
+}
+
+.home-footer-copy {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
