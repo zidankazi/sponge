@@ -1,16 +1,16 @@
 """
 Gemini API client.
 
-Reads GEMINI_API_KEY from the environment (set in backend/.env).
-Wraps google-generativeai to send conversation history, codebase context,
-and active file to Gemini, returning structured guidance as response text.
+Reads GEMINI_API_KEY from backend/.env (loaded by main.py at startup).
+Uses google-generativeai to send codebase context + conversation history
+and return structured guidance as response text.
 """
 
+import asyncio
 import os
 from typing import Optional
 
-# TODO: uncomment once google-generativeai is installed and key is set
-# import google.generativeai as genai
+import google.generativeai as genai
 
 SYSTEM_PROMPT = """
 You are an AIDE (AI-assisted Development Environment) helping a developer work through a timed coding exercise on the RQ (Redis Queue) codebase.
@@ -61,6 +61,36 @@ def _build_context_block(
     return "\n".join(parts)
 
 
+def _call_gemini_sync(
+    prompt_with_context: str,
+    conversation_history: list[dict],
+) -> str:
+    """Synchronous Gemini call — run via asyncio.to_thread from the async wrapper."""
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        return (
+            "**Gemini unavailable** — `GEMINI_API_KEY` is not set. "
+            "Add it to `backend/.env` and restart the server."
+        )
+
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel(
+        model_name="gemini-1.5-flash",
+        system_instruction=SYSTEM_PROMPT,
+    )
+
+    # Convert our history format → Gemini Content format
+    # The last user message is sent as send_message, not in history
+    gemini_history = []
+    for turn in conversation_history:
+        role = "user" if turn["role"] == "user" else "model"
+        gemini_history.append({"role": role, "parts": [turn["content"]]})
+
+    chat = model.start_chat(history=gemini_history)
+    response = chat.send_message(prompt_with_context)
+    return response.text
+
+
 async def call_gemini(
     prompt: str,
     conversation_history: list[dict],
@@ -82,29 +112,4 @@ async def call_gemini(
     context_block = _build_context_block(active_file, file_contents)
     prompt_with_context = f"{context_block}{prompt}" if context_block else prompt
 
-    # --- Placeholder (remove when implementing) ---
-    active_label = f" (viewing {active_file})" if active_file else ""
-    file_count = len(file_contents) if file_contents else 0
-    return (
-        f"[Gemini placeholder{active_label}] "
-        f"Received codebase context ({file_count} files). "
-        "Once the GEMINI_API_KEY is configured this will return a real response. "
-        f"You asked: {prompt!r}"
-    )
-
-    # --- Real implementation (uncomment and fill in) ---
-    # genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-    # model = genai.GenerativeModel(
-    #     model_name="gemini-1.5-flash",
-    #     system_instruction=SYSTEM_PROMPT,
-    # )
-    #
-    # # Convert our history format → Gemini Content format
-    # gemini_history = []
-    # for turn in conversation_history:
-    #     role = "user" if turn["role"] == "user" else "model"
-    #     gemini_history.append({"role": role, "parts": [turn["content"]]})
-    #
-    # chat = model.start_chat(history=gemini_history)
-    # response = chat.send_message(prompt_with_context)
-    # return response.text
+    return await asyncio.to_thread(_call_gemini_sync, prompt_with_context, conversation_history)
