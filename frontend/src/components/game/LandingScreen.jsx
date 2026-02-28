@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useSession } from '../../hooks/useSession'
 
 export default function LandingScreen() {
-  const { beginSession } = useSession()
+  const { beginSession, setView } = useSession()
   const [name, setName] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -61,6 +61,10 @@ export default function LandingScreen() {
 
         <button className="landing-start" onClick={handleStart} disabled={loading}>
           {loading ? 'Starting...' : 'Start Session'}
+        </button>
+
+        <button type="button" className="landing-leaderboard-link" onClick={() => setView('leaderboard')}>
+          View Leaderboard
         </button>
 
         <p className="landing-footnote">

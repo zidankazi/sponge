@@ -9,7 +9,7 @@ const MOCK = {
   startSession: false,   // ✅ Sri done
   logEvent: false,   // ✅ Sri done
   leaderboard: false,   // ✅ Sri done
-  sendPrompt: true,    // ⏳ waiting on Gemini
+  sendPrompt: false,   // ✅ Gemini live
   submit: true,    // ⏳ waiting on scoring engine
 }
 
