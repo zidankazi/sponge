@@ -1,4 +1,8 @@
+import { useState } from 'react'
 import { useSession } from '../../hooks/useSession'
+import Badge from './Badge'
+import ScoreReveal from './ScoreReveal'
+import LeaderboardPage from '../../pages/LeaderboardPage'
 
 const SCORE_LABELS = {
   request_timing: 'Request Timing',
@@ -55,17 +59,37 @@ function MetricRow({ metricKey, value, meta }) {
 
 export default function ResultsScreen() {
   const { results, resetSession } = useSession()
+  const [revealed, setRevealed] = useState(false)
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
 
   if (!results) return null
 
-  const { total_score, breakdown, headline_metrics, interpretation } = results
+  const { total_score, breakdown, headline_metrics, interpretation, badge } = results
 
+  // Phase 1: ScoreReveal (before user clicks Continue)
+  if (!revealed) {
+    return (
+      <ScoreReveal
+        score={total_score}
+        badge={badge}
+        interpretation={interpretation}
+        onComplete={() => setRevealed(true)}
+      />
+    )
+  }
+
+  // Phase 3: Leaderboard view
+  if (showLeaderboard) {
+    return <LeaderboardPage onBack={() => setShowLeaderboard(false)} />
+  }
+
+  // Phase 2: Full breakdown
   const grade =
     total_score >= 90 ? 'A' :
-    total_score >= 80 ? 'B+' :
-    total_score >= 70 ? 'B' :
-    total_score >= 60 ? 'C+' :
-    total_score >= 50 ? 'C' : 'D'
+      total_score >= 80 ? 'B+' :
+        total_score >= 70 ? 'B' :
+          total_score >= 60 ? 'C+' :
+            total_score >= 50 ? 'C' : 'D'
 
   return (
     <div className="results-screen">
@@ -93,6 +117,9 @@ export default function ResultsScreen() {
               <span className="score-number">{total_score}</span>
               <span className="score-grade">{grade}</span>
             </div>
+          </div>
+          <div className="results-badge">
+            <Badge badge={badge} />
           </div>
         </div>
 
@@ -125,6 +152,10 @@ export default function ResultsScreen() {
           <h3>Interpretation</h3>
           <p>{interpretation}</p>
         </div>
+
+        <button className="results-leaderboard-btn" onClick={() => setShowLeaderboard(true)}>
+          View Leaderboard
+        </button>
 
         <button className="results-restart" onClick={resetSession}>
           Start New Session
