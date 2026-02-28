@@ -1,9 +1,7 @@
-import { useState } from 'react'
 import { useSession } from '../../hooks/useSession'
 
 export default function LandingScreen() {
   const { beginSession } = useSession()
-  const [name, setName] = useState('')
 
   return (
     <div className="landing">
@@ -17,9 +15,8 @@ export default function LandingScreen() {
         <div className="landing-card">
           <h2>Add Delayed Job Execution</h2>
           <p>
-            You'll work inside a real codebase with an AI assistant. You'll be scored
-            on <em>how</em> you collaborated with AI. Working code is the baseline —
-            it won't save a bad score, but broken code is an automatic zero.
+            You'll work inside a real codebase with an AI assistant. At the end, you'll be scored
+            on <em>how</em> you collaborated — not whether the code compiles.
           </p>
           <div className="landing-details">
             <div className="landing-detail">
@@ -37,19 +34,7 @@ export default function LandingScreen() {
           </div>
         </div>
 
-        <div className="landing-name-input">
-          <label className="landing-name-label" htmlFor="username-input">Your name</label>
-          <input
-            id="username-input"
-            className="landing-name-field"
-            type="text"
-            placeholder="Anonymous"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-
-        <button className="landing-start" onClick={() => beginSession(name)}>
+        <button className="landing-start" onClick={beginSession}>
           Start Session
         </button>
 

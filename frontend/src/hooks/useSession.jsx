@@ -17,9 +17,7 @@ export function SessionProvider({ children }) {
   const [isAiLoading, setIsAiLoading] = useState(false)
   const [results, setResults] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [username, setUsername] = useState('Anonymous')
   const timerRef = useRef(null)
-  const editDebounceRef = useRef(null)
 
   // Start countdown timer
   useEffect(() => {
@@ -37,8 +35,7 @@ export function SessionProvider({ children }) {
     }
   }, [view])
 
-  const beginSession = useCallback(async (name) => {
-    setUsername(name && name.trim() ? name.trim() : 'Anonymous')
+  const beginSession = useCallback(async () => {
     const { session_id } = await startSession()
     setSessionId(session_id)
     setView('session')
@@ -70,10 +67,7 @@ export function SessionProvider({ children }) {
 
   const updateFileContent = useCallback((path, content) => {
     setFileBuffers((prev) => ({ ...prev, [path]: content }))
-    clearTimeout(editDebounceRef.current)
-    editDebounceRef.current = setTimeout(() => {
-      logEvent({ session_id: sessionId, event: 'file_edit', file: path, ts: Date.now() })
-    }, 1500)
+    logEvent({ session_id: sessionId, event: 'file_edit', file: path, ts: Date.now() })
   }, [sessionId])
 
   const sendChat = useCallback(async (text) => {
@@ -110,7 +104,7 @@ export function SessionProvider({ children }) {
       .join('\n\n')
 
     try {
-      const res = await submitSession({ session_id: sessionId, final_code: allCode, username })
+      const res = await submitSession({ session_id: sessionId, final_code: allCode })
       setResults(res)
       setView('results')
     } catch {
@@ -118,14 +112,7 @@ export function SessionProvider({ children }) {
     } finally {
       setIsSubmitting(false)
     }
-  }, [sessionId, fileBuffers, username])
-
-  // Auto-submit when timer expires (must be after submit is declared)
-  useEffect(() => {
-    if (view === 'session' && timeLeft === 0 && !isSubmitting) {
-      submit()
-    }
-  }, [timeLeft, view, isSubmitting, submit])
+  }, [sessionId, fileBuffers])
 
   const resetSession = useCallback(() => {
     setView('idle')
@@ -149,7 +136,6 @@ export function SessionProvider({ children }) {
         isAiLoading,
         results,
         isSubmitting,
-        username,
         beginSession,
         openFile,
         closeFile,
