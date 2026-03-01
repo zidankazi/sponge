@@ -29,7 +29,7 @@ const CATEGORY_FEEDBACK = {
   communication: 'Strong narration and tradeoff discussion.',
 }
 
-export default function ScoreReveal({ score, badge, interpretation, breakdown, onComplete, onViewLeaderboard }) {
+export default function ScoreReveal({ score, badge, interpretation, breakdown, onComplete }) {
   const [displayScore, setDisplayScore] = useState(0)
   const [badgeVisible, setBadgeVisible] = useState(false)
 
@@ -125,11 +125,6 @@ export default function ScoreReveal({ score, badge, interpretation, breakdown, o
         <button className="score-reveal-continue score-reveal-continue--stagger" onClick={onComplete}>
           See Full Breakdown
         </button>
-        {onViewLeaderboard && (
-          <button type="button" className="score-reveal-secondary score-reveal-view-leaderboard" onClick={onViewLeaderboard}>
-            View Leaderboard
-          </button>
-        )}
       </div>
     </div>
   )
