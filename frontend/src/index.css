@@ -147,8 +147,8 @@ a {
 .ai-float--chatgpt {
   width: 72px;
   height: auto;
-  top: 85%;
-  right: 12%;
+  top: 75%;
+  right: 15%;
   opacity: 0.2;
 }
 
@@ -438,12 +438,29 @@ a {
 }
 
 @keyframes name-shake {
-  0%   { transform: translateX(0); }
-  20%  { transform: translateX(-2px); }
-  40%  { transform: translateX(2px); }
-  60%  { transform: translateX(-1px); }
-  80%  { transform: translateX(1px); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-2px);
+  }
+
+  40% {
+    transform: translateX(2px);
+  }
+
+  60% {
+    transform: translateX(-1px);
+  }
+
+  80% {
+    transform: translateX(1px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
 }
 
 .landing-team-separator {
