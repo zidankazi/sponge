@@ -40,44 +40,80 @@ async def run_tests(body: RunTestsRequest):
 
 @router.get("/run-tests/debug")
 async def debug_test_runner():
-    """Temporary debug endpoint — remove after confirming tests work."""
-    info = {
-        "python": sys.executable,
-        "version": sys.version,
-        "backend_root": BACKEND_ROOT,
-        "rq_source": RQ_SOURCE,
-        "rq_source_exists": os.path.isdir(RQ_SOURCE),
-        "tmp_writable": os.access("/tmp", os.W_OK),
-        "cwd": os.getcwd(),
-    }
-    # Check if pytest is importable
-    try:
-        result = subprocess.run(
-            [sys.executable, "-m", "pytest", "--version"],
-            capture_output=True, text=True, timeout=10,
-        )
-        info["pytest_version"] = result.stdout.strip() or result.stderr.strip()
-    except Exception as e:
-        info["pytest_error"] = str(e)
+    """Temporary debug endpoint — runs actual test flow and reports errors."""
+    import tempfile
+    from scoring.test_runner import (
+        parse_final_code, CONFTEST_CONTENT, TEST_SUITE_PATH, PYTEST_TIMEOUT,
+    )
 
-    # Check if fakeredis is importable
-    try:
-        result = subprocess.run(
-            [sys.executable, "-c", "import fakeredis; print(fakeredis.__version__)"],
-            capture_output=True, text=True, timeout=10,
-        )
-        info["fakeredis_version"] = result.stdout.strip() or result.stderr.strip()
-    except Exception as e:
-        info["fakeredis_error"] = str(e)
+    info = {"python": sys.executable, "version": sys.version}
 
-    # List files in rq_source
-    if os.path.isdir(RQ_SOURCE):
-        info["rq_source_contents"] = os.listdir(RQ_SOURCE)[:10]
-    else:
-        # Check what's in BACKEND_ROOT
-        try:
-            info["backend_root_contents"] = os.listdir(BACKEND_ROOT)[:20]
-        except Exception as e:
-            info["backend_root_error"] = str(e)
+    # Read a real file from rq-v1.0 to build test input
+    queue_path = os.path.join(RQ_SOURCE, "rq", "queue.py")
+    if not os.path.exists(queue_path):
+        info["error"] = f"queue.py not found at {queue_path}"
+        return info
+
+    with open(queue_path) as f:
+        queue_code = f.read()
+    final_code = f"// --- rq/queue.py ---\n{queue_code}"
+
+    # Step 1: parse
+    user_files = parse_final_code(final_code)
+    info["parsed_files"] = list(user_files.keys())
+    if not user_files:
+        info["error"] = "parse_final_code returned empty"
+        return info
+
+    # Step 2: copy rq-v1.0
+    tmpdir = tempfile.mkdtemp(prefix="sponge_debug_")
+    try:
+        rq_copy = os.path.join(tmpdir, "rq-v1.0")
+        shutil.copytree(RQ_SOURCE, rq_copy)
+        info["copytree"] = "ok"
+
+        # Step 3: write conftest
+        with open(os.path.join(tmpdir, "conftest.py"), "w") as f:
+            f.write(CONFTEST_CONTENT)
+
+        # Step 4: overlay user files
+        for rel_path, content in user_files.items():
+            dest = os.path.join(rq_copy, rel_path)
+            os.makedirs(os.path.dirname(dest), exist_ok=True)
+            with open(dest, "w") as f:
+                f.write(content)
+
+        # Step 5: copy test suite
+        test_dest = os.path.join(tmpdir, "test_submission.py")
+        shutil.copy2(TEST_SUITE_PATH, test_dest)
+
+        # Step 6: run pytest
+        env = os.environ.copy()
+        env["RQ_CODEBASE_PATH"] = rq_copy
+        extra_paths = rq_copy + os.pathsep + os.path.join(rq_copy, "tests")
+        existing = env.get("PYTHONPATH", "")
+        env["PYTHONPATH"] = extra_paths + (os.pathsep + existing if existing else "")
+
+        xml_path = os.path.join(tmpdir, "results.xml")
+        cmd = [
+            sys.executable, "-m", "pytest", test_dest,
+            f"--junitxml={xml_path}", "-q", "--no-header",
+            f"--ignore={os.path.join(rq_copy, 'tests')}",
+            f"--rootdir={tmpdir}",
+        ]
+
+        result = subprocess.run(
+            cmd, capture_output=True, text=True,
+            timeout=PYTEST_TIMEOUT, cwd=tmpdir, env=env,
+        )
+        info["returncode"] = result.returncode
+        info["stdout_tail"] = result.stdout[-1000:] if result.stdout else ""
+        info["stderr_tail"] = result.stderr[-1000:] if result.stderr else ""
+        info["xml_exists"] = os.path.exists(xml_path)
+
+    except Exception as e:
+        info["error"] = f"{type(e).__name__}: {e}"
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
 
     return info
