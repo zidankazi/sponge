@@ -18,5 +18,5 @@ dist/
 # OS
 .DS_Store
 
-# Claude Code worktrees
-.claude/worktrees/
+# Claude
+.claude/
