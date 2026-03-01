@@ -135,8 +135,8 @@ export default function LandingScreen() {
 
   return (
     <div className="landing" ref={scrollRef}>
-      {/* ── Floating Claude mascots ── */}
-      <img ref={mascot1Ref} src="/logos/claude.svg" alt="" className="claude-float claude-float--1" />
+      {/* ── Floating AI mascots ── */}
+      <img ref={mascot1Ref} src="/logos/gemini.svg" alt="" className="ai-float ai-float--gemini" />
       <img ref={mascot2Ref} src="/logos/claude.svg" alt="" className="claude-float claude-float--2" />
       <img ref={mascot3Ref} src="/logos/claude.svg" alt="" className="claude-float claude-float--3" />
 

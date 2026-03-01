@@ -128,21 +128,28 @@ a {
   position: relative;
 }
 
-/* ── Floating Claude mascots ── */
-.claude-float {
+/* ── Floating AI logos ── */
+.ai-float {
   position: absolute;
   pointer-events: none;
   z-index: 0;
   will-change: transform;
 }
 
-/* Top-right of hero area — small, tilted slightly */
-.claude-float--1 {
-  width: 64px;
+.ai-float--gemini {
+  width: 56px;
   height: auto;
   top: 18%;
   right: 8%;
-  opacity: 0.12;
+  opacity: 0.18;
+}
+
+/* ── Floating Claude mascots ── */
+.claude-float {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform;
 }
 
 /* Mid-left, between hero and social proof — larger, more faded */
