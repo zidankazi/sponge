@@ -174,7 +174,7 @@ You're dropped into a real open-source Python codebase **([RQ](https://github.co
                                    ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
 │                             SCORE RESPONSE                               │
-│         Score model → ScoreReveal.jsx · badge · interpretation           │
+│         Score model → ResultsScreen.jsx · badge · interpretation          │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -241,10 +241,10 @@ sponge/
 │       ├── components/
 │       │   ├── editor/         FileTree, CodeEditor, ProblemStatement
 │       │   ├── chat/           ChatTerminal, ChatMessage
-│       │   ├── game/           LandingScreen, BriefScreen, ResultsScreen, ScoreReveal
+│       │   ├── game/           LandingScreen, BriefScreen, ResultsScreen
 │       │   └── shared/         Header, Layout
 │       ├── hooks/              useSession, useResizable
-│       ├── api/                client.js — fetch wrapper with mock flags
+│       ├── api/                client.js — fetch wrapper (all live, no mocks)
 │       └── data/               fileTree.js, fileContents.js (RQ source)
 │
 ├── backend/                    FastAPI + Python
