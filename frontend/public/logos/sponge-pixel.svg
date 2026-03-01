@@ -1,36 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
-  <!-- Black outline -->
-  <path d="M2.5,2h11v1h1v11h-1v1h-11v-1h-1v-11h1z" fill="#000000" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 24" shape-rendering="crispEdges">
+  <!-- 
+    Simplified pixel art recreation of an angled blue/yellow kitchen sponge.
+    The blue scrub pad is on top, yellow sponge body is underneath.
+  -->
+
+  <!-- Black Outline Shadow / Base -->
+  <path d="M14,4 h4 v1 h2 v1 h2 v1 h2 v1 h2 v1 h2 v4 h-1 v1 h-1 v1 h-1 v1 h-1 v1 h-1 v1 h-2 v1 h-3 v1 h-6 v1 h-4 v-1 h-3 v-1 h-2 v-1 h-2 v-1 h-1 v-1 h-1 v-4 h4 v-1 h2 v-1 h1 v-1 h2 v-1 h2 v-1 z" fill="#000000" />
+
+  <!-- Yellow Sponge Body -->
+  <path d="M4,13 h4 v-1 h2 v-1 h1 v-1 h2 v1 h2 v1 h3 v-1 h3 v-1 h3 v-1 h2 v2 h-1 v1 h-1 v1 h-1 v1 h-1 v1 h-1 v1 h-2 v1 h-3 v1 h-6 v-1 h-2 v-1 h-2 v-1 h-1 v-1 h-1 v-1 h-1 z" fill="#fae125" />
   
-  <!-- Yellow body -->
-  <path d="M3,3h10v10h-10z" fill="#fce83a" />
+  <!-- Yellow Sponge Shadow -->
+  <path d="M4,15 h2 v1 h2 v1 h1 v1 h1 v1 h2 v1 h6 v-1 h3 v-1 h2 v-1 h1 v-1 h1 v-1 h1 v-1 h1 v-1 h1 v2 h-1 v1 h-1 v1 h-1 v1 h-1 v1 h-1 v1 h-2 v1 h-3 v1 h-6 v-1 h-2 v-1 h-2 v-1 h-1 v-1 h-1 v-1 h-1 z" fill="#d1b815" />
 
-  <!-- Pores (Darker Yellow) -->
-  <rect x="4" y="4" width="2" height="2" fill="#c9b922"/>
-  <rect x="11" y="5" width="1" height="1" fill="#c9b922"/>
-  <rect x="3" y="10" width="1" height="2" fill="#c9b922"/>
-  <rect x="10" y="10" width="2" height="2" fill="#c9b922"/>
-
-  <!-- Eyes (White) -->
-  <rect x="6" y="5" width="2" height="3" fill="#ffffff" />
-  <rect x="9" y="5" width="2" height="3" fill="#ffffff" />
+  <!-- Sponge Pores (Darker Yellow) -->
+  <rect x="6" y="16" width="1" height="1" fill="#b09b0b" />
+  <rect x="9" y="18" width="2" height="1" fill="#b09b0b" />
+  <rect x="15" y="19" width="1" height="1" fill="#b09b0b" />
+  <rect x="19" y="17" width="2" height="1" fill="#b09b0b" />
+  <rect x="23" y="15" width="1" height="1" fill="#b09b0b" />
+  <rect x="25" y="13" width="1" height="1" fill="#b09b0b" />
+  <rect x="4" y="14" width="1" height="1" fill="#b09b0b" />
   
-  <!-- Pupils (Black) -->
-  <rect x="7" y="6" width="1" height="1" fill="#000000" />
-  <rect x="9" y="6" width="1" height="1" fill="#000000" />
+  <rect x="8" y="15" width="1" height="1" fill="#b09b0b" />
+  <rect x="12" y="16" width="1" height="1" fill="#b09b0b" />
+  <rect x="18" y="15" width="1" height="1" fill="#b09b0b" />
+  <rect x="21" y="12" width="1" height="1" fill="#b09b0b" />
 
-  <!-- Mouth/Smile (Black) -->
-  <rect x="5" y="9" width="1" height="1" fill="#000000" />
-  <rect x="11" y="9" width="1" height="1" fill="#000000" />
-  <rect x="6" y="10" width="1" height="1" fill="#000000" />
-  <rect x="10" y="10" width="1" height="1" fill="#000000" />
-  <rect x="7" y="11" width="3" height="1" fill="#000000" />
+  <!-- Blue Scrub Pad (Top) -->
+  <path d="M14,5 h4 v1 h2 v1 h2 v1 h2 v1 h2 v1 h2 v1 h-2 v1 h-3 v1 h-3 v1 h-3 pos-1 v-1 h-2 v-1 h-2 v-1 h-1 v1 h-2 v1 h-4 v-1 h-2 v-1 h-1 v-1 h-2 v-1 h4 v-1 h2 v-1 h1 v-1 h2 v-1 z" fill="#0b5b9c" />
+
+  <!-- Blue Scrub Pad Darker Areas -->
+  <path d="M14,5 h1 v1 h-1 z M16,6 h1 v1 h-1 z M18,7 h1 v1 h-1 z M20,8 h1 v1 h-1 z M22,9 h1 v1 h-1 z M24,10 h1 v1 h-1 z M15,11 h1 v1 h-1 z M12,12 h1 v1 h-1 z M9,11 h1 v1 h-1 z M6,10 h1 v1 h-1 z" fill="#063e6e" />
+  <path d="M21,11 h3 v1 h-3 z M16,13 h3 v1 h-3 z M18,12 h1 v1 h-1 z M10,14 h2 v1 h-2 z" fill="#063e6e" />
   
-  <!-- Buck Teeth (White) -->
-  <rect x="7" y="11" width="1" height="1" fill="#ffffff" />
-  <rect x="9" y="11" width="1" height="1" fill="#ffffff" />
+  <!-- Blue Scrub Pad Edge Highlight -->
+  <path d="M16,7 h2 v1 h2 v1 h2 v1 h2 v1 h1 v1" fill="none" stroke="#2a8eea" stroke-width="1" />
+  <path d="M7,12 h3 v1 h1 v1 h2" fill="none" stroke="#2a8eea" stroke-width="1" />
+  <rect x="18" y="9" width="1" height="1" fill="#2a8eea" />
+  <rect x="13" y="10" width="1" height="1" fill="#2a8eea" />
+  <rect x="14" y="12" width="1" height="1" fill="#2a8eea" />
 
-  <!-- Highlights (Lighter Yellow) -->
-  <rect x="3" y="3" width="10" height="1" fill="#fff58a"/>
-  <rect x="3" y="4" width="1" height="9" fill="#fff58a"/>
 </svg>
