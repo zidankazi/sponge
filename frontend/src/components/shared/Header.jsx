@@ -8,11 +8,12 @@ function formatTime(seconds) {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
-export default function Header() {
+export default function Header({ onTestsTriggered }) {
   const navigate = useNavigate()
   const {
     timeLeft, totalTime, submit, isSubmitting,
     checkpoints, saveCheckpoint, fileBuffers, lastSavedBuffers, setShowHistory,
+    runSessionTests, isRunningTests,
   } = useSession()
 
   const [showToast, setShowToast] = useState(false)
@@ -113,6 +114,25 @@ export default function Header() {
           </button>
           <button className="history-btn" onClick={() => setShowHistory(true)}>
             History
+          </button>
+          <button
+            className="run-btn"
+            onClick={() => { runSessionTests(); onTestsTriggered?.() }}
+            disabled={isRunningTests}
+          >
+            {isRunningTests ? (
+              <>
+                <span className="run-spinner" />
+                Running...
+              </>
+            ) : (
+              <>
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M4 2l10 6-10 6V2z" />
+                </svg>
+                Run
+              </>
+            )}
           </button>
           <button
             className="submit-btn"

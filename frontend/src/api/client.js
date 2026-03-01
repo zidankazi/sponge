@@ -10,6 +10,7 @@ const MOCK = {
   logEvent: false,   // ✅ Sri done
   sendPrompt: false,   // ✅ Gemini live
   submit: false,   // ✅ Sri done
+  runTests: false,  // flip to true for local dev without backend
 }
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms))
@@ -96,6 +97,43 @@ export async function logEvent({ session_id, event, file, ts }) {
     // Non-critical — swallow silently so the session doesn't break
   }
   return {}
+}
+
+// ─── POST /run-tests ─────────────────────────────────────────────────
+
+export async function runTests({ session_id, file_contents }) {
+  if (MOCK.runTests) {
+    await delay(1200)
+    return {
+      total: 12, passed: 1, failed: 11, pass_rate: 0.08,
+      core_failures: ['test_enqueue_in_exists', 'test_enqueue_at_exists'],
+      results: [
+        { test_name: 'test_enqueue_in_exists', passed: false, is_core: true, error_message: 'AssertionError: Queue is missing the enqueue_in method' },
+        { test_name: 'test_enqueue_at_exists', passed: false, is_core: true, error_message: 'AssertionError: Queue is missing the enqueue_at method' },
+        { test_name: 'test_existing_enqueue_unchanged', passed: true, is_core: true },
+        { test_name: 'test_enqueue_in_returns_job', passed: false, is_core: false, error_message: "AttributeError: 'Queue' object has no attribute 'enqueue_in'" },
+        { test_name: 'test_enqueue_at_returns_job', passed: false, is_core: false, error_message: "AttributeError: 'Queue' object has no attribute 'enqueue_at'" },
+        { test_name: 'test_scheduled_job_not_in_queue_immediately', passed: false, is_core: false, error_message: "AttributeError: 'Queue' object has no attribute 'enqueue_in'" },
+        { test_name: 'test_scheduled_job_in_scheduled_registry', passed: false, is_core: false, error_message: "AttributeError: 'Queue' object has no attribute 'enqueue_in'" },
+        { test_name: 'test_enqueue_at_past_datetime', passed: false, is_core: false, error_message: "AttributeError: 'Queue' object has no attribute 'enqueue_at'" },
+        { test_name: 'test_enqueue_in_zero_delay', passed: false, is_core: false, error_message: "AttributeError: 'Queue' object has no attribute 'enqueue_in'" },
+        { test_name: 'test_worker_moves_ready_jobs', passed: false, is_core: false, error_message: "AttributeError: 'Queue' object has no attribute 'enqueue_in'" },
+        { test_name: 'test_multiple_scheduled_jobs_ordering', passed: false, is_core: false, error_message: "AttributeError: 'Queue' object has no attribute 'enqueue_in'" },
+        { test_name: 'test_job_status_lifecycle', passed: false, is_core: false, error_message: "AttributeError: 'Queue' object has no attribute 'enqueue_in'" },
+      ],
+    }
+  }
+  try {
+    const res = await safeFetch(`${API_BASE}/run-tests`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id, file_contents }),
+    }, { endpoint: 'run-tests' })
+    return res.json()
+  } catch (err) {
+    emitError('Test run failed — try again', 'run-tests', true)
+    throw err
+  }
 }
 
 // ─── POST /submit ────────────────────────────────────────────────────

@@ -5,6 +5,7 @@ import ProblemStatement from '../editor/ProblemStatement'
 import FileTree from '../editor/FileTree'
 import CodeEditor from '../editor/CodeEditor'
 import ChatTerminal from '../chat/ChatTerminal'
+import TestResultsPanel from '../editor/TestResultsPanel'
 import { useSession } from '../../hooks/useSession'
 import useResizable from '../../hooks/useResizable'
 
@@ -23,7 +24,7 @@ function CollapsedProblemBar({ onExpand }) {
   )
 }
 
-function CollapsedChatBar({ onExpand }) {
+function CollapsedBottomBar({ onExpand }) {
   return (
     <button className="collapsed-panel-bar collapsed-panel-bar--chat" onClick={onExpand}>
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
@@ -38,10 +39,11 @@ function CollapsedChatBar({ onExpand }) {
 }
 
 export default function Layout() {
-  const { isSubmitting, showHistory, setShowHistory } = useSession()
+  const { isSubmitting, showHistory, setShowHistory, testResults, isRunningTests } = useSession()
 
   const [problemCollapsed, setProblemCollapsed] = useState(false)
-  const [chatCollapsed, setChatCollapsed] = useState(false)
+  const [bottomCollapsed, setBottomCollapsed] = useState(false)
+  const [activeBottomTab, setActiveBottomTab] = useState('chat')
 
   const sidebar = useResizable({
     direction: 'horizontal',
@@ -57,9 +59,20 @@ export default function Layout() {
     maxSize: 600,
   })
 
+  // Called from Header when Run is clicked
+  const onTestsTriggered = () => {
+    setActiveBottomTab('tests')
+    setBottomCollapsed(false)
+  }
+
+  // Badge text for Tests tab
+  const testsBadge = testResults
+    ? `${testResults.passed}/${testResults.total}`
+    : null
+
   return (
     <div className="layout">
-      <Header />
+      <Header onTestsTriggered={onTestsTriggered} />
       <div className="layout-body">
         <aside className="layout-sidebar" style={{ width: sidebar.size, minWidth: sidebar.size }}>
           {problemCollapsed ? (
@@ -80,8 +93,8 @@ export default function Layout() {
             <CodeEditor />
           </div>
 
-          {chatCollapsed ? (
-            <CollapsedChatBar onExpand={() => setChatCollapsed(false)} />
+          {bottomCollapsed ? (
+            <CollapsedBottomBar onExpand={() => setBottomCollapsed(false)} />
           ) : (
             <>
               <div
@@ -89,7 +102,49 @@ export default function Layout() {
                 {...chat.handleProps}
               />
               <div className="layout-chat" style={{ height: chat.size }}>
-                <ChatTerminal onCollapse={() => setChatCollapsed(true)} />
+                <div className="bottom-tabs">
+                  <div className="bottom-tabs-left">
+                    <button
+                      className={`bottom-tab ${activeBottomTab === 'chat' ? 'bottom-tab--active' : ''}`}
+                      onClick={() => setActiveBottomTab('chat')}
+                    >
+                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
+                        <path d="M2 3h12v8H4l-2 2V3z" />
+                      </svg>
+                      <span>AI Assistant</span>
+                    </button>
+                    <button
+                      className={`bottom-tab ${activeBottomTab === 'tests' ? 'bottom-tab--active' : ''}`}
+                      onClick={() => setActiveBottomTab('tests')}
+                    >
+                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
+                        <path d="M4 2l8 0 0 12-8 0z" />
+                        <path d="M6 5.5h4M6 8h4M6 10.5h2" />
+                      </svg>
+                      <span>Tests</span>
+                      {isRunningTests && <span className="bottom-tab-spinner" />}
+                      {!isRunningTests && testsBadge && (
+                        <span className={`bottom-tab-badge ${testResults.failed === 0 ? 'bottom-tab-badge--pass' : 'bottom-tab-badge--fail'}`}>
+                          {testsBadge}
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                  <div className="bottom-tabs-right">
+                    <button className="panel-collapse-btn" onClick={() => setBottomCollapsed(true)} title="Collapse panel">
+                      <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                        <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bottom-panel-content" style={{ display: activeBottomTab === 'chat' ? 'flex' : 'none' }}>
+                  <ChatTerminal hideHeader />
+                </div>
+                <div className="bottom-panel-content" style={{ display: activeBottomTab === 'tests' ? 'flex' : 'none' }}>
+                  <TestResultsPanel />
+                </div>
               </div>
             </>
           )}
