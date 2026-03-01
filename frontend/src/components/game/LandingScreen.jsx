@@ -92,7 +92,7 @@ export default function LandingScreen() {
             </span>
           </h1>
           <p className="hero-subline">
-            The AI-native environment where your logic matters more than memorized code. We make software engineering accessible to anyone with an idea.
+            Stop memorizing syntax. Start architecting systems. Practice building real-world software side-by-side with an AI pair programmer.
           </p>
           <button className="hero-cta" onClick={handleStart} disabled={loading}>
             {loading ? 'Starting Demo...' : 'View demo'}
@@ -100,7 +100,7 @@ export default function LandingScreen() {
         </div>
 
         <div className="hero-social-proof">
-          <p className="hero-social-proof-label">COMPANIES USING AI-ASSISTED INTERVIEWS</p>
+          <p className="hero-social-proof-label">COMPANIES ADOPTING AI-ASSISTED INTERVIEWS</p>
           <div className="marquee-container">
             <div className="marquee-content">
               {companies.map((company, i) => (
