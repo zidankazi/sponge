@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { useSession } from '../../hooks/useSession'
 
 function formatTime(seconds) {
@@ -7,6 +8,7 @@ function formatTime(seconds) {
 }
 
 export default function BriefScreen() {
+  const navigate = useNavigate()
   const { timeLeft, totalTime, startCoding } = useSession()
 
   const pct = (timeLeft / totalTime) * 100
@@ -16,7 +18,7 @@ export default function BriefScreen() {
     <div className="brief">
 
       <header className="brief-header">
-        <div className="brief-header-left">
+        <div className="brief-header-left" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
           <img
             src="/brand/logo-full.png"
             alt="Sponge"
