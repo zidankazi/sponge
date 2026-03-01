@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges">
+  <!-- Sponge body (yellow) -->
+  <rect x="4" y="4" width="16" height="14" fill="#f5d442"/>
+  <!-- Pores / holes -->
+  <rect x="6" y="6" width="3" height="3" fill="#c4a832" rx="0"/>
+  <rect x="12" y="7" width="2" height="2" fill="#c4a832"/>
+  <rect x="7" y="11" width="2" height="3" fill="#c4a832"/>
+  <rect x="14" y="12" width="3" height="2" fill="#c4a832"/>
+  <rect x="11" y="13" width="2" height="2" fill="#c4a832"/>
+  <!-- Pixel eyes -->
+  <rect x="8" y="8" width="2" height="2" fill="#222"/>
+  <rect x="13" y="8" width="2" height="2" fill="#222"/>
+  <!-- Smile -->
+  <rect x="9" y="13" width="1" height="1" fill="#222"/>
+  <rect x="10" y="14" width="4" height="1" fill="#222"/>
+  <rect x="14" y="13" width="1" height="1" fill="#222"/>
+  <!-- Top edge highlight -->
+  <rect x="4" y="4" width="16" height="1" fill="#fae87c"/>
+  <!-- Bottom edge shadow -->
+  <rect x="4" y="17" width="16" height="1" fill="#c4a020"/>
+</svg>

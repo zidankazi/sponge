@@ -12,7 +12,7 @@ const ROTATING_WORDS = [
   'future.'
 ]
 
-// Component: Claude mascot orbiting fully around the team names with a fading dotted trail
+// Component: Pixelated sponge orbiting the team names with a bubble trail
 function OrbitingMascot() {
   const canvasRef = useRef(null)
   const mascotRef = useRef(null)
@@ -29,9 +29,9 @@ function OrbitingMascot() {
     let animId
 
     const speed = 0.006
-    const mascotSize = 32
-    const maxDots = 60
-    const dotSpacing = 2 // record a dot every N frames for denser trail
+    const mascotSize = 36
+    const maxBubbles = 30
+    const bubbleSpacing = 4 // record a bubble every N frames
 
     const resize = () => {
       const parent = canvas.parentElement
@@ -48,7 +48,6 @@ function OrbitingMascot() {
       const a = angleRef.current
 
       // Ellipse radii scale with the container so the orbit wraps around the text
-      // We use 0.40 for X so it leaves some breathing room on the edges of the screen
       const radiusX = canvas.width * 0.40
       const radiusY = canvas.height * 0.42
 
@@ -58,36 +57,53 @@ function OrbitingMascot() {
       const x = cx + Math.cos(a) * radiusX
       const y = cy + Math.sin(a) * radiusY
 
-      // Calculate the tangent angle for rotation (direction of travel)
-      const dx = -Math.sin(a) * radiusX
-      const dy = Math.cos(a) * radiusY
-      const rotationDeg = Math.atan2(dy, dx) * (180 / Math.PI) + 90
+      // Gentle wobble instead of full rotation
+      const wobble = Math.sin(a * 3) * 12
 
-      // Update mascot position and rotation
+      // Update mascot position and wobble
       mascot.style.left = `${x - mascotSize / 2}px`
       mascot.style.top = `${y - mascotSize / 2}px`
-      mascot.style.transform = `rotate(${rotationDeg}deg)`
+      mascot.style.transform = `rotate(${wobble}deg)`
 
-      // Store trail dot (spaced out for a dotted-line look)
-      if (frameCount.current % dotSpacing === 0) {
-        trailRef.current.push({ x, y })
-        if (trailRef.current.length > maxDots) trailRef.current.shift()
+      // Store bubble (spaced out)
+      if (frameCount.current % bubbleSpacing === 0) {
+        // Random size and slight horizontal offset for organic feel
+        const bSize = 3 + Math.random() * 5
+        const offsetX = (Math.random() - 0.5) * 8
+        trailRef.current.push({ x: x + offsetX, y, size: bSize, age: 0 })
+        if (trailRef.current.length > maxBubbles) trailRef.current.shift()
       }
 
-      // Draw trail — newest dots are brightest/biggest, oldest fade out
+      // Draw bubbles — they float upward and fade out
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       const total = trailRef.current.length
       for (let i = 0; i < total; i++) {
-        const dot = trailRef.current[i]
-        // i=0 is oldest, i=total-1 is newest
-        const t = i / total
-        const opacity = t * 0.35
-        const radius = 1 + t * 2.5
+        const b = trailRef.current[i]
+        b.age++
+        // Float upward over time
+        b.y -= 0.3
 
+        const t = i / total // 0=oldest, 1=newest
+        const opacity = t * 0.3
+
+        // Bubble ring
         ctx.beginPath()
-        ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(180, 120, 90, ${opacity})`
+        ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2)
+        ctx.strokeStyle = `rgba(150, 210, 255, ${opacity})`
+        ctx.lineWidth = 1
+        ctx.stroke()
+
+        // Subtle fill
+        ctx.fillStyle = `rgba(150, 210, 255, ${opacity * 0.15})`
         ctx.fill()
+
+        // Highlight dot (top-left of bubble)
+        if (b.size > 3) {
+          ctx.beginPath()
+          ctx.arc(b.x - b.size * 0.3, b.y - b.size * 0.3, b.size * 0.2, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(255, 255, 255, ${opacity * 0.6})`
+          ctx.fill()
+        }
       }
 
       animId = requestAnimationFrame(tick)
@@ -105,7 +121,7 @@ function OrbitingMascot() {
       <canvas ref={canvasRef} className="orbit-trail" />
       <img
         ref={mascotRef}
-        src="/logos/claude.svg"
+        src="/logos/sponge-pixel.svg"
         alt=""
         className="orbit-mascot"
       />
