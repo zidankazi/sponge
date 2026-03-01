@@ -79,8 +79,7 @@ You're dropped into a real open-source Python codebase **([RQ](https://github.co
 
 Test accuracy is **50% of the grade**. The other 50% measures how the candidate collaborates with AI.
 
-<!-- TODO: replace src with screenshots/session.png -->
-<img src="https://placehold.co/1280x760/0f0f13/6C47FF?text=Session+%E2%80%94+Editor+%2B+AI+Chat" alt="Sponge — Session View" width="100%" />
+<img src="https://i.imgur.com/u60KY1b.png" alt="Sponge — Session View" width="100%"/>
 
 ---
 
