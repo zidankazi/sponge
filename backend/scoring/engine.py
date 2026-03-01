@@ -24,6 +24,7 @@ total_score = clamp(round((positives + penalties) / 50 * 100), 0, 100)
 """
 
 import re
+from typing import Optional
 from models.score import HeadlineMetrics, Score, ScoreBreakdown
 from models.session import Session
 
@@ -602,18 +603,36 @@ def _has_any_tests_signal(breakdown: ScoreBreakdown) -> bool:
 
 # ---------- Public entry point ----------
 
-def compute_score(session: Session) -> Score:
+def compute_score(session: Session, semantic_eval: "Optional[object]" = None) -> Score:
     """
     Compute and return a Score for the given session.
     Called by POST /submit after final_code is set on the session.
+
+    If semantic_eval (SemanticEval) is provided, its scores are blended with
+    metric-based scores for request_quality and response_handling (60/40 in
+    favour of semantic), and its interpretation replaces the template text.
+    Falls back to pure metrics if semantic_eval is None.
     """
     # Compute headline metrics first — penalties depend on them
     metrics = _compute_headline_metrics(session)
 
+    # Base metric scores for the two content-sensitive dimensions
+    metric_rq = _score_request_quality(session)
+    metric_rh = _score_response_handling(session)
+
+    # Blend: 60% semantic + 40% metric when semantic eval is available.
+    # Metrics still anchor the score so it can't be gamed by empty-but-long prompts.
+    if semantic_eval is not None:
+        request_quality = min(10, round(0.4 * metric_rq + 0.6 * semantic_eval.prompt_quality_score))
+        response_handling = min(10, round(0.4 * metric_rh + 0.6 * semantic_eval.response_engagement_score))
+    else:
+        request_quality = metric_rq
+        response_handling = metric_rh
+
     breakdown = ScoreBreakdown(
         request_timing=_score_request_timing(session),
-        request_quality=_score_request_quality(session),
-        response_handling=_score_response_handling(session),
+        request_quality=request_quality,
+        response_handling=response_handling,
         verification_discipline=_score_verification_discipline(session),
         iterative_collaboration=_score_iterative_collaboration(session),
         penalties=_score_penalties(session, metrics),
@@ -630,7 +649,12 @@ def compute_score(session: Session) -> Score:
     total = max(0, min(100, round((positives + breakdown.penalties) / 50 * 100)))
 
     badge = _assign_badge(total)
-    interpretation = _build_interpretation(total, breakdown, metrics)
+
+    # Use Gemini's personalized interpretation if available, else template
+    if semantic_eval is not None:
+        interpretation = semantic_eval.interpretation
+    else:
+        interpretation = _build_interpretation(total, breakdown, metrics)
 
     return Score(
         total_score=total,

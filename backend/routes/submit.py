@@ -8,6 +8,7 @@ import store
 from models.score import Score
 from models.session import Session
 from scoring.engine import compute_score
+from scoring.semantic import evaluate_conversation
 
 router = APIRouter(tags=["submit"])
 
@@ -43,7 +44,11 @@ async def submit_session(body: SubmitRequest):
     if body.username:
         session.username = body.username
 
-    score = compute_score(session)
+    # Semantic eval — single Gemini call to score prompt quality and engagement.
+    # Returns None on any failure; engine falls back to pure metrics gracefully.
+    semantic_eval = await evaluate_conversation(session.conversation_history)
+
+    score = compute_score(session, semantic_eval=semantic_eval)
 
     session.score = score
     return score
