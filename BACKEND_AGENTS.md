@@ -72,36 +72,50 @@ Store all events in the session object. The scoring engine reads them later.
 
 ### `POST /submit` (`routes/submit.py`)
 
-Submits session for scoring. Runs the scoring engine on the event log and returns results.
+Submits session for scoring. Fires three concurrent evaluations then runs `compute_score()`:
+1. `evaluate_conversation()` — semantic eval of conversation via Gemini (12 sub-criteria)
+2. `analyze_final_code()` — code quality analysis via Gemini (B1/B2/B3 + P3)
+3. `run_correctness_tests()` — 12 synthesized tests in sandbox
+
+All three return `None` on failure — the engine falls back to metric-based scoring.
 
 ```json
 // Request
 {
   "session_id": "sponge_abc123",
-  "final_code": "// all file contents concatenated"
+  "final_code": "// all file contents concatenated",
+  "username": "alice"
 }
+
+// Response (response_model=Score)
+{
+  "total_score": 72,
+  "breakdown": { "request_timing": 8, "request_quality": 9, "response_handling": 7, "verification_discipline": 5, "iterative_collaboration": 8, "penalties": -2 },
+  "rubric_breakdown": { "problem_solving": 9.0, "code_quality": 10.0, "verification": 7.0, "communication": 11.0 },
+  "headline_metrics": { "blind_adoption_rate": 0.15, "ai_modification_rate": 0.82, "test_after_ai_rate": 0.40, "passive_reprompt_rate": 0.10, "grounded_prompt_rate": 0.75, "evidence_grounded_followup_rate": 0.60, "ai_apply_without_edit_rate": 0.10, "test_pass_rate": 0.75 },
+  "interpretation": "Strong collaborative instincts...",
+  "badge": "On Your Way",
+  "sub_criteria": { "a1_understanding": 4.5, "..." : "..." },
+  "penalty_detail": { "p1_over_reliance": 0, "p2_no_run": 0, "p3_critical_miss": -10 },
+  "test_suite": { "total": 12, "passed": 9, "failed": 3, "pass_rate": 0.75, "results": [], "core_failures": [] }
+}
+```
+
+`rubric_breakdown`, `sub_criteria`, `penalty_detail`, `test_suite` are optional (null if eval failed).
+
+### `POST /run-tests` (`routes/run_tests.py`)
+
+Runs the correctness test suite against the user's current code. Returns pass/fail results.
+
+```json
+// Request
+{ "session_id": "sponge_abc123", "file_contents": { "rq/queue.py": "..." } }
 
 // Response
 {
-  "total_score": 72,
-  "breakdown": {
-    "request_timing": 8,
-    "request_quality": 9,
-    "response_handling": 7,
-    "verification_discipline": 5,
-    "iterative_collaboration": 8,
-    "penalties": -2
-  },
-  "headline_metrics": {
-    "blind_adoption_rate": 0.15,
-    "ai_modification_rate": 0.82,
-    "test_after_ai_rate": 0.40,
-    "passive_reprompt_rate": 0.10,
-    "grounded_prompt_rate": 0.75,
-    "evidence_grounded_followup_rate": 0.60
-  },
-  "interpretation": "Strong collaborative instincts...",
-  "badge": "On Your Way"
+  "total": 12, "passed": 1, "failed": 11, "pass_rate": 0.08,
+  "core_failures": ["test_enqueue_in_exists"],
+  "results": [{ "test_name": "test_enqueue_in_exists", "passed": false, "is_core": true, "error_message": "..." }]
 }
 ```
 
@@ -143,36 +157,47 @@ Returns all completed sessions sorted by score.
 
 ### Score (`models/score.py`)
 ```python
-{
-    "total_score": int,
-    "breakdown": {
-        "request_timing": int,
-        "request_quality": int,
-        "response_handling": int,
-        "verification_discipline": int,
-        "iterative_collaboration": int,
-        "penalties": int
-    },
-    "headline_metrics": {
-        "blind_adoption_rate": float,
-        "ai_modification_rate": float,
-        "test_after_ai_rate": float,
-        "passive_reprompt_rate": float,
-        "grounded_prompt_rate": float,
-        "evidence_grounded_followup_rate": float
-    },
-    "interpretation": str,
-    "badge": str
-}
+Score(
+    total_score: int,                           # 0-100
+    breakdown: ScoreBreakdown,                  # legacy 0-10 metric scores
+    headline_metrics: HeadlineMetrics,           # 8 rate metrics
+    interpretation: str,                         # Socratic feedback text
+    badge: str,                                  # "AI Collaborator" | "On Your Way" | "Needs Work" | "Just Vibing"
+    rubric_breakdown: Optional[RubricBreakdown], # A:0-12, B:0-13, C:0-12, D:0-13
+    sub_criteria: Optional[SubCriteriaDetail],   # 16 sub-criteria detail
+    penalty_detail: Optional[PenaltyDetail],     # P1/P2/P3
+    test_suite: Optional[TestSuiteResult],       # correctness test results
+)
+
+RubricBreakdown(problem_solving, code_quality, verification, communication)
+SubCriteriaDetail(a1_understanding, a2_decomposition, a3_justification, a4_edge_cases,
+                  b1_clarity, b2_correctness, b3_efficiency, b4_ownership,
+                  c1_exec_frequency, c2_test_coverage, c3_ai_validation, c4_debug_discipline,
+                  d1_narration, d2_tradeoffs, d3_ai_balance, d4_status_summaries)
+PenaltyDetail(p1_over_reliance, p2_no_run, p3_critical_miss)
+TestSuiteResult(total, passed, failed, pass_rate, results: list[TestResult], core_failures: list[str])
 ```
 
-## Scoring Engine (`scoring/engine.py`)
+## Scoring Engine (`scoring/`)
 
-**This is entirely the backend partner's domain.** The engine receives a session (with all events and conversation history) and returns a Score object.
+The scoring engine is fully implemented. Key files:
 
-The six scoring categories and their weights are defined in `AGENTS.md`. The implementation is up to the backend partner.
+| File | Purpose |
+|------|---------|
+| `scoring/engine.py` | Main `compute_score()` — orchestrates all scoring, produces the `Score` model |
+| `scoring/semantic.py` | `evaluate_conversation()` — Gemini-based semantic eval of 12 sub-criteria |
+| `scoring/code_analysis.py` | `analyze_final_code()` — Gemini-based code quality eval (B1/B2/B3 + P3) |
+| `scoring/test_runner.py` | `run_correctness_tests()` — runs 12 synthesized tests against user code |
+| `scoring/metrics.py` | Metric computation from event log (rates, timing) |
+| `scoring/interpretation.py` | Generates Socratic feedback text |
+| `scoring/vocabulary.py` | Badge assignment from total score |
 
-The `scoring/` directory is intentionally left empty — design it however you want.
+The engine uses three evaluation sources (all fired concurrently, all fallback to `None`):
+1. Conversation semantic eval → 12 sub-criteria scores (A1-A4, C1-C4, D1-D4)
+2. Code analysis → B1-B3 scores + P3 penalty
+3. Correctness tests → test pass rate → C2 score + P2 penalty
+
+`compute_score()` merges these with event-log metrics to produce the final `Score`.
 
 ## Gemini Integration (`gemini/client.py`)
 

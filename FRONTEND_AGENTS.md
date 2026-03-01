@@ -78,62 +78,30 @@ frontend/src/
 
 ## API Client (`api/client.js`)
 
-All API calls go through `api/client.js`. Currently mocked — each function returns hardcoded data with a simulated delay. When the backend is ready, swap the mock implementations for real `fetch` calls. The function signatures match the API contract exactly:
+All API calls go through `api/client.js`. All endpoints hit the live backend — there are **no mocks**. The base URL defaults to `https://sponge-backend.vercel.app` and can be overridden via `VITE_API_URL`.
 
 ```js
-startSession()                    // POST /session/start
-sendPrompt({ session_id, prompt_text, conversation_history })  // POST /prompt
-logEvent({ session_id, event, file, ts })                      // POST /session/event
-submitSession({ session_id, final_code })                      // POST /submit
-fetchLeaderboard()                // GET /leaderboard
+startSession(username)                                                         // POST /session/start
+sendPrompt({ session_id, prompt_text, conversation_history, active_file, file_contents })  // POST /prompt
+logEvent({ session_id, event, file, ts })                                      // POST /session/event
+runTests({ session_id, file_contents })                                        // POST /run-tests
+submitSession({ session_id, final_code, username })                            // POST /submit
 ```
 
-## Mock API Responses
+Error handling: `safeFetch` wrapper emits errors via `onApiError` subscriber pattern. `logEvent` swallows errors silently (fire-and-forget).
 
-### `POST /prompt` — mock responses
+### Score response shape (from `/submit`)
 
-The mock rotates through canned responses based on keywords in the prompt:
-- Keywords `schedule`, `delay`, `enqueue_in`, `enqueue_at` → response about the scheduling approach
-- Keywords `worker`, `perform`, `execute` → response about the worker execution flow
-- Keywords `queue`, `enqueue` → response about Queue class structure
-- Keywords `test` → response about testing the implementation
-- Default → general overview response
+The frontend consumes these fields from the response:
+- `total_score` (int, 0-100)
+- `breakdown` — legacy 0-10 metric scores (displayed in full breakdown view)
+- `rubric_breakdown` — the real category scores displayed on ScoreReveal: `{ problem_solving, code_quality, verification, communication }` with maxes 12/13/12/13
+- `headline_metrics` — 8 rate metrics (displayed in full breakdown view)
+- `interpretation` (string) — Socratic feedback
+- `badge` (string) — one of "AI Collaborator", "On Your Way", "Needs Work", "Just Vibing"
+- `sub_criteria`, `penalty_detail`, `test_suite` — optional detailed breakdowns
 
-### `POST /submit` — mock response
-
-```json
-{
-  "total_score": 72,
-  "breakdown": {
-    "request_timing": 8,
-    "request_quality": 9,
-    "response_handling": 7,
-    "verification_discipline": 5,
-    "iterative_collaboration": 8,
-    "penalties": -2
-  },
-  "headline_metrics": {
-    "blind_adoption_rate": 0.15,
-    "ai_modification_rate": 0.82,
-    "test_after_ai_rate": 0.40,
-    "passive_reprompt_rate": 0.10,
-    "grounded_prompt_rate": 0.75,
-    "evidence_grounded_followup_rate": 0.60
-  },
-  "interpretation": "Strong collaborative instincts...",
-  "badge": "On Your Way"
-}
-```
-
-### `GET /leaderboard` — mock response
-
-```json
-[
-  { "username": "zidan", "score": 85, "time_completed": "2024-03-01T12:34:56Z", "badge": "AI Collaborator" },
-  { "username": "alice", "score": 72, "time_completed": "2024-03-01T13:00:00Z", "badge": "On Your Way" },
-  { "username": "bob", "score": 58, "time_completed": "2024-03-01T14:30:00Z", "badge": "Needs Work" }
-]
-```
+See `AGENTS.md` for the full response JSON.
 
 ## Design System (CSS Custom Properties)
 

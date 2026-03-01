@@ -82,8 +82,22 @@ Logs a frontend event for scoring analysis. Fire-and-forget.
 
 Event types: `file_open`, `file_edit`, `prompt_sent`, `test_run`
 
+### `POST /run-tests`
+Runs the correctness test suite against the user's current code.
+```json
+// Request
+{ "session_id": "sponge_abc123", "file_contents": { "rq/queue.py": "..." } }
+
+// Response
+{
+  "total": 12, "passed": 1, "failed": 11, "pass_rate": 0.08,
+  "core_failures": ["test_enqueue_in_exists"],
+  "results": [{ "test_name": "test_enqueue_in_exists", "passed": false, "is_core": true, "error_message": "..." }]
+}
+```
+
 ### `POST /submit`
-Submits the session for scoring.
+Submits the session for scoring. Fires three concurrent evaluations (semantic, code analysis, correctness tests) then runs the scoring engine.
 ```json
 // Request
 {
@@ -103,18 +117,31 @@ Submits the session for scoring.
     "iterative_collaboration": 8,
     "penalties": -2
   },
+  "rubric_breakdown": {
+    "problem_solving": 9.0,
+    "code_quality": 10.0,
+    "verification": 7.0,
+    "communication": 11.0
+  },
   "headline_metrics": {
     "blind_adoption_rate": 0.15,
     "ai_modification_rate": 0.82,
     "test_after_ai_rate": 0.40,
     "passive_reprompt_rate": 0.10,
     "grounded_prompt_rate": 0.75,
-    "evidence_grounded_followup_rate": 0.60
+    "evidence_grounded_followup_rate": 0.60,
+    "ai_apply_without_edit_rate": 0.10,
+    "test_pass_rate": 0.75
   },
   "interpretation": "Strong collaborative instincts...",
-  "badge": "On Your Way"
+  "badge": "On Your Way",
+  "sub_criteria": { "a1_understanding": 4.5, "...": "..." },
+  "penalty_detail": { "p1_over_reliance": 0, "p2_no_run": 0, "p3_critical_miss": -10 },
+  "test_suite": { "total": 12, "passed": 9, "failed": 3, "pass_rate": 0.75, "results": [], "core_failures": [] }
 }
 ```
+
+**Note:** `rubric_breakdown`, `sub_criteria`, `penalty_detail`, and `test_suite` are optional and may be null if the corresponding eval failed.
 
 ### `GET /leaderboard`
 Returns the leaderboard.
@@ -126,16 +153,31 @@ Returns the leaderboard.
 ]
 ```
 
-## Scoring System (5 categories + penalties, 0-100 final score)
+## Scoring System (0-100 final score)
 
-Each positive category is scored 0-10, summed to 0-50, then scaled to 0-100.
+The scoring engine produces two layers:
 
+### Legacy breakdown (0-10 per category, metric-based)
 1. **Request Timing** (0-10) — Did they engage with the problem before prompting AI?
 2. **Request Quality** (0-10) — Were prompts specific, contextual, bounded?
 3. **Response Handling** (0-10) — Did they modify AI code or blindly paste it?
 4. **Verification Discipline** (0-10) — Did they run tests after AI output?
 5. **Iterative Collaboration** (0-10) — Did they work in prompt > action > result loops?
-6. **Penalties** (0 to -10 on 0-50 scale) — Blind AI adoption, never running tests
+6. **Penalties** (0 to -10) — Blind AI adoption, never running tests
+
+### Rubric breakdown (the real scores displayed to users)
+Four categories with 16 sub-criteria, scored via Gemini semantic eval + code analysis + correctness tests:
+- **A: Problem Solving** (0-12) — understanding, decomposition, justification, edge cases
+- **B: Code Quality** (0-13) — clarity, correctness, efficiency, ownership
+- **C: Verification** (0-12) — exec frequency, test coverage, AI validation, debug discipline
+- **D: Communication** (0-13) — narration, tradeoffs, AI balance, status summaries
+
+### Penalties (applied after rubric)
+- **P1 Over-reliance** (0, -5, -10, or -15)
+- **P2 No run** (0 or -10) — never ran tests
+- **P3 Critical miss** (0 or -10) — missed critical test failures
+
+`total_score` = sum of rubric categories + penalties, clamped to 0-100.
 
 ## Badges
 

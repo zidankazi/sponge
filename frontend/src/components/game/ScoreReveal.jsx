@@ -6,25 +6,32 @@ import Badge from './Badge'
 
 const COUNT_UP_DURATION_MS = 1200
 
-// Derive rubric-style category scores from API breakdown for display
-function getCategoryScores(breakdown, totalScore) {
-  if (!breakdown) return null
-  const { request_timing, request_quality, response_handling, verification_discipline, iterative_collaboration, penalties } = breakdown
-  const penaltiesVal = penalties || 0
-  const sum = (request_timing || 0) + (request_quality || 0) + (response_handling || 0) + (verification_discipline || 0) + (iterative_collaboration || 0)
-  if (sum <= 0) return null
-  const scale = (totalScore - penaltiesVal) / sum
+// Category max values from the backend rubric (A:12, B:13, C:12, D:13 = 50 total)
+const CATEGORY_MAX = {
+  problemSolving: 12,
+  codeQuality: 13,
+  verification: 12,
+  communication: 13,
+}
+
+// Map rubric_breakdown from the API directly to display categories
+function getCategoryScores(rubricBreakdown) {
+  if (!rubricBreakdown) return null
+  const { problem_solving, code_quality, verification, communication } = rubricBreakdown
+  if (problem_solving == null && code_quality == null && verification == null && communication == null) return null
   return {
-    problemSolving: Math.round(((request_timing || 0) + (request_quality || 0)) * scale),
-    codeQuality: Math.round(((response_handling || 0) + (iterative_collaboration || 0)) * scale),
-    verification: Math.round((verification_discipline || 0) * scale),
-    communication: Math.max(0, totalScore - penaltiesVal - Math.round(((request_timing || 0) + (request_quality || 0)) * scale) - Math.round(((response_handling || 0) + (iterative_collaboration || 0)) * scale) - Math.round((verification_discipline || 0) * scale)),
+    problemSolving: Math.round(problem_solving || 0),
+    codeQuality: Math.round(code_quality || 0),
+    verification: Math.round(verification || 0),
+    communication: Math.round(communication || 0),
   }
 }
 
 function getCategoryFeedback(category, score) {
-  const high = score >= 18
-  const mid = score >= 10
+  const max = CATEGORY_MAX[category] || 13
+  const pct = score / max
+  const high = pct >= 0.75
+  const mid = pct >= 0.45
   switch (category) {
     case 'problemSolving':
       return high ? 'Excellent — you explored the codebase and planned before prompting.'
@@ -47,17 +54,19 @@ function getCategoryFeedback(category, score) {
   }
 }
 
-function getCategoryTier(score) {
-  if (score >= 18) return 'good'
-  if (score >= 10) return 'warn'
+function getCategoryTier(category, score) {
+  const max = CATEGORY_MAX[category] || 13
+  const pct = score / max
+  if (pct >= 0.75) return 'good'
+  if (pct >= 0.45) return 'warn'
   return 'bad'
 }
 
-export default function ScoreReveal({ score, badge, interpretation, breakdown, onComplete }) {
+export default function ScoreReveal({ score, badge, interpretation, rubricBreakdown, onComplete }) {
   const [displayScore, setDisplayScore] = useState(0)
   const [badgeVisible, setBadgeVisible] = useState(false)
 
-  const categories = getCategoryScores(breakdown, score)
+  const categories = getCategoryScores(rubricBreakdown)
 
   useEffect(() => {
     if (score <= 0) {
@@ -125,10 +134,10 @@ export default function ScoreReveal({ score, badge, interpretation, breakdown, o
             ].map(({ key, label }) => (
               <div className="score-reveal-category-card" key={key}>
                 <div className="score-reveal-category-label">{label}</div>
-                <div className={`score-reveal-category-value score-reveal-category-value--${getCategoryTier(categories[key])}`}>
+                <div className={`score-reveal-category-value score-reveal-category-value--${getCategoryTier(key, categories[key])}`}>
                   {categories[key]}
                 </div>
-                <div className="score-reveal-category-max">/ 25</div>
+                <div className="score-reveal-category-max">/ {CATEGORY_MAX[key]}</div>
                 <p className="score-reveal-category-feedback">{getCategoryFeedback(key, categories[key])}</p>
               </div>
             ))}
