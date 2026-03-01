@@ -133,9 +133,7 @@ a {
   position: absolute;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.04;
   will-change: transform;
-  filter: brightness(0) invert(1);
 }
 
 /* Top-right of hero area — small, tilted slightly */
@@ -144,7 +142,7 @@ a {
   height: auto;
   top: 18%;
   right: 8%;
-  opacity: 0.05;
+  opacity: 0.12;
 }
 
 /* Mid-left, between hero and social proof — larger, more faded */
@@ -153,7 +151,7 @@ a {
   height: auto;
   top: 65%;
   left: 5%;
-  opacity: 0.035;
+  opacity: 0.08;
 }
 
 /* Near team section — medium */
@@ -162,7 +160,7 @@ a {
   height: auto;
   top: 130%;
   right: 15%;
-  opacity: 0.06;
+  opacity: 0.15;
 }
 
 .hero-container {
