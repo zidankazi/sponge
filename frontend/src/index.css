@@ -208,33 +208,33 @@ a {
   color: var(--cream);
 }
 
-.rotating-word-container {
+.typing-text {
+  /* Prevent shifting by reserving just enough space if needed, 
+     though typing naturally expands container. 
+     Keeping it inline is fine for this effect. */
+}
+
+.typing-cursor {
   display: inline-block;
-  position: relative;
-  /* Adjust width to fit the longest word ("engineering.") comfortably */
-  min-width: 380px;
-  vertical-align: bottom;
-  text-align: left;
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  vertical-align: text-bottom;
+  color: var(--green-light);
+  /* Give the cursor a cool accent color */
+  animation: blink 1s step-end infinite;
+  margin-left: 4px;
 }
 
-.rotating-word {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  opacity: 0;
-  transform: translateY(40px) rotateX(-90deg);
-  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  transform-origin: bottom center;
-}
+@keyframes blink {
 
-.rotating-word.word-active {
-  opacity: 1;
-  transform: translateY(0) rotateX(0);
-}
+  0%,
+  100% {
+    opacity: 1;
+  }
 
-.rotating-word.word-exiting {
-  opacity: 0;
-  transform: translateY(-40px) rotateX(90deg);
+  50% {
+    opacity: 0;
+  }
 }
 
 .hero-subline {

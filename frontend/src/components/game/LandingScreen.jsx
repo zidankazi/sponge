@@ -15,14 +15,34 @@ const ROTATING_WORDS = [
 export default function LandingScreen() {
   const { beginSession } = useSession()
   const [loading, setLoading] = useState(false)
+
+  // Typing effect state
   const [wordIndex, setWordIndex] = useState(0)
+  const [text, setText] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setWordIndex((prev) => (prev + 1) % ROTATING_WORDS.length)
-    }, 2500) // Change word every 2.5s
-    return () => clearInterval(interval)
-  }, [])
+    let timeout
+    const currentWord = ROTATING_WORDS[wordIndex]
+
+    if (isDeleting) {
+      if (text.length > 0) {
+        timeout = setTimeout(() => setText(currentWord.substring(0, text.length - 1)), 40) // fast delete
+      } else {
+        setIsDeleting(false)
+        setWordIndex((prev) => (prev + 1) % ROTATING_WORDS.length)
+        timeout = setTimeout(() => { }, 200) // slight pause before typing next
+      }
+    } else {
+      if (text.length < currentWord.length) {
+        timeout = setTimeout(() => setText(currentWord.substring(0, text.length + 1)), 70) // type speed
+      } else {
+        timeout = setTimeout(() => setIsDeleting(true), 2000) // pause at end of word
+      }
+    }
+
+    return () => clearTimeout(timeout)
+  }, [text, isDeleting, wordIndex])
 
   const handleStart = async () => {
     setLoading(true)
@@ -67,25 +87,8 @@ export default function LandingScreen() {
           <h1 className="hero-tagline">
             Master the <br />
             <span className="hero-tagline-italic">
-              AI-native{' '}
-              <span className="rotating-word-container">
-                {ROTATING_WORDS.map((word, index) => {
-                  let statusClass = 'word-hidden';
-                  if (index === wordIndex) {
-                    statusClass = 'word-active';
-                  } else if (
-                    index === (wordIndex - 1 + ROTATING_WORDS.length) % ROTATING_WORDS.length
-                  ) {
-                    statusClass = 'word-exiting';
-                  }
-
-                  return (
-                    <span key={word} className={`rotating-word ${statusClass}`}>
-                      {word}
-                    </span>
-                  );
-                })}
-              </span>
+              AI-native <span className="typing-text">{text}</span>
+              <span className="typing-cursor">|</span>
             </span>
           </h1>
           <p className="hero-subline">
