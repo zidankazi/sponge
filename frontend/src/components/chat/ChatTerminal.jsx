@@ -182,7 +182,7 @@ function renderInline(text) {
   return parts
 }
 
-export default function ChatTerminal() {
+export default function ChatTerminal({ onCollapse }) {
   const { chatHistory, isAiLoading, sendChat, username, fileBuffers, updateFileContent, openFile } = useSession()
   const userInitial = username ? username[0].toUpperCase() : 'Y'
   const [input, setInput] = useState('')
@@ -217,7 +217,16 @@ export default function ChatTerminal() {
           </svg>
           <span>AI Assistant</span>
         </div>
-        <span className="chat-header-badge">Gemini</span>
+        <div className="chat-header-right">
+          <span className="chat-header-badge">Gemini</span>
+          {onCollapse && (
+            <button className="panel-collapse-btn" onClick={onCollapse} title="Collapse AI panel">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="chat-messages" ref={scrollRef}>
