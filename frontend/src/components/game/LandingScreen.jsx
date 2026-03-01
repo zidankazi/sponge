@@ -304,7 +304,8 @@ export default function LandingScreen() {
   }, [handleScroll])
 
   const handleStart = () => {
-    navigate('/demo')
+    setLoading(true)
+    setTimeout(() => navigate('/demo'), 400)
   }
 
   const companies = [
@@ -318,7 +319,7 @@ export default function LandingScreen() {
   ]
 
   return (
-    <div className="landing" ref={scrollRef}>
+    <div className="landing" ref={scrollRef} style={loading ? { opacity: 0, transition: 'opacity 0.4s ease-out', pointerEvents: 'none' } : undefined}>
       {/* ── Floating AI mascots ── */}
       <img ref={mascot1Ref} src="/logos/gemini.svg" alt="" className="ai-float ai-float--gemini" />
       <img ref={mascot2Ref} src="/logos/claude.svg" alt="" className="claude-float claude-float--2" />
