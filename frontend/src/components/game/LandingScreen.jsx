@@ -12,6 +12,89 @@ const ROTATING_WORDS = [
   'future.'
 ]
 
+// Component: Claude mascot orbiting around the team names with a dotted trail
+function OrbitingMascot() {
+  const canvasRef = useRef(null)
+  const mascotRef = useRef(null)
+  const trailRef = useRef([])
+  const angleRef = useRef(0)
+
+  useEffect(() => {
+    const mascot = mascotRef.current
+    const canvas = canvasRef.current
+    if (!mascot || !canvas) return
+
+    const ctx = canvas.getContext('2d')
+    let animId
+
+    // Ellipse parameters (relative to container center)
+    const radiusX = 340
+    const radiusY = 50
+    const speed = 0.006
+    const mascotSize = 28
+    const maxDots = 18
+
+    const resize = () => {
+      const parent = canvas.parentElement
+      canvas.width = parent.offsetWidth
+      canvas.height = parent.offsetHeight
+    }
+    resize()
+    window.addEventListener('resize', resize)
+
+    const tick = () => {
+      angleRef.current += speed
+      const a = angleRef.current
+
+      const cx = canvas.width / 2
+      const cy = canvas.height / 2 + 10
+
+      const x = cx + Math.cos(a) * radiusX
+      const y = cy + Math.sin(a) * radiusY
+
+      // Update mascot position
+      mascot.style.left = `${x - mascotSize / 2}px`
+      mascot.style.top = `${y - mascotSize / 2}px`
+
+      // Store trail dot
+      trailRef.current.push({ x, y, age: 0 })
+      if (trailRef.current.length > maxDots) trailRef.current.shift()
+
+      // Draw trail
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      trailRef.current.forEach((dot, i) => {
+        dot.age++
+        const opacity = Math.max(0, 0.35 - (i / maxDots) * 0.35)
+        const size = 2.5 - (i / maxDots) * 1.5
+        ctx.beginPath()
+        ctx.arc(dot.x, dot.y, Math.max(size, 0.5), 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(180, 120, 90, ${opacity})`
+        ctx.fill()
+      })
+
+      animId = requestAnimationFrame(tick)
+    }
+    tick()
+
+    return () => {
+      cancelAnimationFrame(animId)
+      window.removeEventListener('resize', resize)
+    }
+  }, [])
+
+  return (
+    <div className="orbit-container">
+      <canvas ref={canvasRef} className="orbit-trail" />
+      <img
+        ref={mascotRef}
+        src="/logos/claude.svg"
+        alt=""
+        className="orbit-mascot"
+      />
+    </div>
+  )
+}
+
 // Component to handle scroll-driven individual letter revealing
 function TeamNameReveal({ name, containerRef, staggerIndex = 0 }) {
   const letters = name.split('')
@@ -169,11 +252,7 @@ export default function LandingScreen() {
       const rotate = scrollTop * -0.015
       mascot2Ref.current.style.transform = `translateY(${y}px) rotate(${rotate}deg)`
     }
-    if (mascot3Ref.current) {
-      const y = scrollTop * -0.08
-      const rotate = scrollTop * 0.01
-      mascot3Ref.current.style.transform = `translateY(${y}px) rotate(${rotate}deg)`
-    }
+    // mascot3 is the orbiting Claude — no parallax override needed
     if (mascot4Ref.current) {
       const y = scrollTop * -0.22
       const rotate = scrollTop * -0.025
@@ -208,7 +287,7 @@ export default function LandingScreen() {
       {/* ── Floating AI mascots ── */}
       <img ref={mascot1Ref} src="/logos/gemini.svg" alt="" className="ai-float ai-float--gemini" />
       <img ref={mascot2Ref} src="/logos/claude.svg" alt="" className="claude-float claude-float--2" />
-      <img ref={mascot3Ref} src="/logos/claude.svg" alt="" className="claude-float claude-float--3" />
+      {/* mascot3 is now rendered as OrbitingMascot inside the team section */}
       <img ref={mascot4Ref} src="/logos/chatgpt.svg" alt="" className="ai-float ai-float--chatgpt" />
 
       {/* ── First viewport: Hero ── */}
@@ -268,6 +347,7 @@ export default function LandingScreen() {
       <div className="landing-section" ref={teamRef}>
         <div className="landing-section-inner">
           <p className="landing-section-label">BUILT BY</p>
+          <OrbitingMascot />
           <div className="landing-team">
             <a href="https://www.zidankazi.com/" target="_blank" rel="noreferrer" className="landing-team-member">
               <TeamNameReveal name="Zidan Kazi" containerRef={scrollRef} staggerIndex={0} />

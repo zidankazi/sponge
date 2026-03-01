@@ -169,13 +169,32 @@ a {
   opacity: 0.18;
 }
 
-/* Near team section — medium */
-.claude-float--3 {
-  width: 48px;
+/* ── Orbiting Claude mascot around team names ── */
+.orbit-container {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  margin-top: -60px;
+  margin-bottom: -60px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.orbit-trail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.orbit-mascot {
+  position: absolute;
+  width: 28px;
   height: auto;
-  top: 130%;
-  right: 15%;
-  opacity: 0.25;
+  opacity: 0.5;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px rgba(180, 120, 90, 0.3));
 }
 
 .hero-container {
