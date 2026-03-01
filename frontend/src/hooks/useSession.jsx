@@ -20,6 +20,7 @@ export function SessionProvider({ children }) {
   const [username, setUsername] = useState('Anonymous')
   const [checkpoints, setCheckpoints] = useState([])
   const [showHistory, setShowHistory] = useState(false)
+  const [lastSavedBuffers, setLastSavedBuffers] = useState(() => ({ ...fileContents }))
   const timerRef = useRef(null)
   const editDebounceRef = useRef(null)
 
@@ -89,6 +90,7 @@ export function SessionProvider({ children }) {
     const resolvedLabel = label || `Checkpoint ${checkpoints.length + 1}`
     const cp = { id, label: resolvedLabel, ts: id, buffers: { ...fileBuffers } }
     setCheckpoints((prev) => [cp, ...prev].slice(0, 30))
+    setLastSavedBuffers({ ...fileBuffers })
   }, [fileBuffers, checkpoints.length])
 
   const restoreCheckpoint = useCallback((id) => {
@@ -176,6 +178,7 @@ export function SessionProvider({ children }) {
         isSubmitting,
         username,
         checkpoints,
+        lastSavedBuffers,
         showHistory,
         setShowHistory,
         beginSession,
