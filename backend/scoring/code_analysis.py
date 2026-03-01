@@ -19,6 +19,8 @@ from google import genai
 from google.genai import types
 from pydantic import BaseModel
 
+from gemini.fallback import generate_with_fallback
+
 logger = logging.getLogger(__name__)
 
 _client: Optional[genai.Client] = None
@@ -154,8 +156,8 @@ async def analyze_final_code(final_code: str) -> Optional[CodeSemanticEval]:
     prompt = f"Here is the developer's submitted code:\n\n{final_code}"
 
     try:
-        response = await client.aio.models.generate_content(
-            model="gemini-2.5-flash",
+        response = await generate_with_fallback(
+            client,
             contents=[{"role": "user", "parts": [{"text": prompt}]}],
             config=types.GenerateContentConfig(
                 system_instruction=_CODE_EVAL_SYSTEM_PROMPT,

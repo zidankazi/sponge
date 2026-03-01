@@ -112,6 +112,12 @@ def _run_tests_sync(final_code: str) -> Optional[TestSuiteResult]:
             "--tb=line",
             "-q",
             "--no-header",
+            # Prevent pytest from scanning RQ's own test directory, which
+            # contains base classes that trigger a Python 3.9 incompatibility
+            # with @functools.total_ordering (ValueError: must define at least
+            # one ordering operation: < > <= >=)
+            f"--ignore={os.path.join(rq_copy, 'tests')}",
+            f"--rootdir={rq_copy}",
         ]
 
         # Run pytest with timeout

@@ -23,6 +23,8 @@ from typing import Optional
 from google import genai
 from google.genai import types
 
+from gemini.config import GEMINI_MODEL_CHAIN
+
 logger = logging.getLogger(__name__)
 
 # ─── Limits ────────────────────────────────────────────────────────────
@@ -296,7 +298,7 @@ async def call_gemini(
 
     try:
         response = await client.aio.models.generate_content(
-            model="gemini-3-flash-preview",
+            model=GEMINI_MODEL_CHAIN[0],
             contents=contents,
             config=_make_config(),
         )

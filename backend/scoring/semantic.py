@@ -20,6 +20,8 @@ from google import genai
 from google.genai import types
 from pydantic import BaseModel
 
+from gemini.fallback import generate_with_fallback
+
 logger = logging.getLogger(__name__)
 
 _client: Optional[genai.Client] = None
@@ -250,8 +252,8 @@ async def evaluate_conversation(
     prompt = f"Here is the full conversation to evaluate:\n\n{transcript}"
 
     try:
-        response = await client.aio.models.generate_content(
-            model="gemini-2.5-flash",
+        response = await generate_with_fallback(
+            client,
             contents=[{"role": "user", "parts": [{"text": prompt}]}],
             config=types.GenerateContentConfig(
                 system_instruction=_EVAL_SYSTEM_PROMPT,
