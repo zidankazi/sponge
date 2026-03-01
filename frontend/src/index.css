@@ -141,7 +141,7 @@ a {
   height: auto;
   top: 18%;
   right: 8%;
-  opacity: 0.18;
+  opacity: 0.35;
 }
 
 /* ── Floating Claude mascots ── */
@@ -158,7 +158,7 @@ a {
   height: auto;
   top: 65%;
   left: 5%;
-  opacity: 0.08;
+  opacity: 0.18;
 }
 
 /* Near team section — medium */
@@ -167,7 +167,7 @@ a {
   height: auto;
   top: 130%;
   right: 15%;
-  opacity: 0.15;
+  opacity: 0.25;
 }
 
 .hero-container {
