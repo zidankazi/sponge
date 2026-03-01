@@ -13,7 +13,7 @@ const ROTATING_WORDS = [
 ]
 
 // Component to handle scroll-driven individual letter revealing
-function TeamNameReveal({ name, containerRef }) {
+function TeamNameReveal({ name, index = 0, totalNames = 3, containerRef }) {
   const letters = name.split('')
   const nameRef = useRef(null)
 
@@ -30,14 +30,23 @@ function TeamNameReveal({ name, containerRef }) {
       const rect = nameRef.current.getBoundingClientRect()
       const windowH = window.innerHeight
 
-      // Calculate how far the element is from the bottom of the screen to the middle
-      // Start revealing when the top of the element hits 90% of viewport height
-      // Finish revealing when it hits 65% of viewport height
-      const startRevealY = windowH * 0.9
-      const endRevealY = windowH * 0.65
+      // Overall reveal area for the entire team section:
+      // Starts when the top of the element hits 95% of viewport
+      // Ends when the element hits 55% of viewport
+      const totalStartRevealY = windowH * 0.95
+      const totalEndRevealY = windowH * 0.55
 
-      // 0 = just entered start bound, 1 = fully at end bound
-      const progress = Math.max(0, Math.min(1, (startRevealY - rect.top) / (startRevealY - endRevealY)))
+      // 0 = section just entered, 1 = section fully at end bound
+      let sectionProgress = (totalStartRevealY - rect.top) / (totalStartRevealY - totalEndRevealY)
+      sectionProgress = Math.max(0, Math.min(1, sectionProgress))
+
+      // Now map this sectionProgress into a specific window for this specific name
+      // We overlap slightly so it feels like a fluid wipe
+      const nameStart = (index / totalNames) * 0.7
+      const nameEnd = nameStart + 0.3
+
+      let nameProgress = (sectionProgress - nameStart) / (nameEnd - nameStart)
+      nameProgress = Math.max(0, Math.min(1, nameProgress))
 
       // Stagger the letter opacities
       letterRefs.current.forEach((letterSpan, idx) => {
@@ -49,7 +58,7 @@ function TeamNameReveal({ name, containerRef }) {
 
         // Calculate opacity: 
         // We use a steep curve so a letter goes from 0.25 to 1 quickly once its threshold is met
-        const letterProgress = Math.max(0, Math.min(1, (progress - (letterThreshold * 0.6)) * 4))
+        const letterProgress = Math.max(0, Math.min(1, (nameProgress - (letterThreshold * 0.6)) * 4))
 
         const minOpacity = 0.25
         const currentOpacity = minOpacity + (1 - minOpacity) * letterProgress
@@ -265,15 +274,15 @@ export default function LandingScreen() {
           <p className="landing-section-label">BUILT BY</p>
           <div className="landing-team">
             <a href="https://www.zidankazi.com/" target="_blank" rel="noreferrer" className="landing-team-member">
-              <TeamNameReveal name="Zidan Kazi" containerRef={scrollRef} />
+              <TeamNameReveal name="Zidan Kazi" index={0} containerRef={scrollRef} />
             </a>
             <span className="landing-team-separator">&bull;</span>
             <a href="https://www.linkedin.com/in/sriram-pankanti/" target="_blank" rel="noreferrer" className="landing-team-member">
-              <TeamNameReveal name="Sriram Pankanti" containerRef={scrollRef} />
+              <TeamNameReveal name="Sriram Pankanti" index={1} containerRef={scrollRef} />
             </a>
             <span className="landing-team-separator">&bull;</span>
             <a href="https://www.linkedin.com/in/shreyas-ghosh-roy/" target="_blank" rel="noreferrer" className="landing-team-member">
-              <TeamNameReveal name="Shreyas Ghosh Roy" containerRef={scrollRef} />
+              <TeamNameReveal name="Shreyas Ghosh Roy" index={2} containerRef={scrollRef} />
             </a>
           </div>
         </div>
