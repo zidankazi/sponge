@@ -152,7 +152,9 @@ def _run_tests_sync(final_code: str, include_hidden: bool = False) -> Optional[T
         # Set RQ_CODEBASE_PATH so test_submission.py imports from the overlay
         env = os.environ.copy()
         env["RQ_CODEBASE_PATH"] = rq_copy
-        env["PYTHONPATH"] = rq_copy + os.pathsep + os.path.join(rq_copy, "tests")
+        extra_paths = rq_copy + os.pathsep + os.path.join(rq_copy, "tests")
+        existing = env.get("PYTHONPATH", "")
+        env["PYTHONPATH"] = extra_paths + (os.pathsep + existing if existing else "")
 
         xml_path = os.path.join(tmpdir, "results.xml")
         python_exe = sys.executable
