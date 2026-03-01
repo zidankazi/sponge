@@ -55,43 +55,11 @@ You're dropped into a real open-source Python codebase ([RQ](https://github.com/
 
 ---
 
-## Screenshots
-
-### 🏠 Landing Screen
-*Enter your name and start the interview*
-
-<!-- TODO: replace src with screenshots/landing.png -->
-<img src="https://placehold.co/1280x760/0f0f13/6C47FF?text=Landing+Screen" alt="Sponge — Landing Screen" width="100%" />
-
----
-
-### 📋 Brief Screen
-*Read the problem statement before the clock starts*
-
-<!-- TODO: replace src with screenshots/brief.png -->
-<img src="https://placehold.co/1280x760/0f0f13/6C47FF?text=Brief+Screen" alt="Sponge — Brief Screen" width="100%" />
-
----
-
-### 💻 Session — Editor + AI Chat
+## 💻 Session — Editor + AI Chat
 *VS Code-style editor with live AI assistant, file tree, and countdown timer*
 
 <!-- TODO: replace src with screenshots/session.png -->
 <img src="https://placehold.co/1280x760/0f0f13/6C47FF?text=Session+%E2%80%94+Editor+%2B+AI+Chat" alt="Sponge — Session View" width="100%" />
-
----
-
-### 🏆 Results & Score Reveal
-*See your final score, rubric breakdown, badge, and personalised feedback*
-
-<div align="center">
-  <table><tr>
-    <!-- TODO: replace src with screenshots/results.png -->
-    <td><img src="https://placehold.co/620x700/0f0f13/6C47FF?text=Results+Screen" alt="Sponge — Results Screen" width="100%" /></td>
-    <!-- TODO: replace src with screenshots/score-reveal.png -->
-    <td><img src="https://placehold.co/620x700/0f0f13/6C47FF?text=Score+Reveal" alt="Sponge — Score Reveal" width="100%" /></td>
-  </tr></table>
-</div>
 
 ---
 
