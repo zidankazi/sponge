@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSession } from '../../hooks/useSession'
 
@@ -16,18 +16,44 @@ export default function Header() {
   } = useSession()
 
   const [showToast, setShowToast] = useState(false)
+  const [showSaveModal, setShowSaveModal] = useState(false)
+  const [saveLabel, setSaveLabel] = useState('')
+  const saveLabelRef = useRef(null)
 
   const pct = (timeLeft / totalTime) * 100
   const timerClass = timeLeft <= 10 ? 'timer--critical' : timeLeft <= 60 ? 'timer--urgent' : ''
 
-  // Unsaved changes detection — compares against last save (or initial load)
-  const hasUnsaved = JSON.stringify(fileBuffers) !== JSON.stringify(lastSavedBuffers)
+  // Dirty flag — set true on any file edit, cleared on save
+  const dirtyRef = useRef(false)
+  const prevBuffersRef = useRef(lastSavedBuffers)
+  if (lastSavedBuffers !== prevBuffersRef.current) {
+    prevBuffersRef.current = lastSavedBuffers
+    dirtyRef.current = false
+  }
+  if (fileBuffers !== prevBuffersRef.current && fileBuffers !== lastSavedBuffers) {
+    dirtyRef.current = true
+  }
+  const hasUnsaved = dirtyRef.current
 
   const handleSave = useCallback(() => {
-    const label = window.prompt('Checkpoint label (optional):') || ''
-    saveCheckpoint(label)
+    setShowSaveModal(true)
+    setSaveLabel('')
+  }, [])
+
+  const confirmSave = useCallback(() => {
+    saveCheckpoint(saveLabel)
+    setShowSaveModal(false)
+    setSaveLabel('')
     setShowToast(true)
-  }, [saveCheckpoint])
+    dirtyRef.current = false
+  }, [saveCheckpoint, saveLabel])
+
+  // Focus the input when modal opens
+  useEffect(() => {
+    if (showSaveModal && saveLabelRef.current) {
+      saveLabelRef.current.focus()
+    }
+  }, [showSaveModal])
 
   // Cmd/Ctrl+S shortcut
   useEffect(() => {
@@ -36,6 +62,7 @@ export default function Header() {
         e.preventDefault()
         saveCheckpoint('')
         setShowToast(true)
+        dirtyRef.current = false
       }
     }
     window.addEventListener('keydown', handler)
@@ -103,7 +130,29 @@ export default function Header() {
           </button>
         </div>
       </header>
+
       {showToast && <div className="save-toast">Saved ✓</div>}
+
+      {showSaveModal && (
+        <div className="save-modal-overlay" onClick={() => setShowSaveModal(false)}>
+          <div className="save-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="save-modal-title">Save Checkpoint</div>
+            <input
+              ref={saveLabelRef}
+              className="save-modal-input"
+              type="text"
+              placeholder="Label (optional)"
+              value={saveLabel}
+              onChange={(e) => setSaveLabel(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') confirmSave() }}
+            />
+            <div className="save-modal-actions">
+              <button className="save-modal-cancel" onClick={() => setShowSaveModal(false)}>Cancel</button>
+              <button className="save-modal-confirm" onClick={confirmSave}>Save</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

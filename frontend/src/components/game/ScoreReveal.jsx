@@ -65,8 +65,10 @@ export default function ScoreReveal({ score, badge, interpretation, breakdown, o
       setBadgeVisible(true)
       return
     }
+    let cancelled = false
     const start = performance.now()
     const tick = (now) => {
+      if (cancelled) return
       const elapsed = now - start
       const t = Math.min(elapsed / COUNT_UP_DURATION_MS, 1)
       const eased = 1 - (1 - t) ** 2
@@ -75,6 +77,7 @@ export default function ScoreReveal({ score, badge, interpretation, breakdown, o
       else requestAnimationFrame(tick)
     }
     requestAnimationFrame(tick)
+    return () => { cancelled = true }
   }, [score])
 
   const summary = interpretation

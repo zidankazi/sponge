@@ -23,6 +23,13 @@ export function SessionProvider({ children }) {
   const [lastSavedBuffers, setLastSavedBuffers] = useState(() => ({ ...fileContents }))
   const timerRef = useRef(null)
   const editDebounceRef = useRef(null)
+  const chatHistoryRef = useRef(chatHistory)
+  chatHistoryRef.current = chatHistory
+  const activeFileRef = useRef(activeFile)
+  activeFileRef.current = activeFile
+  const fileBuffersRef = useRef(fileBuffers)
+  fileBuffersRef.current = fileBuffers
+  const submittingRef = useRef(false)
 
   // Start countdown timer on brief + session screens
   useEffect(() => {
@@ -53,9 +60,10 @@ export function SessionProvider({ children }) {
       setActiveFile('rq/job.py')
       setOpenFiles(['rq/job.py'])
       setFileBuffers({ ...fileContents })
-    } catch {
+    } catch (err) {
       // ErrorBanner already showing via onApiError — stay on landing screen
       setUsername('')
+      throw err
     }
   }, [])
 
@@ -109,33 +117,37 @@ export function SessionProvider({ children }) {
     setChatHistory((prev) => [...prev, userMsg])
     setIsAiLoading(true)
 
-    logEvent({ session_id: sessionId, event: 'prompt_sent', file: activeFile, ts: Date.now() })
+    logEvent({ session_id: sessionId, event: 'prompt_sent', file: activeFileRef.current, ts: Date.now() })
 
     try {
       const { response_text } = await sendPrompt({
         session_id: sessionId,
         prompt_text: text,
-        conversation_history: [...chatHistory, userMsg],
-        active_file: activeFile,
-        file_contents: fileBuffers,
+        conversation_history: [...chatHistoryRef.current.filter((m) => m.role !== 'error'), userMsg],
+        active_file: activeFileRef.current,
+        file_contents: fileBuffersRef.current,
       })
       const aiMsg = { role: 'assistant', content: response_text }
       setChatHistory((prev) => [...prev, aiMsg])
     } catch {
+      // Error already emitted via onApiError — add a non-assistant marker
+      // so this doesn't pollute conversation_history sent to the API
       setChatHistory((prev) => [
         ...prev,
-        { role: 'assistant', content: 'Something went wrong. Try again.' },
+        { role: 'error', content: 'Something went wrong. Try again.' },
       ])
     } finally {
       setIsAiLoading(false)
     }
-  }, [sessionId, activeFile, chatHistory])
+  }, [sessionId])
 
   const submit = useCallback(async () => {
+    if (submittingRef.current) return
+    submittingRef.current = true
     setIsSubmitting(true)
     clearInterval(timerRef.current)
 
-    const allCode = Object.entries(fileBuffers)
+    const allCode = Object.entries(fileBuffersRef.current)
       .map(([path, content]) => `// --- ${path} ---\n${content}`)
       .join('\n\n')
 
@@ -147,8 +159,18 @@ export function SessionProvider({ children }) {
       // ErrorBanner shows via onApiError — stay in session so user can retry
     } finally {
       setIsSubmitting(false)
+      submittingRef.current = false
     }
-  }, [sessionId, fileBuffers, username])
+  }, [sessionId, username])
+
+  // Warn before closing tab during active session
+  useEffect(() => {
+    if (view === 'brief' || view === 'session') {
+      const handler = (e) => { e.preventDefault(); e.returnValue = '' }
+      window.addEventListener('beforeunload', handler)
+      return () => window.removeEventListener('beforeunload', handler)
+    }
+  }, [view])
 
   // Auto-submit when timer expires (must be after submit is declared)
   useEffect(() => {

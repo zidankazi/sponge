@@ -16,6 +16,7 @@ Edge cases handled:
   - Duplicate user message in history (frontend includes current msg)
 """
 
+import asyncio
 import logging
 import os
 from typing import Optional
@@ -24,6 +25,7 @@ from google import genai
 from google.genai import types
 
 from gemini.config import GEMINI_MODEL_CHAIN
+from gemini.fallback import generate_with_fallback
 from .system_prompt import SYSTEM_PROMPT
 
 logger = logging.getLogger(__name__)
@@ -34,6 +36,7 @@ MAX_CONTEXT_CHARS = 120_000   # ~30k tokens — safe under Gemini's 1M window
 MAX_FILE_CHARS = 20_000       # Truncate any single file beyond this
 MAX_HISTORY_TURNS = 40        # Keep last N turns to avoid token overflow
 MAX_OUTPUT_TOKENS = 2048      # Cap response length — prevents one-shot dumps
+GEMINI_TIMEOUT_S = 10         # Per-call timeout — Vercel functions die at ~15s
 
 
 # ─── Lazy client initialization ────────────────────────────────────────
@@ -240,10 +243,8 @@ async def call_gemini(
     """
     client = _get_client()
     if client is None:
-        return (
-            "**Gemini unavailable** — `GEMINI_API_KEY` is not set. "
-            "Add it to `backend/.env` and restart the server."
-        )
+        logger.error("GEMINI_API_KEY is not set")
+        return "The AI assistant is unavailable due to a configuration error."
 
     context_block = _build_context_block(active_file, file_contents)
     prompt_with_context = f"{context_block}{prompt}" if context_block else prompt
@@ -253,12 +254,27 @@ async def call_gemini(
     contents = gemini_history + [{"role": "user", "parts": [{"text": prompt_with_context}]}]
 
     try:
-        response = await client.aio.models.generate_content(
-            model=GEMINI_MODEL_CHAIN[0],
-            contents=contents,
-            config=_make_config(),
+        response = await asyncio.wait_for(
+            generate_with_fallback(
+                client,
+                contents=contents,
+                config=_make_config(),
+            ),
+            timeout=GEMINI_TIMEOUT_S,
         )
+        if response is None:
+            return (
+                "The AI assistant is temporarily rate-limited. "
+                "Please wait a moment and try again."
+            )
         return _extract_response(response)
+
+    except asyncio.TimeoutError:
+        logger.warning("Gemini API call timed out after %ds", GEMINI_TIMEOUT_S)
+        return (
+            "The AI assistant timed out. "
+            "Try a shorter question or try again in a moment."
+        )
 
     except Exception as exc:
         logger.exception("Gemini API call failed")
@@ -270,20 +286,9 @@ async def call_gemini(
                 "Please wait a moment and try again."
             )
         if "api key" in err or "api_key" in err or "401" in err or "403" in err:
-            return (
-                "**Gemini API key error** — the key may be invalid or expired. "
-                "Check `backend/.env`."
-            )
+            return "The AI assistant is unavailable due to a configuration error."
         if "not found" in err or "404" in err:
-            return (
-                "**Model not available** — `gemini-3-flash-preview` may not be accessible "
-                "with your API key. Check your Google AI Studio plan."
-            )
-        if "timeout" in err or "deadline" in err or "504" in err:
-            return (
-                "The AI assistant timed out. "
-                "Try a shorter question or try again in a moment."
-            )
+            return "The AI assistant is temporarily unavailable. Please try again."
         if "block" in err or "safety" in err or "filter" in err:
             return (
                 "Your message was flagged by content filters. "

@@ -73,9 +73,9 @@ export async function sendPrompt({ session_id, prompt_text, conversation_history
       body: JSON.stringify({ session_id, prompt_text, conversation_history, active_file, file_contents }),
     }, { endpoint: 'prompt' })
     return res.json()
-  } catch {
+  } catch (err) {
     emitError('AI assistant unavailable — try again', 'prompt', true)
-    return { response_text: '_The AI assistant is temporarily unavailable. Please try again._' }
+    throw err
   }
 }
 
