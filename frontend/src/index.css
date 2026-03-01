@@ -393,8 +393,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 60vh;
-  padding: 120px 32px;
+  padding: 64px 32px 48px;
   transition: transform 0.1s ease-out, opacity 0.1s ease-out;
   transform-origin: center center;
 }
@@ -428,6 +427,15 @@ a {
   font-weight: 400;
   color: var(--cream);
   letter-spacing: -0.01em;
+  text-decoration: none;
+  transition: all 0.2s ease-out;
+}
+
+.landing-team-member:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
 }
 
 .landing-team-separator {
@@ -436,7 +444,7 @@ a {
 }
 
 .landing-footer-spacer {
-  height: 20vh;
+  height: 48px;
 }
 
 /* ═══════════════════════════════════════

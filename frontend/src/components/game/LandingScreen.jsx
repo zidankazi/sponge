@@ -205,11 +205,17 @@ export default function LandingScreen() {
         <div className="landing-section-inner">
           <p className="landing-section-label">BUILT BY</p>
           <div className="landing-team">
-            <span className="landing-team-member">Zidan Kazi</span>
+            <a href="https://www.zidankazi.com/" target="_blank" rel="noreferrer" className="landing-team-member">
+              Zidan Kazi
+            </a>
             <span className="landing-team-separator">&bull;</span>
-            <span className="landing-team-member">Sriram Pankanti</span>
+            <a href="https://www.linkedin.com/in/sriram-pankanti/" target="_blank" rel="noreferrer" className="landing-team-member">
+              Sriram Pankanti
+            </a>
             <span className="landing-team-separator">&bull;</span>
-            <span className="landing-team-member">Shreyas Ghosh Roy</span>
+            <a href="https://www.linkedin.com/in/shreyas-ghosh-roy/" target="_blank" rel="noreferrer" className="landing-team-member">
+              Shreyas Ghosh Roy
+            </a>
           </div>
         </div>
       </div>
