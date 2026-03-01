@@ -120,21 +120,21 @@ a {
    ═══════════════════════════════════════ */
 
 .landing {
-  min-height: 100vh;
+  height: 100%;
   background: var(--bg-root);
   color: var(--text);
-  display: flex;
-  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .hero-container {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 32px 0 0;
+  padding: 0 32px;
   display: flex;
   flex-direction: column;
-  flex: 1;
+  min-height: 100vh;
 }
 
 /* ── Header ── */
@@ -272,13 +272,15 @@ a {
   padding-bottom: 64px;
   width: 100%;
   overflow: hidden;
+  transition: transform 0.1s ease-out;
+  transform-origin: center center;
 }
 
 .hero-social-proof-label {
   text-align: center;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   color: var(--text-dim);
   text-transform: uppercase;
   margin-bottom: 32px;
@@ -332,11 +334,59 @@ a {
 
   100% {
     transform: translateX(calc(-50% - 40px));
-    /* -50% of the flex container, minus half the gap */
   }
 }
 
+/* ── Landing Sections (below hero) ── */
+.landing-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 120px 32px;
+  transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+  transform-origin: center center;
+}
 
+.landing-section-inner {
+  text-align: center;
+  max-width: 800px;
+}
+
+.landing-section-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+
+.landing-team {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.landing-team-member {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 36px;
+  font-weight: 400;
+  color: var(--cream);
+  letter-spacing: -0.01em;
+}
+
+.landing-team-separator {
+  color: var(--text-dim);
+  font-size: 24px;
+}
+
+.landing-footer-spacer {
+  height: 20vh;
+}
 
 /* ═══════════════════════════════════════
    BRIEF SCREEN
