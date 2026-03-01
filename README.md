@@ -168,13 +168,13 @@ You're dropped into a real open-source Python codebase **([RQ](https://github.co
                                    ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
 │                        FILTERING  (Post-Scoring)                         │
-│         interpretation.py — narrative feedback · badge assignment        │
+│         insights.py — Gemini-powered personalised insights · badge       │
 └──────────────────────────────────┬───────────────────────────────────────┘
                                    │
                                    ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
 │                             SCORE RESPONSE                               │
-│         Score model → ResultsScreen.jsx · badge · interpretation          │
+│         Score model → ResultsScreen.jsx · badge · insights                │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -250,7 +250,7 @@ sponge/
 ├── backend/                    FastAPI + Python
 │   ├── routes/                 session, prompt, submit, leaderboard
 │   ├── scoring/                engine, semantic, code_analysis, test_runner,
-│   │                           metrics, interpretation, vocabulary
+│   │                           metrics, insights, vocabulary
 │   ├── models/                 Session, Event, Score (Pydantic v2)
 │   ├── gemini/                 client, config, fallback, system_prompt
 │   └── store.py                In-memory session store
@@ -336,8 +336,12 @@ npm run dev
   "total_score": 78,
   "breakdown": { "problem_solving": 20, "code_quality": 18, "verification": 22, "communication": 21 },
   "headline_metrics": { "ai_apply_without_edit_rate": 0.12, "test_pass_rate": 0.83, ... },
-  "interpretation": "Strong ownership of AI suggestions...",
-  "badge": "AI Collaborator"
+  "interpretation": "You scored 78/100. Check the insights below for specific feedback.",
+  "badge": "AI Collaborator",
+  "insights": [
+    { "category": "Code Quality", "type": "strength", "title": "Active code ownership", "description": "You modified code after 88% of AI responses." },
+    { "category": "Verification", "type": "improvement", "title": "Run tests more frequently", "description": "Running tests after each AI suggestion catches issues early." }
+  ]
 }
 ```
 

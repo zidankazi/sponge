@@ -93,15 +93,19 @@ All three return `None` on failure — the engine falls back to metric-based sco
   "breakdown": { "request_timing": 8, "request_quality": 9, "response_handling": 7, "verification_discipline": 5, "iterative_collaboration": 8, "penalties": -2 },
   "rubric_breakdown": { "problem_solving": 9.0, "code_quality": 10.0, "verification": 7.0, "communication": 11.0 },
   "headline_metrics": { "blind_adoption_rate": 0.15, "ai_modification_rate": 0.82, "test_after_ai_rate": 0.40, "passive_reprompt_rate": 0.10, "grounded_prompt_rate": 0.75, "evidence_grounded_followup_rate": 0.60, "ai_apply_without_edit_rate": 0.10, "test_pass_rate": 0.75 },
-  "interpretation": "Strong collaborative instincts...",
+  "interpretation": "You scored 72/100. Check the insights below for specific feedback.",
   "badge": "On Your Way",
+  "insights": [
+    { "category": "Communication", "type": "strength", "title": "Grounded prompts", "description": "75% of your prompts referenced specific files." },
+    { "category": "Verification", "type": "improvement", "title": "Run tests more frequently", "description": "Running tests after each AI suggestion catches issues early." }
+  ],
   "sub_criteria": { "a1_understanding": 4.5, "..." : "..." },
   "penalty_detail": { "p1_over_reliance": 0, "p2_no_run": 0, "p3_critical_miss": -10 },
   "test_suite": { "total": 12, "passed": 9, "failed": 3, "pass_rate": 0.75, "results": [], "core_failures": [] }
 }
 ```
 
-`rubric_breakdown`, `sub_criteria`, `penalty_detail`, `test_suite` are optional (null if eval failed).
+`rubric_breakdown`, `sub_criteria`, `penalty_detail`, `test_suite`, `insights` are optional (null if eval failed).
 
 ### `POST /run-tests` (`routes/run_tests.py`)
 
@@ -161,13 +165,16 @@ Score(
     total_score: int,                           # 0-100
     breakdown: ScoreBreakdown,                  # legacy 0-10 metric scores
     headline_metrics: HeadlineMetrics,           # 8 rate metrics
-    interpretation: str,                         # Socratic feedback text
+    interpretation: str,                         # Brief summary text
     badge: str,                                  # "AI Collaborator" | "On Your Way" | "Needs Work" | "Just Vibing"
     rubric_breakdown: Optional[RubricBreakdown], # A:0-12, B:0-13, C:0-12, D:0-13
     sub_criteria: Optional[SubCriteriaDetail],   # 16 sub-criteria detail
     penalty_detail: Optional[PenaltyDetail],     # P1/P2/P3
     test_suite: Optional[TestSuiteResult],       # correctness test results
+    insights: Optional[list[Insight]],           # Gemini-powered personalised insights
 )
+
+Insight(category, type, title, description)  # type: "strength" | "improvement"
 
 RubricBreakdown(problem_solving, code_quality, verification, communication)
 SubCriteriaDetail(a1_understanding, a2_decomposition, a3_justification, a4_edge_cases,
@@ -189,7 +196,7 @@ The scoring engine is fully implemented. Key files:
 | `scoring/code_analysis.py` | `analyze_final_code()` — Gemini-based code quality eval (B1/B2/B3 + P3) |
 | `scoring/test_runner.py` | `run_correctness_tests()` — runs 12 synthesized tests against user code |
 | `scoring/metrics.py` | Metric computation from event log (rates, timing) |
-| `scoring/interpretation.py` | Generates Socratic feedback text |
+| `scoring/insights.py` | `generate_insights()` — Gemini-powered personalised insights (strengths + improvements) |
 | `scoring/vocabulary.py` | Badge assignment from total score |
 
 The engine uses three evaluation sources (all fired concurrently, all fallback to `None`):

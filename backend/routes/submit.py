@@ -12,6 +12,7 @@ from scoring.engine import compute_score
 from scoring.semantic import evaluate_conversation
 from scoring.code_analysis import analyze_final_code
 from scoring.test_runner import run_correctness_tests
+from scoring.insights import generate_insights
 
 router = APIRouter(tags=["submit"])
 
@@ -67,6 +68,23 @@ async def submit_session(body: SubmitRequest):
         code_eval=code_eval,
         test_results=test_results,
     )
+
+    # Generate personalised insights from the scoring data
+    user_prompts = [
+        t["content"] for t in session.conversation_history
+        if t.get("role") == "user"
+    ]
+    insights = await generate_insights(
+        user_prompts=user_prompts,
+        total_score=score.total_score,
+        rubric=score.rubric_breakdown,
+        sub_criteria=score.sub_criteria,
+        metrics=score.headline_metrics,
+        penalties=score.penalty_detail,
+        test_suite=score.test_suite,
+    )
+    score.insights = insights
+    score.user_prompts = user_prompts
 
     session.score = score
     return score

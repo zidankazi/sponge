@@ -133,15 +133,19 @@ Submits the session for scoring. Fires three concurrent evaluations (semantic, c
     "ai_apply_without_edit_rate": 0.10,
     "test_pass_rate": 0.75
   },
-  "interpretation": "Strong collaborative instincts...",
+  "interpretation": "You scored 85/100. Check the insights below for specific feedback on your session.",
   "badge": "On Your Way",
+  "insights": [
+    { "category": "Communication", "type": "strength", "title": "Grounded prompts", "description": "75% of your prompts referenced specific files — this helps the AI give targeted answers." },
+    { "category": "Verification", "type": "improvement", "title": "Run tests more frequently", "description": "Running tests after each AI suggestion helps catch issues early." }
+  ],
   "sub_criteria": { "a1_understanding": 4.5, "...": "..." },
   "penalty_detail": { "p1_over_reliance": 0, "p2_no_run": 0, "p3_critical_miss": -10 },
   "test_suite": { "total": 12, "passed": 9, "failed": 3, "pass_rate": 0.75, "results": [], "core_failures": [] }
 }
 ```
 
-**Note:** `rubric_breakdown`, `sub_criteria`, `penalty_detail`, and `test_suite` are optional and may be null if the corresponding eval failed.
+**Note:** `rubric_breakdown`, `sub_criteria`, `penalty_detail`, `test_suite`, and `insights` are optional and may be null if the corresponding eval failed.
 
 ### `GET /leaderboard`
 Returns the leaderboard.

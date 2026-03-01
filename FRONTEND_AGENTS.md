@@ -24,7 +24,7 @@ Also owns: `pages/SessionPage.jsx`, `hooks/useSession.jsx`, `hooks/useTimer.js`,
 
 | Component | Purpose |
 |-----------|---------|
-| `game/ResultsScreen.jsx` | Post-session results — score circle, breakdown bars, metrics, interpretation |
+| `game/ResultsScreen.jsx` | Post-session results — score circle, insight cards, breakdown bars, metrics |
 | `game/Leaderboard.jsx` | Leaderboard table with rankings, scores, badges |
 | `game/Badge.jsx` | Badge component — icon + label for each badge tier |
 
@@ -95,8 +95,9 @@ The frontend consumes these fields from the response:
 - `breakdown` — legacy 0-10 metric scores (displayed in full breakdown view)
 - `rubric_breakdown` — category scores: `{ problem_solving, code_quality, verification, communication }` with maxes 12/13/12/13
 - `headline_metrics` — 8 rate metrics (displayed in full breakdown view)
-- `interpretation` (string) — Socratic feedback
+- `interpretation` (string) — brief summary (fallback if insights unavailable)
 - `badge` (string) — one of "AI Collaborator", "On Your Way", "Needs Work", "Just Vibing"
+- `insights` — array of `{ category, type, title, description }` — Gemini-powered personalised feedback cards (strengths + improvements)
 - `sub_criteria`, `penalty_detail`, `test_suite` — optional detailed breakdowns
 
 See `AGENTS.md` for the full response JSON.
