@@ -5,7 +5,7 @@
 <br/>
 
 <div align="center">
-  <em> Master the AI-native Workflow. </em>
+  <em> Master the AI-native Workflow. 🧽🫧</em>
 </div>
 
 <br/>
