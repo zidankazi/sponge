@@ -34,7 +34,7 @@
 
 ![AI-powered development](https://www.anthropic.com/_next/image?url=https%3A%2F%2Fwww-cdn.anthropic.com%2Fimages%2F4zrzovbb%2Fwebsite%2Fab5167a53ff0de956bd500b01b30d8aba028d843-4584x2580.png&w=3840&q=75)
 
-> *How you use AI matters more than whether you use it [Anthropic](https://www.anthropic.com/research/AI-assistance-coding-skills) .*
+> *How you use AI matters more than whether you use it [(Anthropic)](https://www.anthropic.com/research/AI-assistance-coding-skills) .*
 
 ## What is Sponge?
 
