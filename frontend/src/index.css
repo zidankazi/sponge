@@ -432,10 +432,11 @@ a {
 }
 
 .landing-team-member:hover {
+  color: #ffffff;
   text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.3);
   text-decoration-thickness: 1px;
   text-underline-offset: 6px;
-  text-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
 }
 
 .landing-team-separator {
