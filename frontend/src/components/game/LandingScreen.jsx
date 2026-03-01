@@ -33,10 +33,13 @@ function TeamNameReveal({ name, containerRef, staggerIndex = 0 }) {
       // Calculate how far the element is from the bottom of the screen to the middle
       // We offset the reveal window based on the staggerIndex so they happen sequentially
       // Zidan (0) reveals earliest, Shreyas (2) reveals last
-      const staggerOffset = staggerIndex * 0.15 * windowH
+      const staggerOffset = staggerIndex * 0.12 * windowH
 
-      const startRevealY = windowH * 0.95 - staggerOffset
-      const endRevealY = windowH * 0.70 - staggerOffset
+      // Start revealing exactly when it enters the viewport (100%)
+      // Finish revealing when it hits the exact center of the screen (50%) 
+      // This ensures everything is 100% white well before hitting the scroll limit.
+      const startRevealY = windowH * 1.0 - staggerOffset
+      const endRevealY = windowH * 0.5 - staggerOffset
 
       // 0 = just entered start bound, 1 = fully at end bound
       const progress = Math.max(0, Math.min(1, (startRevealY - rect.top) / (startRevealY - endRevealY)))
