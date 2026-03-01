@@ -1,0 +1,28 @@
+# Ralph Progress Log — Sponge Scoring Engine v2
+Started: 2026-02-28
+---
+
+## Codebase Patterns
+- Python venv at backend/venv/ — use `./venv/bin/python` for imports
+- All backend imports are flat: `from scoring.vocabulary import ...` (no `backend.` prefix)
+- Run quality checks from `backend/` working directory
+- engine.py uses `_` prefix for private functions, public entry is `compute_score`
+
+## Iteration 1 — SE-001/002/003: Extract vocabulary, metrics, interpretation modules
+### What was implemented
+- Extracted RQ_TERMS, TRADEOFF_TERMS, EDGE_CASE_TERMS + 4 helpers to scoring/vocabulary.py
+- Extracted compute_headline_metrics + 4 session helpers to scoring/metrics.py (renamed from _compute_headline_metrics to public)
+- Extracted _build_interpretation + _has_any_tests_signal to scoring/interpretation.py
+- Updated engine.py imports to use new modules
+
+### Files changed
+- backend/scoring/vocabulary.py (created)
+- backend/scoring/metrics.py (created)
+- backend/scoring/interpretation.py (created)
+- backend/scoring/engine.py (modified — removed inline definitions, added imports)
+
+### Learnings for future iterations
+- _word_overlap is in vocabulary.py (used by both metrics.py and engine.py)
+- metrics.py imports from vocabulary.py (_is_grounded, _word_overlap)
+- engine.py still imports vocabulary helpers directly for scorer functions
+- compute_headline_metrics is the public name (no underscore prefix)
