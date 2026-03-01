@@ -8,7 +8,7 @@ const TOTAL_TIME = 60 * 60 // 60 minutes in seconds
 
 export function SessionProvider({ children }) {
   const [sessionId, setSessionId] = useState(null)
-  const [view, setView] = useState('idle') // idle | session | results | leaderboard
+  const [view, setView] = useState('idle') // idle | brief | session | results | leaderboard
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME)
   const [activeFile, setActiveFile] = useState('rq/job.py')
   const [openFiles, setOpenFiles] = useState(['rq/job.py'])
@@ -24,9 +24,9 @@ export function SessionProvider({ children }) {
   const timerRef = useRef(null)
   const editDebounceRef = useRef(null)
 
-  // Start countdown timer
+  // Start countdown timer on brief + session screens
   useEffect(() => {
-    if (view === 'session' && timeLeft > 0) {
+    if ((view === 'brief' || view === 'session') && timeLeft > 0) {
       timerRef.current = setInterval(() => {
         setTimeLeft((t) => {
           if (t <= 1) {
@@ -46,7 +46,7 @@ export function SessionProvider({ children }) {
     try {
       const { session_id } = await startSession(resolvedName)
       setSessionId(session_id)
-      setView('session')
+      setView('brief')
       setTimeLeft(TOTAL_TIME)
       setChatHistory([])
       setResults(null)
@@ -57,6 +57,10 @@ export function SessionProvider({ children }) {
       // ErrorBanner already showing via onApiError — stay on landing screen
       setUsername('')
     }
+  }, [])
+
+  const startCoding = useCallback(() => {
+    setView('session')
   }, [])
 
   const openFile = useCallback((path) => {
@@ -182,6 +186,7 @@ export function SessionProvider({ children }) {
         showHistory,
         setShowHistory,
         beginSession,
+        startCoding,
         openFile,
         closeFile,
         updateFileContent,
