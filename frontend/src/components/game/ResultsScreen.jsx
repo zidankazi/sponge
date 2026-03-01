@@ -66,7 +66,7 @@ export default function ResultsScreen() {
 
   if (!results) return null
 
-  const { total_score = 0, breakdown = {}, headline_metrics = {}, interpretation = '', badge = 'Just Vibing' } = results
+  const { total_score = 0, breakdown = {}, rubric_breakdown, headline_metrics = {}, interpretation = '', badge = 'Just Vibing' } = results
 
   // Phase 1: ScoreReveal (before user clicks Continue)
   if (!revealed) {
@@ -75,7 +75,7 @@ export default function ResultsScreen() {
         score={total_score}
         badge={badge}
         interpretation={interpretation}
-        breakdown={breakdown}
+        rubricBreakdown={rubric_breakdown}
         onComplete={() => setRevealed(true)}
       />
     )
