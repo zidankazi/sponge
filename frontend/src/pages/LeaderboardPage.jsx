@@ -39,7 +39,7 @@ export default function LeaderboardPage({ onBack, onStartNewSession }) {
           </button>
         )}
         <div className="leaderboard-page-title">
-          <div className="leaderboard-logo-icon">S</div>
+          <img src="/brand/favicon-48x48.png" alt="Sponge" className="leaderboard-logo-img" height={28} width={28} />
           <h1>Leaderboard</h1>
         </div>
       </div>

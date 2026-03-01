@@ -53,8 +53,13 @@ export default function Header() {
       <header className="header">
         <div className="header-left">
           <div className="header-logo">
-            <span className="logo-icon">S</span>
-            <span className="logo-text">sponge</span>
+            <img
+              src="/brand/logo-full.png"
+              srcSet="/brand/logo-full.png 1x"
+              alt="Sponge"
+              className="nav-logo-img"
+              height={22}
+            />
           </div>
           <span className="header-divider" />
           <span className="header-problem-tag">Delayed Job Execution</span>
