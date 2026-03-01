@@ -12,12 +12,13 @@ const ROTATING_WORDS = [
   'future.'
 ]
 
-// Component: Claude mascot orbiting around the team names with a dotted trail
+// Component: Claude mascot orbiting fully around the team names with a fading dotted trail
 function OrbitingMascot() {
   const canvasRef = useRef(null)
   const mascotRef = useRef(null)
   const trailRef = useRef([])
   const angleRef = useRef(0)
+  const frameCount = useRef(0)
 
   useEffect(() => {
     const mascot = mascotRef.current
@@ -27,15 +28,17 @@ function OrbitingMascot() {
     const ctx = canvas.getContext('2d')
     let animId
 
-    // Ellipse parameters (relative to container center)
-    const radiusX = 340
-    const radiusY = 50
-    const speed = 0.006
-    const mascotSize = 28
-    const maxDots = 18
+    // Big ellipse that fully wraps around all three names
+    const radiusX = 480
+    const radiusY = 80
+    const speed = 0.008
+    const mascotSize = 32
+    const maxDots = 50
+    const dotSpacing = 3 // only record a dot every N frames
 
     const resize = () => {
       const parent = canvas.parentElement
+      if (!parent) return
       canvas.width = parent.offsetWidth
       canvas.height = parent.offsetHeight
     }
@@ -44,33 +47,46 @@ function OrbitingMascot() {
 
     const tick = () => {
       angleRef.current += speed
+      frameCount.current++
       const a = angleRef.current
 
       const cx = canvas.width / 2
-      const cy = canvas.height / 2 + 10
+      const cy = canvas.height / 2
 
       const x = cx + Math.cos(a) * radiusX
       const y = cy + Math.sin(a) * radiusY
 
-      // Update mascot position
+      // Calculate the tangent angle for rotation (direction of travel)
+      const dx = -Math.sin(a) * radiusX
+      const dy = Math.cos(a) * radiusY
+      const rotationDeg = Math.atan2(dy, dx) * (180 / Math.PI) + 90
+
+      // Update mascot position and rotation
       mascot.style.left = `${x - mascotSize / 2}px`
       mascot.style.top = `${y - mascotSize / 2}px`
+      mascot.style.transform = `rotate(${rotationDeg}deg)`
 
-      // Store trail dot
-      trailRef.current.push({ x, y, age: 0 })
-      if (trailRef.current.length > maxDots) trailRef.current.shift()
+      // Store trail dot (spaced out for a dotted-line look)
+      if (frameCount.current % dotSpacing === 0) {
+        trailRef.current.push({ x, y })
+        if (trailRef.current.length > maxDots) trailRef.current.shift()
+      }
 
-      // Draw trail
+      // Draw trail — newest dots are brightest/biggest, oldest fade out
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      trailRef.current.forEach((dot, i) => {
-        dot.age++
-        const opacity = Math.max(0, 0.35 - (i / maxDots) * 0.35)
-        const size = 2.5 - (i / maxDots) * 1.5
+      const total = trailRef.current.length
+      for (let i = 0; i < total; i++) {
+        const dot = trailRef.current[i]
+        // i=0 is oldest, i=total-1 is newest
+        const t = i / total
+        const opacity = t * 0.4 // 0 → 0.4
+        const radius = 1 + t * 2 // 1px → 3px
+
         ctx.beginPath()
-        ctx.arc(dot.x, dot.y, Math.max(size, 0.5), 0, Math.PI * 2)
+        ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2)
         ctx.fillStyle = `rgba(180, 120, 90, ${opacity})`
         ctx.fill()
-      })
+      }
 
       animId = requestAnimationFrame(tick)
     }
