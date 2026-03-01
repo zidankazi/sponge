@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useSession } from '../../hooks/useSession'
 import Badge from './Badge'
 import ScoreReveal from './ScoreReveal'
-import LeaderboardPage from '../../pages/LeaderboardPage'
 
 const SCORE_LABELS = {
   request_timing: 'Request Timing',
@@ -23,29 +22,32 @@ const METRIC_LABELS = {
 }
 
 function ScoreBar({ label, value, max = 10, negative }) {
-  const pct = negative ? 0 : (value / max) * 100
+  const safeValue = typeof value === 'number' ? value : 0
+  const pct = negative ? 0 : (safeValue / max) * 100
 
   return (
     <div className="score-bar-row">
       <div className="score-bar-label">{label}</div>
       <div className="score-bar-track">
         {negative ? (
-          <div className="score-bar-fill score-bar-fill--negative" style={{ width: `${(Math.abs(value) / 5) * 100}%` }} />
+          <div className="score-bar-fill score-bar-fill--negative" style={{ width: `${(Math.abs(safeValue) / 5) * 100}%` }} />
         ) : (
           <div className="score-bar-fill" style={{ width: `${pct}%` }} />
         )}
       </div>
       <div className={`score-bar-value ${negative ? 'score-bar-value--negative' : ''}`}>
-        {negative ? value : `${value}/${max}`}
+        {negative ? safeValue : `${safeValue}/${max}`}
       </div>
     </div>
   )
 }
 
 function MetricRow({ metricKey, value, meta }) {
-  const pctStr = `${Math.round(value * 100)}%`
-  const isGood = (meta.good === 'high' && value >= 0.6) || (meta.good === 'low' && value <= 0.3)
-  const isBad = (meta.good === 'high' && value < 0.3) || (meta.good === 'low' && value > 0.6)
+  if (!meta) return null
+  const safeValue = typeof value === 'number' ? value : 0
+  const pctStr = `${Math.round(safeValue * 100)}%`
+  const isGood = (meta.good === 'high' && safeValue >= 0.6) || (meta.good === 'low' && safeValue <= 0.3)
+  const isBad = (meta.good === 'high' && safeValue < 0.3) || (meta.good === 'low' && safeValue > 0.6)
 
   return (
     <div className="metric-row">
@@ -60,11 +62,10 @@ function MetricRow({ metricKey, value, meta }) {
 export default function ResultsScreen() {
   const { results, resetSession } = useSession()
   const [revealed, setRevealed] = useState(false)
-  const [showLeaderboard, setShowLeaderboard] = useState(false)
 
   if (!results) return null
 
-  const { total_score, breakdown, headline_metrics, interpretation, badge } = results
+  const { total_score = 0, breakdown = {}, headline_metrics = {}, interpretation = '', badge = 'Just Vibing' } = results
 
   // Phase 1: ScoreReveal (before user clicks Continue)
   if (!revealed) {
@@ -75,17 +76,6 @@ export default function ResultsScreen() {
         interpretation={interpretation}
         breakdown={breakdown}
         onComplete={() => setRevealed(true)}
-        onViewLeaderboard={() => setShowLeaderboard(true)}
-      />
-    )
-  }
-
-  // Leaderboard page (from ScoreReveal or full breakdown)
-  if (showLeaderboard) {
-    return (
-      <LeaderboardPage
-        onBack={() => setShowLeaderboard(false)}
-        onStartNewSession={resetSession}
       />
     )
   }
@@ -162,9 +152,6 @@ export default function ResultsScreen() {
 
         <div className="results-actions">
           <h3 className="results-actions-title">What&apos;s next?</h3>
-          <button className="results-leaderboard-btn" onClick={() => setShowLeaderboard(true)}>
-            View Leaderboard
-          </button>
           <button className="results-bottleneck-btn" onClick={() => setRevealed(false)}>
             Re-attempt Bottleneck
           </button>
