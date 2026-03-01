@@ -166,7 +166,7 @@ def _score_code_quality(session: Session, conv_eval=None, code_eval=None, test_r
     if code_eval is not None:
         b1 = _clamp(code_eval.b1_clarity * (5 / 8), 0, 5)
     else:
-        b1 = 2.5  # mid-range default
+        b1 = 0.0  # no eval data — don't award free points
 
     # ── B2 — Correctness — REMOVED (handled by test accuracy T) ──
     b2 = 0.0
@@ -182,7 +182,7 @@ def _score_code_quality(session: Session, conv_eval=None, code_eval=None, test_r
     elif conv_eval is not None:
         b3 = _clamp(conv_eval.b3_efficiency_discussion * (4 / 5), 0, 4)
     else:
-        b3 = 2.0  # mid-range default
+        b3 = 0.0  # no eval data — don't award free points
 
     # ── B4 — AI Code Ownership (0-4) — blended metric + semantic ──
     b4_metric = 0.0
@@ -458,7 +458,10 @@ def _compute_penalties(session: Session, metrics: HeadlineMetrics,
         p1 = min(p1 + 3, 0)
 
     # ── P2 — No-run ──
-    p2 = -5 if not test_events else 0
+    # Only penalise if the user actually edited code but never ran tests.
+    # Zero-effort sessions (no edits) are already punished by low T and B scores.
+    edit_events = _events_of(session, "file_edit")
+    p2 = -5 if (edit_events and not test_events) else 0
 
     # ── P3 — Removed (redundant with T: test accuracy) ──
     p3 = 0
