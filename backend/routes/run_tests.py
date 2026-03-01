@@ -21,7 +21,7 @@ class RunTestsRequest(BaseModel):
     file_contents: str  # concatenated // --- path --- format, same as submit
 
 
-@router.post("/run-tests", response_model=Optional[TestSuiteResult])
+@router.post("/run-tests")
 async def run_tests(body: RunTestsRequest):
     """Run user-visible test cases against the current code.
 
@@ -34,8 +34,22 @@ async def run_tests(body: RunTestsRequest):
         session = Session(session_id=body.session_id)
         store.sessions[body.session_id] = session
 
-    result = await run_correctness_tests(body.file_contents)
-    return result
+    try:
+        result = await run_correctness_tests(body.file_contents)
+        if result is None:
+            # Return diagnostic info so we can debug
+            from scoring.test_runner import parse_final_code
+            parsed = parse_final_code(body.file_contents)
+            return {
+                "error": "test_runner returned None",
+                "parsed_file_count": len(parsed),
+                "parsed_files": list(parsed.keys())[:5],
+                "file_contents_length": len(body.file_contents),
+                "file_contents_preview": body.file_contents[:200],
+            }
+        return result
+    except Exception as e:
+        return {"error": f"{type(e).__name__}: {e}"}
 
 
 @router.get("/run-tests/debug")
