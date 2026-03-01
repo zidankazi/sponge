@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useSession } from '../../hooks/useSession'
+import { useNavigate } from 'react-router-dom'
 import '@fontsource/newsreader/400.css'
 import '@fontsource/newsreader/400-italic.css'
 
@@ -13,7 +13,7 @@ const ROTATING_WORDS = [
 ]
 
 export default function LandingScreen() {
-  const { beginSession } = useSession()
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
 
   // Typing effect state
@@ -120,13 +120,8 @@ export default function LandingScreen() {
     return () => container.removeEventListener('scroll', handleScroll)
   }, [handleScroll])
 
-  const handleStart = async () => {
-    setLoading(true)
-    try {
-      await beginSession('Guest')
-    } finally {
-      setLoading(false)
-    }
+  const handleStart = () => {
+    navigate('/demo')
   }
 
   const companies = [
@@ -175,8 +170,8 @@ export default function LandingScreen() {
           <p className="hero-subline">
             Stop memorizing syntax. Start architecting systems. Practice building real-world software side-by-side with an AI pair programmer.
           </p>
-          <button className="hero-cta" onClick={handleStart} disabled={loading}>
-            {loading ? 'Starting Demo...' : 'View demo'}
+          <button className="hero-cta" onClick={handleStart}>
+            View demo
           </button>
         </div>
 
