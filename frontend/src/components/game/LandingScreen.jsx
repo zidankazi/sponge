@@ -12,6 +12,72 @@ const ROTATING_WORDS = [
   'future.'
 ]
 
+// Component to handle scroll-driven individual letter revealing
+function TeamNameReveal({ name, containerRef }) {
+  const letters = name.split('')
+  const nameRef = useRef(null)
+
+  // We'll update inline styles on spans for performance instead of state
+  const letterRefs = useRef([])
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const handleScroll = () => {
+      if (!nameRef.current) return
+
+      const rect = nameRef.current.getBoundingClientRect()
+      const windowH = window.innerHeight
+
+      // Calculate how far the element is from the bottom of the screen to the middle
+      // Start revealing when the top of the element hits 90% of viewport height
+      // Finish revealing when it hits 65% of viewport height
+      const startRevealY = windowH * 0.9
+      const endRevealY = windowH * 0.65
+
+      // 0 = just entered start bound, 1 = fully at end bound
+      const progress = Math.max(0, Math.min(1, (startRevealY - rect.top) / (startRevealY - endRevealY)))
+
+      // Stagger the letter opacities
+      letterRefs.current.forEach((letterSpan, idx) => {
+        if (!letterSpan) return
+
+        // Calculate an individual threshold for this letter
+        // letters at the start of the word reveal earlier
+        const letterThreshold = idx / letters.length
+
+        // Calculate opacity: 
+        // We use a steep curve so a letter goes from 0.25 to 1 quickly once its threshold is met
+        const letterProgress = Math.max(0, Math.min(1, (progress - (letterThreshold * 0.6)) * 4))
+
+        const minOpacity = 0.25
+        const currentOpacity = minOpacity + (1 - minOpacity) * letterProgress
+
+        letterSpan.style.color = `rgba(255, 255, 255, ${currentOpacity})`
+      })
+    }
+
+    container.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll() // initial
+    return () => container.removeEventListener('scroll', handleScroll)
+  }, [containerRef, letters.length])
+
+  return (
+    <span ref={nameRef} className="team-name-reveal">
+      {letters.map((char, i) => (
+        <span
+          key={i}
+          ref={(el) => (letterRefs.current[i] = el)}
+          style={{ color: 'rgba(255, 255, 255, 0.25)', transition: 'color 0.1s ease-out' }}
+        >
+          {char === ' ' ? '\u00A0' : char}
+        </span>
+      ))}
+    </span>
+  )
+}
+
 export default function LandingScreen() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
@@ -73,7 +139,7 @@ export default function LandingScreen() {
       el.style.transform = `scale(${scale})`
     }
 
-    // Team section parallax
+    // Team section parallax (keep scaling, let the Reveal component handle opacity)
     if (teamRef.current) {
       const el = teamRef.current
       const rect = el.getBoundingClientRect()
@@ -84,9 +150,7 @@ export default function LandingScreen() {
       const maxDist = windowH / 2
       const progress = 1 - Math.min(dist / maxDist, 1)
       const scale = 1 + progress * 0.1
-      const opacity = 0.3 + progress * 0.7
       el.style.transform = `scale(${scale})`
-      el.style.opacity = opacity
     }
 
     // Claude mascots — each drifts at a different parallax rate
@@ -201,15 +265,15 @@ export default function LandingScreen() {
           <p className="landing-section-label">BUILT BY</p>
           <div className="landing-team">
             <a href="https://www.zidankazi.com/" target="_blank" rel="noreferrer" className="landing-team-member">
-              Zidan Kazi
+              <TeamNameReveal name="Zidan Kazi" containerRef={scrollRef} />
             </a>
             <span className="landing-team-separator">&bull;</span>
             <a href="https://www.linkedin.com/in/sriram-pankanti/" target="_blank" rel="noreferrer" className="landing-team-member">
-              Sriram Pankanti
+              <TeamNameReveal name="Sriram Pankanti" containerRef={scrollRef} />
             </a>
             <span className="landing-team-separator">&bull;</span>
             <a href="https://www.linkedin.com/in/shreyas-ghosh-roy/" target="_blank" rel="noreferrer" className="landing-team-member">
-              Shreyas Ghosh Roy
+              <TeamNameReveal name="Shreyas Ghosh Roy" containerRef={scrollRef} />
             </a>
           </div>
         </div>
