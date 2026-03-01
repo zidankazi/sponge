@@ -1,38 +1,21 @@
 """
-Scoring engine v2 — implements the Meta-style rubric on native 0-25 per category.
+Scoring engine v3 — test accuracy is 50% of the grade.
 
-Rubric categories (each 0-25, total 0-100 before penalties):
-  A. Problem Solving   (A1 understanding, A2 decomposition, A3 justification, A4 edge cases)
-  B. Code Quality      (B1 clarity, B2 correctness, B3 efficiency, B4 ownership)
-  C. Verification      (C1 exec frequency, C2 test coverage, C3 AI validation, C4 debug discipline)
-  D. Communication     (D1 narration, D2 tradeoffs, D3 AI balance, D4 status summaries)
+Test Accuracy (0-50):
+  T: round(pass_rate * 50) from all 20 tests (12 visible + 8 hidden)
+     Fallback: 25 if tests fail to run (infra error, not student's fault)
 
-Penalties (subtracted after A-D on the 0-100 scale):
-  P1. Over-reliance on AI   (0, -5, -10, or -15)
-  P2. No-run               (-10 if zero test_run events)
-  P3. Critical miss         (-10 if core tests fail or semantic detects missing feature)
+Rubric categories (remaining 50 points):
+  A. Problem Solving   (0-12): A1 understanding(3), A2 decomposition(4), A3 justification(3), A4 edge cases(2)
+  B. Code Quality      (0-13): B1 clarity(5), B3 efficiency(4), B4 ownership(4)
+  C. Verification      (0-12): C1 exec frequency(4), C2 test coverage(4), C3 AI validation(2), C4 debug discipline(2)
+  D. Communication     (0-13): D1 narration(4), D2 tradeoffs(4), D3 AI balance(3), D4 status summaries(2)
 
-total_score = clamp(A + B + C + D + P1 + P2 + P3, 0, 100)
+Penalties (applied to 0-100 total):
+  P1. Over-reliance on AI   (0, -3, -5, or -8)
+  P2. No-run               (-5 if zero test_run events)
 
-Blending formulas per sub-criterion (from plan Section 4):
-  A1: clamp(0.4*metric + 0.6*semantic, floor, 6)
-  A2: clamp(0.3*metric + 0.7*semantic, floor, 7)
-  A3: pure semantic (metric fallback)
-  A4: clamp(0.5*metric + 0.5*semantic, 0, 5)
-  B1: pure semantic code analysis
-  B2: min(test_pass_cap, semantic_b2) — execution-gated
-  B3: round(0.4*conv_b3 + 0.6*code_b3)
-  B4: clamp(0.4*metric + 0.6*semantic, 0, 5)
-  C1: pure metric
-  C2: clamp(0.3*metric + 0.7*semantic, floor, 9)
-  C3: clamp(0.5*metric + 0.5*semantic, 0, 4)
-  C4: pure metric
-  D1: clamp(0.3*metric + 0.7*semantic, floor, 8)
-  D2: pure semantic (metric fallback)
-  D3: clamp(0.4*metric + 0.6*semantic, 0, 5)
-  D4: pure semantic (metric fallback)
-
-The 5 frontend breakdown fields (0-10 each) are derived for backward compatibility.
+total_score = clamp(T + A + B + C + D + P1 + P2, 0, 100)
 """
 
 from typing import Optional
@@ -55,61 +38,56 @@ def _clamp(value: float, lo: float, hi: float) -> float:
     return max(lo, min(hi, value))
 
 
-# ---------- B2 gate from test pass rate ----------
+# ---------- T: Test Accuracy (0-50) ----------
 
-def _compute_b2_cap(test_results) -> int:
-    """Returns the maximum B2 score allowed by test pass rate."""
+def _compute_test_accuracy(test_results) -> int:
+    """Direct test accuracy score: pass_rate * 50, rounded.
+
+    Returns 25 (neutral mid-point) if tests failed to run entirely,
+    since that's an infra error not the student's fault.
+    """
     if test_results is None:
-        return 7  # No gate — fallback to pure semantic
-    if test_results.pass_rate >= 1.0:
-        return 7  # 12/12: full range
-    if test_results.pass_rate >= 0.8:
-        return 5  # 10-11/12
-    if test_results.pass_rate >= 0.5:
-        return 3  # 6-9/12
-    return 1      # 0-5/12: fundamentally broken
+        return 25
+    return round(test_results.pass_rate * 50)
 
 
-# ---------- Category A: Problem Solving (0-25) ----------
+# ---------- Category A: Problem Solving (0-12) ----------
 
 def _score_problem_solving(session: Session, conv_eval=None) -> dict:
     """
-    A1: Understanding & Restatement (0-6) — semantic + metric floor
-    A2: Decomposition / Plan (0-7) — semantic + metric floor
-    A3: Algorithm/Approach Justification (0-7) — pure semantic
-    A4: Edge Cases Before Coding (0-5) — blended 50/50
+    A1: Understanding & Restatement (0-3) — semantic + metric floor
+    A2: Decomposition / Plan (0-4) — semantic + metric floor
+    A3: Algorithm/Approach Justification (0-3) — pure semantic
+    A4: Edge Cases Before Coding (0-2) — blended 50/50
     """
     prompts = _user_prompts(session)
     prompt_events = _events_of(session, "prompt_sent")
     file_open_events = _events_of(session, "file_open")
     start_ms = _session_start_ms(session)
 
-    # ── A1 — Problem Understanding (0-6) ──
-    # Metric component (scaled to 0-6)
+    # ── A1 — Problem Understanding (0-3) ──
     a1_metric = 0.0
     a1_floor = 0.0
-    a1_ceiling = 6.0
+    a1_ceiling = 3.0
     if prompts:
         first_words = len(prompts[0].split())
         if first_words >= 50:
-            a1_metric = 4.0
-        elif first_words >= 20:
-            a1_metric = 3.0
-        elif first_words >= 8:
             a1_metric = 2.0
-        # Floor: first_prompt_words >= 20 AND mentions RQ term → floor = 2
+        elif first_words >= 20:
+            a1_metric = 1.5
+        elif first_words >= 8:
+            a1_metric = 1.0
         if first_words >= 20 and _is_grounded(prompts[0]):
-            a1_floor = 2.0
-        # Ceiling: first_prompt_words < 8 → ceiling = 2
+            a1_floor = 1.0
         if first_words < 8:
-            a1_ceiling = 2.0
+            a1_ceiling = 1.0
 
     if conv_eval is not None:
-        a1 = _clamp(0.4 * a1_metric + 0.6 * conv_eval.a1_understanding, a1_floor, a1_ceiling)
+        a1 = _clamp(0.4 * a1_metric + 0.6 * conv_eval.a1_understanding * (3 / 6), a1_floor, a1_ceiling)
     else:
         a1 = _clamp(a1_metric, a1_floor, a1_ceiling)
 
-    # ── A2 — Decomposition / Plan (0-7) ──
+    # ── A2 — Decomposition / Plan (0-4) ──
     a2_metric = 0.0
     a2_floor = 0.0
     if prompt_events:
@@ -118,102 +96,95 @@ def _score_problem_solving(session: Session, conv_eval=None) -> dict:
         minutes_to_first = (first_prompt_ts - start_ms) / 60_000
 
         if files_before >= 3:
-            a2_metric += 3.0
+            a2_metric += 1.5
         elif files_before >= 1:
-            a2_metric += 2.0
-
-        if 2 <= minutes_to_first <= 20:
-            a2_metric += 2.0
-        elif minutes_to_first > 0:
             a2_metric += 1.0
 
-        # Floor: files >= 3 AND time >= 2 min → 3; files >= 1 AND time >= 1 → 2
+        if 2 <= minutes_to_first <= 20:
+            a2_metric += 1.0
+        elif minutes_to_first > 0:
+            a2_metric += 0.5
+
         if files_before >= 3 and minutes_to_first >= 2:
-            a2_floor = 3.0
+            a2_floor = 1.5
         elif files_before >= 1 and minutes_to_first >= 1:
-            a2_floor = 2.0
+            a2_floor = 1.0
 
     if conv_eval is not None:
-        a2 = _clamp(0.3 * a2_metric + 0.7 * conv_eval.a2_decomposition, a2_floor, 7)
+        a2 = _clamp(0.3 * a2_metric + 0.7 * conv_eval.a2_decomposition * (4 / 7), a2_floor, 4)
     else:
-        a2 = _clamp(a2_metric, a2_floor, 7)
+        a2 = _clamp(a2_metric, a2_floor, 4)
 
-    # ── A3 — Justification (0-7) — pure semantic ──
+    # ── A3 — Justification (0-3) — pure semantic ──
     if conv_eval is not None:
-        a3 = _clamp(conv_eval.a3_justification, 0, 7)
+        a3 = _clamp(conv_eval.a3_justification * (3 / 7), 0, 3)
     else:
-        # Metric fallback: dialogue depth as proxy
         n_prompts = len(prompts)
         if n_prompts >= 7:
-            a3 = 3.0
+            a3 = 1.5
         elif n_prompts >= 4:
-            a3 = 2.0
-        elif n_prompts >= 2:
             a3 = 1.0
+        elif n_prompts >= 2:
+            a3 = 0.5
         else:
             a3 = 0.0
 
-    # ── A4 — Edge Cases (0-5) — blended 50/50 ──
+    # ── A4 — Edge Cases (0-2) — blended 50/50 ──
     edge_count = sum(1 for p in prompts if _has_edge_case_language(p))
     if edge_count >= 4:
-        a4_metric = 3.0
+        a4_metric = 1.5
     elif edge_count >= 2:
-        a4_metric = 2.0
-    elif edge_count >= 1:
         a4_metric = 1.0
+    elif edge_count >= 1:
+        a4_metric = 0.5
     else:
         a4_metric = 0.0
 
     if conv_eval is not None:
-        a4 = _clamp(0.5 * a4_metric + 0.5 * conv_eval.a4_edge_cases, 0, 5)
+        a4 = _clamp(0.5 * a4_metric + 0.5 * conv_eval.a4_edge_cases * (2 / 5), 0, 2)
     else:
-        a4 = _clamp(a4_metric, 0, 5)
+        a4 = _clamp(a4_metric, 0, 2)
 
     return {"a1": round(a1, 1), "a2": round(a2, 1), "a3": round(a3, 1), "a4": round(a4, 1)}
 
 
-# ---------- Category B: Code Quality (0-25) ----------
+# ---------- Category B: Code Quality (0-13) ----------
 
 def _score_code_quality(session: Session, conv_eval=None, code_eval=None, test_results=None) -> dict:
     """
-    B1: Clarity/Readability (0-8) — pure semantic (code analysis)
-    B2: Correctness (0-7) — execution-gated semantic
-    B3: Efficiency (0-5) — blended conv+code semantic
-    B4: AI Code Ownership (0-5) — blended metric+semantic
+    B1: Clarity/Readability (0-5) — pure semantic (code analysis)
+    B2: Correctness — REMOVED (now handled by T: Test Accuracy), always 0
+    B3: Efficiency (0-4) — blended conv+code semantic
+    B4: AI Code Ownership (0-4) — blended metric+semantic
     """
     prompts = _user_prompts(session)
     responses = _ai_responses(session)
     prompt_events = _events_of(session, "prompt_sent")
     edit_events = _events_of(session, "file_edit")
 
-    # ── B1 — Clarity (0-8) — pure semantic code analysis ──
+    # ── B1 — Clarity (0-5) — pure semantic code analysis ──
     if code_eval is not None:
-        b1 = _clamp(code_eval.b1_clarity, 0, 8)
+        b1 = _clamp(code_eval.b1_clarity * (5 / 8), 0, 5)
     else:
-        b1 = 4.0  # mid-range default
+        b1 = 2.5  # mid-range default
 
-    # ── B2 — Correctness (0-7) — execution-gated semantic ──
-    b2_cap = _compute_b2_cap(test_results)
-    if code_eval is not None:
-        b2_semantic = _clamp(code_eval.b2_correctness, 0, 7)
-        b2 = min(b2_cap, b2_semantic)
-    else:
-        b2 = min(b2_cap, 3.5)  # mid-range default, still gated
+    # ── B2 — Correctness — REMOVED (handled by test accuracy T) ──
+    b2 = 0.0
 
-    # ── B3 — Efficiency (0-5) — blended conv+code semantic ──
+    # ── B3 — Efficiency (0-4) — blended conv+code semantic ──
     if conv_eval is not None and code_eval is not None:
         b3 = _clamp(
-            round(0.4 * conv_eval.b3_efficiency_discussion + 0.6 * code_eval.b3_efficiency_code, 1),
-            0, 5,
+            round(0.4 * conv_eval.b3_efficiency_discussion * (4 / 5) + 0.6 * code_eval.b3_efficiency_code * (4 / 5), 1),
+            0, 4,
         )
     elif code_eval is not None:
-        b3 = _clamp(code_eval.b3_efficiency_code, 0, 5)
+        b3 = _clamp(code_eval.b3_efficiency_code * (4 / 5), 0, 4)
     elif conv_eval is not None:
-        b3 = _clamp(conv_eval.b3_efficiency_discussion, 0, 5)
+        b3 = _clamp(conv_eval.b3_efficiency_discussion * (4 / 5), 0, 4)
     else:
-        b3 = 2.5  # mid-range default
+        b3 = 2.0  # mid-range default
 
-    # ── B4 — AI Code Ownership (0-5) — blended metric + semantic ──
+    # ── B4 — AI Code Ownership (0-4) — blended metric + semantic ──
     b4_metric = 0.0
     if prompt_events:
         mod_count = 0
@@ -225,11 +196,11 @@ def _score_code_quality(session: Session, conv_eval=None, code_eval=None, test_r
 
         mod_rate = mod_count / len(prompt_events)
         if mod_rate >= 0.75:
-            b4_metric = 3.0
+            b4_metric = 2.5
         elif mod_rate >= 0.5:
-            b4_metric = 2.0
+            b4_metric = 1.5
         elif mod_rate >= 0.25:
-            b4_metric = 1.0
+            b4_metric = 0.5
 
         # ai_apply_without_edit_rate bonus
         ai_apply_events = _events_of(session, "ai_apply")
@@ -244,7 +215,7 @@ def _score_code_quality(session: Session, conv_eval=None, code_eval=None, test_r
                     apply_no_edit += 1
             apply_no_edit_rate = apply_no_edit / len(ai_apply_events)
             if apply_no_edit_rate < 0.3:
-                b4_metric += 1.0
+                b4_metric += 0.5
 
         # Evidence-grounded follow-ups as ownership signal
         if len(prompts) >= 2 and responses:
@@ -256,16 +227,16 @@ def _score_code_quality(session: Session, conv_eval=None, code_eval=None, test_r
             )
             evidence_frac = evidence_count / len(followups)
             if evidence_frac >= 0.5:
-                b4_metric += 1.5
-            elif evidence_frac >= 0.25:
                 b4_metric += 1.0
-            elif evidence_frac > 0:
+            elif evidence_frac >= 0.25:
                 b4_metric += 0.5
+            elif evidence_frac > 0:
+                b4_metric += 0.25
 
     if conv_eval is not None:
-        b4 = _clamp(0.4 * b4_metric + 0.6 * conv_eval.b4_ownership_dialogue, 0, 5)
+        b4 = _clamp(0.4 * b4_metric + 0.6 * conv_eval.b4_ownership_dialogue * (4 / 5), 0, 4)
     else:
-        b4 = _clamp(b4_metric, 0, 5)
+        b4 = _clamp(b4_metric, 0, 4)
 
     return {
         "b1": round(b1, 1),
@@ -275,14 +246,14 @@ def _score_code_quality(session: Session, conv_eval=None, code_eval=None, test_r
     }
 
 
-# ---------- Category C: Verification (0-25) ----------
+# ---------- Category C: Verification (0-12) ----------
 
 def _score_verification(session: Session, conv_eval=None) -> dict:
     """
-    C1: Execution Frequency (0-8) — pure metric
-    C2: Test Coverage (0-9) — semantic + metric floor
-    C3: AI Output Validation (0-4) — blended 50/50
-    C4: Debug Discipline (0-4) — pure metric
+    C1: Execution Frequency (0-4) — pure metric
+    C2: Test Coverage (0-4) — semantic + metric floor
+    C3: AI Output Validation (0-2) — blended 50/50
+    C4: Debug Discipline (0-2) — pure metric
     """
     test_events = _events_of(session, "test_run")
     prompt_events = _events_of(session, "prompt_sent")
@@ -291,26 +262,26 @@ def _score_verification(session: Session, conv_eval=None) -> dict:
 
     n_tests = len(test_events)
 
-    # ── C1 — Execution Frequency (0-8) — pure metric ──
+    # ── C1 — Execution Frequency (0-4) — pure metric ──
     if n_tests >= 4:
-        c1 = 8.0
+        c1 = 4.0
     elif n_tests >= 2:
-        c1 = 6.0
-    elif n_tests == 1:
         c1 = 3.0
+    elif n_tests == 1:
+        c1 = 1.5
     else:
         c1 = 0.0
 
-    # ── C2 — Test Coverage (0-9) — semantic + metric floor ──
-    c2_metric = 3.0 if n_tests >= 1 else 0.0
-    c2_floor = 3.0 if n_tests >= 1 else 0.0
+    # ── C2 — Test Coverage (0-4) — semantic + metric floor ──
+    c2_metric = 1.5 if n_tests >= 1 else 0.0
+    c2_floor = 1.5 if n_tests >= 1 else 0.0
 
     if conv_eval is not None:
-        c2 = _clamp(0.3 * c2_metric + 0.7 * conv_eval.c2_test_mentions, c2_floor, 9)
+        c2 = _clamp(0.3 * c2_metric + 0.7 * conv_eval.c2_test_mentions * (4 / 9), c2_floor, 4)
     else:
-        c2 = _clamp(c2_metric, c2_floor, 9)
+        c2 = _clamp(c2_metric, c2_floor, 4)
 
-    # ── C3 — AI Output Validation (0-4) — blended 50/50 ──
+    # ── C3 — AI Output Validation (0-2) — blended 50/50 ──
     c3_metric = 0.0
     if prompt_events and test_events:
         tests_after_ai = 0
@@ -321,9 +292,9 @@ def _score_verification(session: Session, conv_eval=None) -> dict:
                 tests_after_ai += 1
         rate = tests_after_ai / len(prompt_events) if prompt_events else 0
         if rate >= 0.5:
-            c3_metric = 2.0
-        elif rate >= 0.25:
             c3_metric = 1.0
+        elif rate >= 0.25:
+            c3_metric = 0.5
 
     # ai_apply_without_edit_rate bonus for C3
     if ai_apply_events and edit_events:
@@ -336,14 +307,14 @@ def _score_verification(session: Session, conv_eval=None) -> dict:
             if not has_edit_after:
                 apply_no_edit += 1
         if len(ai_apply_events) > 0 and (apply_no_edit / len(ai_apply_events)) < 0.3:
-            c3_metric += 1.0
+            c3_metric += 0.5
 
     if conv_eval is not None:
-        c3 = _clamp(0.5 * c3_metric + 0.5 * conv_eval.c3_ai_questioning, 0, 4)
+        c3 = _clamp(0.5 * c3_metric + 0.5 * conv_eval.c3_ai_questioning * (2 / 4), 0, 2)
     else:
-        c3 = _clamp(c3_metric, 0, 4)
+        c3 = _clamp(c3_metric, 0, 2)
 
-    # ── C4 — Debug Discipline (0-4) — pure metric ──
+    # ── C4 — Debug Discipline (0-2) — pure metric ──
     all_events = sorted(session.events, key=lambda e: e.ts)
     c4 = 0.0
     for i, ev in enumerate(all_events):
@@ -352,10 +323,10 @@ def _score_verification(session: Session, conv_eval=None) -> dict:
             has_edit = any(e.event == "file_edit" for e in subsequent)
             has_retest = any(e.event == "test_run" for e in subsequent)
             if has_edit and has_retest:
-                c4 = 4.0
+                c4 = 2.0
                 break
             elif has_edit:
-                c4 = 2.0
+                c4 = 1.0
                 break
 
     return {
@@ -366,14 +337,14 @@ def _score_verification(session: Session, conv_eval=None) -> dict:
     }
 
 
-# ---------- Category D: Communication (0-25) ----------
+# ---------- Category D: Communication (0-13) ----------
 
 def _score_communication(session: Session, conv_eval=None) -> dict:
     """
-    D1: Continuous Narration (0-8) — semantic + metric floor
-    D2: Tradeoffs and Decisions (0-7) — pure semantic
-    D3: AI Collaboration Balance (0-5) — blended 40/60
-    D4: Status Summaries (0-5) — pure semantic
+    D1: Continuous Narration (0-4) — semantic + metric floor
+    D2: Tradeoffs and Decisions (0-4) — pure semantic
+    D3: AI Collaboration Balance (0-3) — blended 40/60
+    D4: Status Summaries (0-2) — pure semantic
     """
     prompts = _user_prompts(session)
     if not prompts:
@@ -381,52 +352,50 @@ def _score_communication(session: Session, conv_eval=None) -> dict:
 
     n = len(prompts)
 
-    # ── D1 — Narration (0-8) — semantic + metric floor ──
+    # ── D1 — Narration (0-4) — semantic + metric floor ──
     avg_len = sum(len(p.split()) for p in prompts) / n
     if avg_len >= 50:
-        d1_metric = 3.0
+        d1_metric = 1.5
     elif avg_len >= 25:
-        d1_metric = 2.0
-    elif avg_len >= 10:
         d1_metric = 1.0
+    elif avg_len >= 10:
+        d1_metric = 0.5
     else:
         d1_metric = 0.0
 
-    # Metric floor: avg >= 25 → floor 2, >= 10 → floor 1
     d1_floor = 0.0
     if avg_len >= 25:
-        d1_floor = 2.0
-    elif avg_len >= 10:
         d1_floor = 1.0
+    elif avg_len >= 10:
+        d1_floor = 0.5
 
     if conv_eval is not None:
-        d1 = _clamp(0.3 * d1_metric + 0.7 * conv_eval.d1_narration, d1_floor, 8)
+        d1 = _clamp(0.3 * d1_metric + 0.7 * conv_eval.d1_narration * (4 / 8), d1_floor, 4)
     else:
-        d1 = _clamp(d1_metric, d1_floor, 8)
+        d1 = _clamp(d1_metric, d1_floor, 4)
 
-    # ── D2 — Tradeoffs (0-7) — pure semantic ──
+    # ── D2 — Tradeoffs (0-4) — pure semantic ──
     if conv_eval is not None:
-        d2 = _clamp(conv_eval.d2_tradeoffs, 0, 7)
+        d2 = _clamp(conv_eval.d2_tradeoffs * (4 / 7), 0, 4)
     else:
-        # Metric fallback: tradeoff keyword count
         tradeoff_count = sum(1 for p in prompts if _has_tradeoff_language(p))
         if tradeoff_count >= 3:
-            d2 = 3.0
+            d2 = 1.5
         elif tradeoff_count >= 2:
-            d2 = 2.0
-        elif tradeoff_count >= 1:
             d2 = 1.0
+        elif tradeoff_count >= 1:
+            d2 = 0.5
         else:
             d2 = 0.0
 
-    # ── D3 — AI Collaboration Balance (0-5) — blended 40/60 ──
+    # ── D3 — AI Collaboration Balance (0-3) — blended 40/60 ──
     d3_metric = 0.0
     grounded_count = sum(1 for p in prompts if _is_grounded(p))
     grounded_frac = grounded_count / n
     if grounded_frac >= 0.6:
-        d3_metric += 2.0
-    elif grounded_frac >= 0.3:
         d3_metric += 1.0
+    elif grounded_frac >= 0.3:
+        d3_metric += 0.5
 
     if n >= 2:
         similar_pairs = sum(
@@ -435,24 +404,23 @@ def _score_communication(session: Session, conv_eval=None) -> dict:
         )
         passive_rate = similar_pairs / (n - 1)
         if passive_rate <= 0.1:
-            d3_metric += 2.0
-        elif passive_rate <= 0.3:
             d3_metric += 1.0
+        elif passive_rate <= 0.3:
+            d3_metric += 0.5
 
     if conv_eval is not None:
-        d3 = _clamp(0.4 * d3_metric + 0.6 * conv_eval.d3_ai_balance, 0, 5)
+        d3 = _clamp(0.4 * d3_metric + 0.6 * conv_eval.d3_ai_balance * (3 / 5), 0, 3)
     else:
-        d3 = _clamp(d3_metric, 0, 5)
+        d3 = _clamp(d3_metric, 0, 3)
 
-    # ── D4 — Status Summaries (0-5) — pure semantic ──
+    # ── D4 — Status Summaries (0-2) — pure semantic ──
     if conv_eval is not None:
-        d4 = _clamp(conv_eval.d4_status_updates, 0, 5)
+        d4 = _clamp(conv_eval.d4_status_updates * (2 / 5), 0, 2)
     else:
-        # Metric fallback: dialogue depth
         if n >= 5:
-            d4 = 2.0
-        elif n >= 3:
             d4 = 1.0
+        elif n >= 3:
+            d4 = 0.5
         else:
             d4 = 0.0
 
@@ -469,37 +437,31 @@ def _score_communication(session: Session, conv_eval=None) -> dict:
 def _compute_penalties(session: Session, metrics: HeadlineMetrics,
                        conv_eval=None, code_eval=None, test_results=None) -> dict:
     """
-    P1: Over-reliance on AI (0, -5, -10, or -15) — metric + semantic modifier
-    P2: No-run (-10 if zero test_run events) — pure metric
-    P3: Critical miss (0 or -10) — execution primary, semantic fallback
+    P1: Over-reliance on AI (0, -3, -5, or -8) — metric + semantic modifier
+    P2: No-run (-5 if zero test_run events) — pure metric
+    P3: REMOVED — core test failures already penalized heavily via T (50 pts)
     """
     test_events = _events_of(session, "test_run")
 
-    # ── P1 — Over-reliance on AI ──
+    # ── P1 — Over-reliance on AI (scaled for 50-pt non-test portion) ──
     if metrics.blind_adoption_rate > 0.8:
-        p1 = -15
+        p1 = -8
     elif metrics.blind_adoption_rate > 0.6:
-        p1 = -10
-    elif metrics.blind_adoption_rate > 0.4:
         p1 = -5
+    elif metrics.blind_adoption_rate > 0.4:
+        p1 = -3
     else:
         p1 = 0
 
     # Semantic modifier: if B4 ownership >= 3, reduce penalty by one tier
     if conv_eval is not None and conv_eval.b4_ownership_dialogue >= 3.0 and p1 < 0:
-        p1 = min(p1 + 5, 0)  # reduce magnitude by one tier (5 points)
+        p1 = min(p1 + 3, 0)
 
     # ── P2 — No-run ──
-    p2 = -10 if not test_events else 0
+    p2 = -5 if not test_events else 0
 
-    # ── P3 — Critical miss ──
-    # Primary: test results (core test failures)
-    # Fallback: semantic code analysis (p3_critical_miss flag)
+    # ── P3 — Removed (redundant with T: test accuracy) ──
     p3 = 0
-    if test_results is not None and test_results.core_failures:
-        p3 = -10
-    elif test_results is None and code_eval is not None and code_eval.p3_critical_miss:
-        p3 = -10
 
     return {"p1": p1, "p2": p2, "p3": p3}
 
@@ -568,6 +530,9 @@ def compute_score(
     else:
         metrics.test_pass_rate = -1.0
 
+    # T: Test Accuracy (0-50) — 50% of total grade
+    test_accuracy = _compute_test_accuracy(test_results)
+
     # Score each category with eval sources
     a = _score_problem_solving(session, conv_eval=effective_conv_eval)
     b = _score_code_quality(session, conv_eval=effective_conv_eval, code_eval=code_eval, test_results=test_results)
@@ -578,21 +543,20 @@ def compute_score(
                                   code_eval=code_eval,
                                   test_results=test_results)
 
-    # Category totals (0-25 each)
+    # Category totals (A:0-12, B:0-13, C:0-12, D:0-13)
     cat_a = round(a["a1"] + a["a2"] + a["a3"] + a["a4"], 1)
     cat_b = round(b["b1"] + b["b2"] + b["b3"] + b["b4"], 1)
     cat_c = round(c["c1"] + c["c2"] + c["c3"] + c["c4"], 1)
     cat_d = round(d["d1"] + d["d2"] + d["d3"] + d["d4"], 1)
 
-    # Clamp categories to 0-25
-    cat_a = max(0, min(25, cat_a))
-    cat_b = max(0, min(25, cat_b))
-    cat_c = max(0, min(25, cat_c))
-    cat_d = max(0, min(25, cat_d))
+    cat_a = max(0, min(12, cat_a))
+    cat_b = max(0, min(13, cat_b))
+    cat_c = max(0, min(12, cat_c))
+    cat_d = max(0, min(13, cat_d))
 
-    # Total score on 0-100
+    # Total score on 0-100: T(50) + A(12) + B(13) + C(12) + D(13) + penalties
     p_total = penalties["p1"] + penalties["p2"] + penalties["p3"]
-    total = max(0, min(100, round(cat_a + cat_b + cat_c + cat_d + p_total)))
+    total = max(0, min(100, round(test_accuracy + cat_a + cat_b + cat_c + cat_d + p_total)))
 
     badge = _assign_badge(total)
 
@@ -629,14 +593,14 @@ def compute_score(
         p3_critical_miss=penalties["p3"],
     )
 
-    # Derive 0-10 breakdown fields for backward compatibility
+    # Derive 0-10 breakdown fields for backward compatibility (frontend display)
     breakdown = ScoreBreakdown(
-        request_timing=max(0, min(10, round(cat_a / 25 * 10))),
-        request_quality=max(0, min(10, round(cat_d / 25 * 10))),
-        response_handling=max(0, min(10, round(cat_b / 25 * 10))),
-        verification_discipline=max(0, min(10, round(cat_c / 25 * 10))),
-        iterative_collaboration=max(0, min(10, round((cat_a + cat_d) / 50 * 10))),
-        penalties=max(-10, min(0, round(p_total / 35 * 10))),
+        request_timing=max(0, min(10, round(cat_a / 12 * 10))),
+        request_quality=max(0, min(10, round(cat_d / 13 * 10))),
+        response_handling=max(0, min(10, round(cat_b / 13 * 10))),
+        verification_discipline=max(0, min(10, round(cat_c / 12 * 10))),
+        iterative_collaboration=max(0, min(10, round(test_accuracy / 50 * 10))),
+        penalties=max(-10, min(0, round(p_total / 13 * 10))),
     )
 
     # Interpretation: prefer conv_eval interpretation, then semantic_eval, then build from metrics
