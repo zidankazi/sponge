@@ -52,7 +52,8 @@ function OrbitingMascot() {
       const radiusY = canvas.height * 0.42
 
       const cx = canvas.width / 2
-      const cy = canvas.height / 2
+      // Lower the entire orbit by 20px so the bottom clears the names
+      const cy = (canvas.height / 2) + 20
 
       const x = cx + Math.cos(a) * radiusX
       const y = cy + Math.sin(a) * radiusY
