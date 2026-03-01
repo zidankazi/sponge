@@ -11,7 +11,7 @@ Override the primary model via GEMINI_MODEL env var (e.g. in .env):
 import os
 
 # Priority chain: highest capability first, most available last
-_primary = os.environ.get("GEMINI_MODEL", "gemini-3.0-flash-preview")
+_primary = os.environ.get("GEMINI_MODEL", "gemini-2.5-pro")
 GEMINI_MODEL_CHAIN = list(dict.fromkeys([
     _primary,
     "gemini-2.5-flash",
