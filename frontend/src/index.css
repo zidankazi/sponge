@@ -145,11 +145,11 @@ a {
 }
 
 .ai-float--chatgpt {
-  width: 72px;
+  width: 56px;
   height: auto;
-  top: 85%;
-  right: 12%;
-  opacity: 0.2;
+  top: 42%;
+  left: 8%;
+  opacity: 0.15;
 }
 
 /* ── Floating Claude mascots ── */
