@@ -1,5 +1,6 @@
 import { SessionProvider, useSession } from './hooks/useSession'
 import LandingScreen from './components/game/LandingScreen'
+import BriefScreen from './components/game/BriefScreen'
 import Layout from './components/shared/Layout'
 import ResultsScreen from './components/game/ResultsScreen'
 import LeaderboardPage from './pages/LeaderboardPage'
@@ -9,6 +10,7 @@ function AppInner() {
   const { view, setView, resetSession } = useSession()
 
   if (view === 'idle') return <LandingScreen />
+  if (view === 'brief') return <BriefScreen />
   if (view === 'results') return <ResultsScreen />
   if (view === 'leaderboard') {
     return (
