@@ -12,6 +12,14 @@ Gamified AI-assisted coding interview practice. Users drop into a real Python co
 <br/>
 
 <div align="center">
+  <a href="https://youtu.be/vZ8cEIYBHMU">
+    <img src="https://img.youtube.com/vi/vZ8cEIYBHMU/maxresdefault.jpg" width="80%" alt="Sponge Demo Video" />
+  </a>
+</div>
+
+<br/>
+
+<div align="center">
 
 [![Live Demo](https://img.shields.io/badge/▶%20Live%20Demo-sponge--alpha.vercel.app-6C47FF?style=for-the-badge)](https://sponge-alpha.vercel.app)
 [![GitHub](https://img.shields.io/badge/GitHub-zidankazi%2Fsponge-181717?style=for-the-badge&logo=github)](https://github.com/zidankazi/sponge)
