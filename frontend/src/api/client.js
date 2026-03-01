@@ -10,7 +10,7 @@ const MOCK = {
   logEvent: false,   // ✅ Sri done
   leaderboard: false,   // ✅ Sri done
   sendPrompt: false,   // ✅ Gemini live
-  submit: true,    // ⏳ waiting on scoring engine
+  submit: false,    // ⏳ waiting on scoring engine
 }
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms))
