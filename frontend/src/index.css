@@ -144,6 +144,14 @@ a {
   opacity: 0.35;
 }
 
+.ai-float--chatgpt {
+  width: 72px;
+  height: auto;
+  top: 85%;
+  right: 12%;
+  opacity: 0.2;
+}
+
 /* ── Floating Claude mascots ── */
 .claude-float {
   position: absolute;

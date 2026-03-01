@@ -28,6 +28,7 @@ export default function LandingScreen() {
   const mascot1Ref = useRef(null)
   const mascot2Ref = useRef(null)
   const mascot3Ref = useRef(null)
+  const mascot4Ref = useRef(null)
 
   useEffect(() => {
     let timeout
@@ -104,6 +105,11 @@ export default function LandingScreen() {
       const rotate = scrollTop * 0.01
       mascot3Ref.current.style.transform = `translateY(${y}px) rotate(${rotate}deg)`
     }
+    if (mascot4Ref.current) {
+      const y = scrollTop * -0.22
+      const rotate = scrollTop * -0.025
+      mascot4Ref.current.style.transform = `translateY(${y}px) rotate(${rotate}deg)`
+    }
   }, [])
 
   useEffect(() => {
@@ -139,6 +145,7 @@ export default function LandingScreen() {
       <img ref={mascot1Ref} src="/logos/gemini.svg" alt="" className="ai-float ai-float--gemini" />
       <img ref={mascot2Ref} src="/logos/claude.svg" alt="" className="claude-float claude-float--2" />
       <img ref={mascot3Ref} src="/logos/claude.svg" alt="" className="claude-float claude-float--3" />
+      <img ref={mascot4Ref} src="/logos/chatgpt.svg" alt="" className="ai-float ai-float--chatgpt" />
 
       {/* ── First viewport: Hero ── */}
       <div className="hero-container">
