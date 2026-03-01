@@ -10,7 +10,7 @@ function formatTime(seconds) {
 export default function Header() {
   const {
     timeLeft, totalTime, submit, isSubmitting,
-    checkpoints, saveCheckpoint, fileBuffers, setShowHistory,
+    checkpoints, saveCheckpoint, fileBuffers, lastSavedBuffers, setShowHistory,
   } = useSession()
 
   const [showToast, setShowToast] = useState(false)
@@ -18,9 +18,8 @@ export default function Header() {
   const pct = (timeLeft / totalTime) * 100
   const timerClass = timeLeft <= 10 ? 'timer--critical' : timeLeft <= 60 ? 'timer--urgent' : ''
 
-  // Unsaved changes detection
-  const hasUnsaved = checkpoints.length === 0 ||
-    JSON.stringify(fileBuffers) !== JSON.stringify(checkpoints[0].buffers)
+  // Unsaved changes detection — compares against last save (or initial load)
+  const hasUnsaved = JSON.stringify(fileBuffers) !== JSON.stringify(lastSavedBuffers)
 
   const handleSave = useCallback(() => {
     const label = window.prompt('Checkpoint label (optional):') || ''
