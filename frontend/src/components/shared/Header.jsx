@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useSession } from '../../hooks/useSession'
 
 function formatTime(seconds) {
@@ -8,6 +9,7 @@ function formatTime(seconds) {
 }
 
 export default function Header() {
+  const navigate = useNavigate()
   const {
     timeLeft, totalTime, submit, isSubmitting,
     checkpoints, saveCheckpoint, fileBuffers, lastSavedBuffers, setShowHistory,
@@ -51,7 +53,7 @@ export default function Header() {
     <>
       <header className="header">
         <div className="header-left">
-          <div className="header-logo">
+          <div className="header-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
             <img
               src="/brand/logo-full.png"
               srcSet="/brand/logo-full.png 1x"

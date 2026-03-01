@@ -145,7 +145,7 @@ a {
 }
 
 .ai-float--chatgpt {
-  width: 72px;
+  width: 56px;
   height: auto;
   top: 75%;
   right: 15%;
@@ -529,9 +529,16 @@ a {
 
 /* ═══════════════════════════════════════
    BRIEF SCREEN
-   ═══════════════════════════════════════ */
+   ═══════════════════════════════════════
 
-.brief-screen {
+   Layout: left-aligned single column, max 780px.
+   Two-column grid for objective/requirements + constraints.
+   Typography: Inter only. Mono for code + data.
+   Scale: 56px title → 11px labels. No mid-sizes.
+   Spacing: 64px vertical rhythm between major blocks.
+*/
+
+.brief {
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -539,63 +546,213 @@ a {
   overflow-y: auto;
 }
 
-.brief-body {
-  flex: 1;
+/* ── Header: logo left, timer right. Flat, structural. ── */
+.brief-header {
   display: flex;
-  justify-content: center;
-  padding: 80px 40px 120px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 48px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
-.brief-content {
+.brief-header-left {
+  display: flex;
+  align-items: center;
+}
+
+.brief-header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ── Main content ── */
+.brief-main {
+  flex: 1;
+  max-width: 780px;
   width: 100%;
-  max-width: 640px;
+  margin: 0 auto;
+  padding: 64px 48px 96px;
 }
 
-.brief-title {
-  font-family: 'Inter', sans-serif;
-  font-size: 64px;
+/* ── Meta line: CHALLENGE / 59:42 remaining ── */
+.brief-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.brief-label {
+  font-size: 11px;
   font-weight: 600;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+  letter-spacing: 0.14em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.brief-sep {
+  font-size: 11px;
+  color: var(--border);
+}
+
+.brief-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.02em;
+}
+
+/* ── Title: large, tight, left-pinned ── */
+.brief .brief-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 56px;
+  font-weight: 600;
+  line-height: 1.0;
+  letter-spacing: -0.035em;
   color: var(--cream);
-  margin: 0 0 48px;
+  margin: 0 0 32px;
 }
 
-.brief-text {
-  font-size: 17px;
-  line-height: 1.75;
+/* ── Description ── */
+.brief-desc {
+  font-size: 15px;
+  line-height: 1.7;
   color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 0 0;
 }
 
-.brief-text p {
-  margin: 0 0 24px;
+/* ── Divider: structural, not decorative ── */
+.brief-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 48px 0;
 }
 
-.brief-text ul {
-  margin: 0 0 24px;
-  padding-left: 24px;
+/* ── Two-column grid ── */
+.brief-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  margin-bottom: 56px;
+}
+
+/* ── Section labels ── */
+.brief-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin: 0 0 16px;
+}
+
+.brief-section-label--spaced {
+  margin-top: 32px;
+}
+
+.brief-section-text {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text);
+  margin: 0;
+}
+
+/* ── Requirements ── */
+.brief-req {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 12px;
 }
 
-.brief-text code {
+.brief-req-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.brief-req-num {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  background: var(--bg-surface-2);
-  color: var(--cream);
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-}
-
-.brief-text em {
-  color: var(--cream);
-  font-style: italic;
-}
-
-.brief-aside {
+  font-size: 11px;
   color: var(--text-dim);
-  font-size: 15px;
+  flex-shrink: 0;
+  width: 16px;
+}
+
+.brief-req-text code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  color: var(--text);
+  background: var(--bg-surface);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* ── Constraints ── */
+.brief-constraints {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.brief-constraints li {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  padding-left: 16px;
+  position: relative;
+}
+
+.brief-constraints li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--border);
+}
+
+.brief-constraints em {
+  color: var(--cream);
+  font-style: normal;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+}
+
+/* ── Note ── */
+.brief-note {
+  margin-top: 32px;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+/* ── Actions: left-aligned ── */
+.brief-actions {
+  display: flex;
+}
+
+.brief-start {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--bg-root);
+  background: var(--cream);
+  padding: 10px 28px;
+  border-radius: 4px;
+  transition: background 0.15s;
+  cursor: pointer;
+  border: none;
+}
+
+.brief-start:hover {
+  background: #ffffff;
 }
 
 /* ═══════════════════════════════════════

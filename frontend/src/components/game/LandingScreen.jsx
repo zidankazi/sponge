@@ -312,7 +312,7 @@ export default function LandingScreen() {
       <div className="hero-container">
 
         <div className="hero-header">
-          <div className="hero-logo">
+          <div className="hero-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
             <img
               src="/brand/logo-full.png"
               alt="Sponge"
