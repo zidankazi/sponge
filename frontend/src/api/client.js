@@ -8,9 +8,8 @@ const API_BASE = import.meta.env.VITE_API_URL || 'https://sponge-backend.vercel.
 const MOCK = {
   startSession: false,   // ✅ Sri done
   logEvent: false,   // ✅ Sri done
-  leaderboard: false,   // ✅ Sri done
   sendPrompt: false,   // ✅ Gemini live
-  submit: false,    // ⏳ waiting on scoring engine
+  submit: false,   // ✅ Sri done
 }
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms))
@@ -137,26 +136,6 @@ export async function submitSession({ session_id, final_code, username }) {
   } catch (err) {
     emitError('Submission failed — please try again', 'submit', true)
     throw err
-  }
-}
-
-// ─── GET /leaderboard ────────────────────────────────────────────────
-
-export async function fetchLeaderboard() {
-  if (MOCK.leaderboard) {
-    await delay(400)
-    return [
-      { username: 'zidan', score: 85, time_completed: '2024-03-01T12:34:56Z', badge: 'AI Collaborator' },
-      { username: 'alice', score: 72, time_completed: '2024-03-01T13:00:00Z', badge: 'On Your Way' },
-      { username: 'bob', score: 58, time_completed: '2024-03-01T14:30:00Z', badge: 'Needs Work' },
-    ]
-  }
-  try {
-    const res = await safeFetch(`${API_BASE}/leaderboard`, {}, { endpoint: 'leaderboard' })
-    return res.json()
-  } catch {
-    emitError('Could not load leaderboard', 'leaderboard')
-    return []
   }
 }
 

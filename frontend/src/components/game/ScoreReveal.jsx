@@ -22,11 +22,35 @@ function getCategoryScores(breakdown, totalScore) {
   }
 }
 
-const CATEGORY_FEEDBACK = {
-  problemSolving: 'Clear restatement and steps; add edge cases before coding.',
-  codeQuality: 'Good structure; you explained AI output before adopting.',
-  verification: 'Run tests more often after each change.',
-  communication: 'Strong narration and tradeoff discussion.',
+function getCategoryFeedback(category, score) {
+  const high = score >= 18
+  const mid = score >= 10
+  switch (category) {
+    case 'problemSolving':
+      return high ? 'Excellent — you explored the codebase and planned before prompting.'
+        : mid ? 'Solid start — try reading more files before your first AI prompt.'
+          : 'Explore the code and plan your approach before asking AI for help.'
+    case 'codeQuality':
+      return high ? 'Strong — you reviewed and adapted AI suggestions thoughtfully.'
+        : mid ? 'Good instincts — try modifying AI output more before accepting it.'
+          : 'Avoid copy-pasting AI code directly; review and adapt it first.'
+    case 'verification':
+      return high ? 'Thorough — you tested consistently after making changes.'
+        : mid ? 'Decent discipline — run tests more often after each AI interaction.'
+          : 'Run tests after every change to catch issues early.'
+    case 'communication':
+      return high ? 'Clear, grounded prompts with strong iterative dialogue.'
+        : mid ? 'Good discussion — reference specific code and tradeoffs more.'
+          : 'Be more specific in prompts; mention files, functions, and tradeoffs.'
+    default:
+      return ''
+  }
+}
+
+function getCategoryTier(score) {
+  if (score >= 18) return 'good'
+  if (score >= 10) return 'warn'
+  return 'bad'
 }
 
 export default function ScoreReveal({ score, badge, interpretation, breakdown, onComplete }) {
@@ -90,30 +114,21 @@ export default function ScoreReveal({ score, badge, interpretation, breakdown, o
 
         {categories && (
           <div className="score-reveal-categories">
-            <div className="score-reveal-category-card">
-              <div className="score-reveal-category-label">Problem Solving</div>
-              <div className="score-reveal-category-value score-reveal-category-value--good">{categories.problemSolving}</div>
-              <div className="score-reveal-category-max">/ 25</div>
-              <p className="score-reveal-category-feedback">{CATEGORY_FEEDBACK.problemSolving}</p>
-            </div>
-            <div className="score-reveal-category-card">
-              <div className="score-reveal-category-label">Code Quality</div>
-              <div className="score-reveal-category-value score-reveal-category-value--good">{categories.codeQuality}</div>
-              <div className="score-reveal-category-max">/ 25</div>
-              <p className="score-reveal-category-feedback">{CATEGORY_FEEDBACK.codeQuality}</p>
-            </div>
-            <div className="score-reveal-category-card">
-              <div className="score-reveal-category-label">Verification</div>
-              <div className="score-reveal-category-value score-reveal-category-value--warn">{categories.verification}</div>
-              <div className="score-reveal-category-max">/ 25</div>
-              <p className="score-reveal-category-feedback">{CATEGORY_FEEDBACK.verification}</p>
-            </div>
-            <div className="score-reveal-category-card">
-              <div className="score-reveal-category-label">Communication</div>
-              <div className="score-reveal-category-value score-reveal-category-value--good">{categories.communication}</div>
-              <div className="score-reveal-category-max">/ 25</div>
-              <p className="score-reveal-category-feedback">{CATEGORY_FEEDBACK.communication}</p>
-            </div>
+            {[
+              { key: 'problemSolving', label: 'Problem Solving' },
+              { key: 'codeQuality', label: 'Code Quality' },
+              { key: 'verification', label: 'Verification' },
+              { key: 'communication', label: 'Communication' },
+            ].map(({ key, label }) => (
+              <div className="score-reveal-category-card" key={key}>
+                <div className="score-reveal-category-label">{label}</div>
+                <div className={`score-reveal-category-value score-reveal-category-value--${getCategoryTier(categories[key])}`}>
+                  {categories[key]}
+                </div>
+                <div className="score-reveal-category-max">/ 25</div>
+                <p className="score-reveal-category-feedback">{getCategoryFeedback(key, categories[key])}</p>
+              </div>
+            ))}
           </div>
         )}
 

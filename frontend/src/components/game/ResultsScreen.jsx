@@ -24,7 +24,8 @@ const METRIC_LABELS = {
 }
 
 function ScoreBar({ label, value, max = 10, negative }) {
-  const pct = negative ? 0 : (value / max) * 100
+  const safeValue = typeof value === 'number' ? value : 0
+  const pct = negative ? 0 : (safeValue / max) * 100
 
   return (
     <div className="score-bar-row">
@@ -37,7 +38,7 @@ function ScoreBar({ label, value, max = 10, negative }) {
         )}
       </div>
       <div className={`score-bar-value ${negative ? 'score-bar-value--negative' : ''}`}>
-        {negative ? value : `${value}/${max}`}
+        {negative ? safeValue : `${safeValue}/${max}`}
       </div>
     </div>
   )
@@ -65,7 +66,7 @@ export default function ResultsScreen() {
 
   if (!results) return null
 
-  const { total_score, breakdown, headline_metrics, interpretation, badge } = results
+  const { total_score = 0, breakdown = {}, headline_metrics = {}, interpretation = '', badge = 'Just Vibing' } = results
 
   // Phase 1: ScoreReveal (before user clicks Continue)
   if (!revealed) {
