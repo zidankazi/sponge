@@ -19,6 +19,8 @@ const METRIC_LABELS = {
   passive_reprompt_rate: { label: 'Passive Reprompt Rate', good: 'low', format: 'pct' },
   grounded_prompt_rate: { label: 'Grounded Prompt Rate', good: 'high', format: 'pct' },
   evidence_grounded_followup_rate: { label: 'Evidence-Grounded Followup', good: 'high', format: 'pct' },
+  ai_apply_without_edit_rate: { label: 'AI Apply Without Edit', good: 'low', format: 'pct' },
+  test_pass_rate: { label: 'Test Pass Rate', good: 'high', format: 'pct' },
 }
 
 function ScoreBar({ label, value, max = 10, negative }) {
@@ -30,7 +32,7 @@ function ScoreBar({ label, value, max = 10, negative }) {
       <div className="score-bar-label">{label}</div>
       <div className="score-bar-track">
         {negative ? (
-          <div className="score-bar-fill score-bar-fill--negative" style={{ width: `${(Math.abs(safeValue) / 5) * 100}%` }} />
+          <div className="score-bar-fill score-bar-fill--negative" style={{ width: `${Math.min((Math.abs(value) / 5) * 100, 100)}%` }} />
         ) : (
           <div className="score-bar-fill" style={{ width: `${pct}%` }} />
         )}
@@ -44,10 +46,9 @@ function ScoreBar({ label, value, max = 10, negative }) {
 
 function MetricRow({ metricKey, value, meta }) {
   if (!meta) return null
-  const safeValue = typeof value === 'number' ? value : 0
-  const pctStr = `${Math.round(safeValue * 100)}%`
-  const isGood = (meta.good === 'high' && safeValue >= 0.6) || (meta.good === 'low' && safeValue <= 0.3)
-  const isBad = (meta.good === 'high' && safeValue < 0.3) || (meta.good === 'low' && safeValue > 0.6)
+  const pctStr = typeof value === 'number' && value < 0 ? '—' : `${Math.round(value * 100)}%`
+  const isGood = (meta.good === 'high' && value >= 0.6) || (meta.good === 'low' && value <= 0.3)
+  const isBad = (meta.good === 'high' && value < 0.3) || (meta.good === 'low' && value > 0.6)
 
   return (
     <div className="metric-row">
@@ -124,7 +125,7 @@ export default function ResultsScreen() {
           <div className="results-card">
             <h3>Breakdown</h3>
             <div className="score-bars">
-              {Object.entries(breakdown).map(([key, val]) => (
+              {breakdown && Object.entries(breakdown).map(([key, val]) => (
                 <ScoreBar
                   key={key}
                   label={SCORE_LABELS[key] || key}
@@ -138,7 +139,7 @@ export default function ResultsScreen() {
           <div className="results-card">
             <h3>Headline Metrics</h3>
             <div className="metrics-list">
-              {Object.entries(headline_metrics).map(([key, val]) => (
+              {headline_metrics && Object.entries(headline_metrics).map(([key, val]) => (
                 <MetricRow key={key} metricKey={key} value={val} meta={METRIC_LABELS[key]} />
               ))}
             </div>
@@ -153,7 +154,7 @@ export default function ResultsScreen() {
         <div className="results-actions">
           <h3 className="results-actions-title">What&apos;s next?</h3>
           <button className="results-bottleneck-btn" onClick={() => setRevealed(false)}>
-            Re-attempt Bottleneck
+            Watch score again
           </button>
           <button className="results-restart" onClick={resetSession}>
             Start New Session
