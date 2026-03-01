@@ -29,6 +29,80 @@ function extractFilename(codeLang, codeLines, fileBufferKeys) {
   return null
 }
 
+/**
+ * Smart-merge a code snippet into an existing file.
+ *
+ * Strategy:
+ *   1. Use first N lines of the snippet as a "start anchor" — find where they
+ *      appear consecutively in the existing file.
+ *   2. Use last N lines as an "end anchor" — find where they appear.
+ *   3. Replace everything between those anchors with the snippet.
+ *   4. If anchors can't be found, fall back to full file replace.
+ */
+function smartMerge(existingContent, snippetContent) {
+  const existingLines = existingContent.split('\n')
+  const snippetLines = snippetContent.split('\n')
+
+  if (snippetLines.length === 0) return existingContent
+
+  // Helper: check if `needle` lines match consecutively starting at `haystack[offset]`
+  const matchAt = (haystack, offset, needle) => {
+    for (let j = 0; j < needle.length; j++) {
+      if (haystack[offset + j]?.trim() !== needle[j].trim()) return false
+    }
+    return true
+  }
+
+  // Try anchor sizes 3 → 2 → 1
+  const maxAnchor = Math.min(3, snippetLines.length)
+  let startIdx = -1
+  let anchorUsed = 0
+
+  for (let a = maxAnchor; a >= 1; a--) {
+    const anchor = snippetLines.slice(0, a)
+    // Skip if anchor is all blank lines
+    if (anchor.every((l) => l.trim() === '')) continue
+    for (let i = 0; i <= existingLines.length - a; i++) {
+      if (matchAt(existingLines, i, anchor)) {
+        startIdx = i
+        anchorUsed = a
+        break
+      }
+    }
+    if (startIdx !== -1) break
+  }
+
+  if (startIdx === -1) return snippetContent // total fallback
+
+  // Find end anchor
+  const endAnchorSize = Math.min(maxAnchor, snippetLines.length)
+  let endIdx = -1
+
+  for (let a = endAnchorSize; a >= 1; a--) {
+    const endAnchor = snippetLines.slice(-a)
+    if (endAnchor.every((l) => l.trim() === '')) continue
+    // Search from startIdx onward
+    for (let i = startIdx; i <= existingLines.length - a; i++) {
+      if (matchAt(existingLines, i, endAnchor)) {
+        endIdx = i + a - 1
+        // Don't break — take the LAST match (the actual end, not a duplicate earlier)
+      }
+    }
+    if (endIdx !== -1) break
+  }
+
+  if (endIdx === -1 || endIdx < startIdx) {
+    // Can't find end — replace from startIdx for snippet length
+    endIdx = Math.min(startIdx + snippetLines.length - 1, existingLines.length - 1)
+  }
+
+  return [
+    ...existingLines.slice(0, startIdx),
+    ...snippetLines,
+    ...existingLines.slice(endIdx + 1),
+  ].join('\n')
+}
+
 function ApplyCodeBlock({ filename, code, onApply, reactKey }) {
   const [applied, setApplied] = useState(false)
 
@@ -196,9 +270,14 @@ export default function ChatTerminal({ onCollapse }) {
   }, [chatHistory, isAiLoading])
 
   const onApplyCode = useCallback((filename, code) => {
-    updateFileContent(filename, code)
+    const existing = fileBuffers?.[filename]
+    if (existing) {
+      updateFileContent(filename, smartMerge(existing, code))
+    } else {
+      updateFileContent(filename, code)
+    }
     openFile(filename)
-  }, [updateFileContent, openFile])
+  }, [updateFileContent, openFile, fileBuffers])
 
   const handleSubmit = (e) => {
     e.preventDefault()
