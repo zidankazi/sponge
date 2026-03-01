@@ -36,7 +36,7 @@ MAX_CONTEXT_CHARS = 120_000   # ~30k tokens — safe under Gemini's 1M window
 MAX_FILE_CHARS = 20_000       # Truncate any single file beyond this
 MAX_HISTORY_TURNS = 40        # Keep last N turns to avoid token overflow
 MAX_OUTPUT_TOKENS = 2048      # Cap response length — prevents one-shot dumps
-GEMINI_TIMEOUT_S = 10         # Per-call timeout — Vercel functions die at ~15s
+GEMINI_TIMEOUT_S = 55         # Per-call timeout — Vercel Pro allows 60s
 
 
 # ─── Lazy client initialization ────────────────────────────────────────
