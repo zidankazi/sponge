@@ -15,80 +15,75 @@ export default function BriefScreen() {
   return (
     <div className="brief-screen">
 
-      {/* Slim top bar with logo + live timer + CTA always visible */}
-      <div className="brief-topbar">
-        <img
-          src="/brand/logo-full.png"
-          alt="Sponge"
-          className="brief-topbar-logo"
-          height={20}
-        />
-        <div className={`brief-topbar-timer ${timerClass}`}>
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
-            <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
-            <path d="M8 4.5V8L10.5 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-          <span>{formatTime(timeLeft)}</span>
+      {/* Identical chrome to the coding header */}
+      <header className="header">
+        <div className="header-left">
+          <div className="header-logo">
+            <img
+              src="/brand/logo-full.png"
+              alt="Sponge"
+              className="nav-logo-img"
+              height={22}
+            />
+          </div>
         </div>
-        <div className="brief-topbar-bar">
-          <div className="brief-topbar-bar-fill" style={{ width: `${pct}%` }} />
-        </div>
-        <button className="brief-topbar-cta" onClick={startCoding}>
-          Start coding
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-      </div>
 
-      {/* Main content */}
+        <div className="header-center">
+          <div className={`timer ${timerClass}`}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
+              <path d="M8 4.5V8L10.5 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+            <span className="timer-text">{formatTime(timeLeft)}</span>
+          </div>
+          <div className="timer-bar">
+            <div className="timer-bar-fill" style={{ width: `${pct}%` }} />
+          </div>
+        </div>
+
+        <div className="header-right">
+          <button className="submit-btn" onClick={startCoding}>
+            Start coding &rarr;
+          </button>
+        </div>
+      </header>
+
+      {/* Content */}
       <div className="brief-body">
         <div className="brief-content">
 
-          <div className="brief-eyebrow">Your challenge</div>
-          <h1 className="brief-title">Add Delayed Job Execution</h1>
+          <h1 className="brief-title">
+            Add Delayed<br />
+            Job Execution
+          </h1>
 
-          <div className="brief-section">
-            <h3 className="brief-section-heading">Context</h3>
-            <p className="brief-section-body">
+          <div className="brief-text">
+            <p>
               RQ is a Python job queue backed by Redis. Producers enqueue jobs onto named queues.
               Workers run in separate processes — each worker continuously pulls the next available
               job off a queue and executes it. When a job finishes or fails, it moves into a
               registry. Right now, every enqueued job is eligible to run immediately.
             </p>
-          </div>
-
-          <div className="brief-section">
-            <h3 className="brief-section-heading">Task</h3>
-            <p className="brief-section-body">
+            <p>
               Extend RQ so jobs can be scheduled to run at a specific time in the future.
             </p>
-            <ul className="brief-list">
+            <ul>
               <li>Add <code>enqueue_in(seconds, func, *args, **kwargs)</code> to <code>Queue</code></li>
               <li>Add <code>enqueue_at(datetime, func, *args, **kwargs)</code> to <code>Queue</code></li>
             </ul>
-          </div>
-
-          <div className="brief-section">
-            <h3 className="brief-section-heading">Expected Behavior</h3>
-            <ul className="brief-list">
-              <li>A job scheduled for time <em>T</em> must not execute before <em>T</em></li>
-              <li>A job scheduled in the past is treated as immediately ready</li>
-              <li>All existing behavior must continue to work unchanged</li>
-            </ul>
-          </div>
-
-          <div className="brief-footer">
-            <p className="brief-note">
-              You have <strong>60 minutes</strong>. Use the AI as a collaborator, not a crutch.
+            <p>
+              A job scheduled for time <em>T</em> must not execute before <em>T</em>.
+              A job scheduled in the past should be treated as immediately ready.
+              All existing behavior must continue to work unchanged.
             </p>
-            <button className="brief-cta" onClick={startCoding}>
-              Start coding
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
+            <p className="brief-aside">
+              You have 60 minutes. Use the AI as a collaborator, not a crutch.
+            </p>
           </div>
+
+          <button className="hero-cta" onClick={startCoding}>
+            Start coding
+          </button>
 
         </div>
       </div>

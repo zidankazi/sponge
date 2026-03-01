@@ -425,18 +425,25 @@ a {
   font-style: italic;
   font-size: 36px;
   font-weight: 400;
-  color: var(--cream);
+  color: rgba(255, 255, 255, 0.25);
   letter-spacing: -0.01em;
   text-decoration: none;
-  transition: all 0.2s ease-out;
+  transition: color 0.15s ease-out;
+  display: inline-block;
 }
 
 .landing-team-member:hover {
   color: #ffffff;
-  text-decoration: underline;
-  text-decoration-color: rgba(255, 255, 255, 0.3);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 6px;
+  animation: name-shake 0.4s ease-out forwards;
+}
+
+@keyframes name-shake {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-2px); }
+  40%  { transform: translateX(2px); }
+  60%  { transform: translateX(-1px); }
+  80%  { transform: translateX(1px); }
+  100% { transform: translateX(0); }
 }
 
 .landing-team-separator {
