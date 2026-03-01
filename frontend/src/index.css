@@ -357,8 +357,8 @@ a {
   width: 28px;
   height: 28px;
   border-radius: 6px;
-  background: var(--green-dark);
-  color: var(--cream);
+  background: var(--cream);
+  color: var(--bg-root);
   font-size: 14px;
   font-weight: 700;
   font-family: 'JetBrains Mono', monospace;
@@ -395,7 +395,7 @@ a {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: var(--green-light);
+  color: var(--text);
 }
 
 .timer--urgent {
@@ -589,7 +589,7 @@ a {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: var(--green);
+  background: var(--text-dim);
 }
 
 .hint-files {
@@ -602,10 +602,10 @@ a {
 .hint-files code {
   font-size: 11px;
   padding: 2px 8px;
-  background: var(--green-faint);
-  color: var(--green-light);
+  background: var(--bg-surface-2);
+  color: var(--text-secondary);
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(82, 183, 136, 0.15);
+  border: 1px solid var(--border-subtle);
 }
 
 .problem-footer {
@@ -616,7 +616,7 @@ a {
 }
 
 .problem-footer strong {
-  color: var(--green-light);
+  color: var(--cream);
 }
 
 /* ═══════════════════════════════════════
@@ -666,7 +666,7 @@ a {
 }
 
 .tree-row--active {
-  background: var(--green-faint) !important;
+  background: var(--cream-faint) !important;
   color: var(--cream);
 }
 
@@ -696,7 +696,7 @@ a {
 
 .tree-folder-icon {
   display: inline-flex;
-  color: var(--green);
+  color: var(--text-secondary);
   flex-shrink: 0;
 }
 
@@ -731,7 +731,7 @@ a {
   display: flex;
   align-items: center;
   height: 36px;
-  background: var(--bg-surface-2);
+  background: var(--bg-surface);
   border-bottom: 1px solid var(--border);
   overflow-x: auto;
   flex-shrink: 0;
@@ -750,7 +750,7 @@ a {
   font-size: 12px;
   color: var(--text-dim);
   cursor: pointer;
-  border-right: 1px solid var(--border-subtle);
+  border-right: 1px solid transparent;
   white-space: nowrap;
   transition: color 0.1s, background 0.1s;
 }
@@ -762,8 +762,8 @@ a {
 
 .editor-tab--active {
   color: var(--cream);
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--green);
+  background: var(--bg-root);
+  border-bottom: 1px solid var(--cream);
   margin-bottom: -1px;
 }
 
@@ -788,7 +788,7 @@ a {
 .editor-body {
   flex: 1;
   min-height: 0;
-  background: var(--bg-surface);
+  background: var(--bg-root);
 }
 
 .editor-empty {
@@ -839,8 +839,8 @@ a {
 .chat-header-badge {
   font-size: 10px;
   padding: 2px 6px;
-  background: var(--green-faint);
-  color: var(--green-light);
+  background: var(--bg-surface-2);
+  color: var(--text-secondary);
   border-radius: var(--radius-sm);
   font-weight: 500;
 }
@@ -897,7 +897,7 @@ a {
 }
 
 .chat-msg--assistant .chat-msg-avatar {
-  background: var(--green-dark);
+  background: var(--bg-surface-3);
   color: var(--cream);
 }
 
@@ -938,7 +938,7 @@ a {
   content: '•';
   position: absolute;
   left: 4px;
-  color: var(--green);
+  color: var(--text-dim);
 }
 
 .chat-bullet--numbered::before {
@@ -966,7 +966,7 @@ a {
 
 .chat-inline-code {
   background: var(--bg-surface-3);
-  color: var(--green-lighter);
+  color: var(--cream-dim);
   padding: 1px 5px;
   border-radius: 3px;
   font-size: 12px;
@@ -982,8 +982,8 @@ a {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--green);
-  opacity: 0.4;
+  background: var(--text-dim);
+  opacity: 0.6;
   animation: typing 1.2s ease-in-out infinite;
 }
 
@@ -1016,7 +1016,7 @@ a {
   gap: 8px;
   padding: 8px 12px;
   border-top: 1px solid var(--border);
-  background: var(--bg-surface-2);
+  background: var(--bg-surface);
   flex-shrink: 0;
 }
 
@@ -1036,7 +1036,7 @@ a {
 }
 
 .chat-input:focus {
-  border-color: var(--green-dark);
+  border-color: var(--text-dim);
 }
 
 .chat-send {
@@ -2415,7 +2415,7 @@ a {
 }
 
 .save-btn:hover {
-  border-color: var(--green);
+  border-color: var(--text-dim);
   color: var(--cream);
 }
 
@@ -2425,7 +2425,7 @@ a {
   right: -2px;
   width: 6px;
   height: 6px;
-  background: var(--green-light);
+  background: var(--cream);
   border-radius: 50%;
 }
 
@@ -2442,7 +2442,7 @@ a {
 }
 
 .history-btn:hover {
-  border-color: var(--green);
+  border-color: var(--text-dim);
   color: var(--cream);
 }
 
@@ -2453,8 +2453,8 @@ a {
   bottom: 24px;
   right: 24px;
   background: var(--bg-surface-2);
-  border: 1px solid var(--green);
-  color: var(--green-light);
+  border: 1px solid var(--border);
+  color: var(--cream);
   padding: 8px 16px;
   border-radius: var(--radius-md);
   font-size: 13px;
@@ -2558,7 +2558,7 @@ a {
 }
 
 .history-entry--latest {
-  border-color: var(--green-dark);
+  border-color: var(--text-dim);
 }
 
 .history-entry-time {
@@ -2574,7 +2574,7 @@ a {
 }
 
 .history-restore-btn {
-  background: var(--green-dark);
+  background: var(--bg-surface-3);
   color: var(--cream);
   font-size: 11px;
   font-weight: 600;
@@ -2587,7 +2587,7 @@ a {
 }
 
 .history-restore-btn:hover {
-  background: var(--green);
+  background: var(--bg-hover);
 }
 
 .history-empty {
