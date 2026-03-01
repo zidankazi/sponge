@@ -290,12 +290,14 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 80px;
 }
 
 .marquee-logo {
   display: block;
-  width: 120px;
-  height: 28px;
+  height: 32px;
+  width: auto;
+  max-width: 200px;
   object-fit: contain;
   object-position: center;
   /* Force all logos to pure white, then pull back opacity for muted look */

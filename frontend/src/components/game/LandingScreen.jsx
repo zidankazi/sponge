@@ -16,17 +16,16 @@ export default function LandingScreen() {
     }
   }
 
-  // SVG-only logos — consistent color treatment on dark background
+  // Only verified-working SVGs (atlassian/cursor/rippling files are corrupt)
+  // imgStyle overrides per-logo to compensate for different aspect ratios
   const companies = [
-    { name: 'Google',    logo: '/logos/google.svg' },
-    { name: 'Meta',      logo: '/logos/meta.svg' },
-    { name: 'OpenAI',    logo: '/logos/openai.svg' },
-    { name: 'Shopify',   logo: '/logos/shopify.svg' },
-    { name: 'Nvidia',    logo: '/logos/nvidia.svg' },
-    { name: 'Atlassian', logo: '/logos/atlassian.svg' },
-    { name: 'Canva',     logo: '/logos/canva.svg' },
-    { name: 'Oracle',    logo: '/logos/oracle.svg' },
-    { name: 'Cursor',    logo: '/logos/cursor.svg' },
+    { name: 'Google',  logo: '/logos/google.svg'  },
+    { name: 'Meta',    logo: '/logos/meta.svg'    },
+    { name: 'OpenAI',  logo: '/logos/openai.svg'  },
+    { name: 'Shopify', logo: '/logos/shopify.svg' },
+    { name: 'Nvidia',  logo: '/logos/nvidia.svg'  },
+    { name: 'Canva',   logo: '/logos/canva.svg',   imgStyle: { height: '48px', width: 'auto' } },
+    { name: 'Oracle',  logo: '/logos/oracle.svg'  },
   ]
 
   return (
@@ -62,13 +61,13 @@ export default function LandingScreen() {
             <div className="marquee-content">
               {companies.map((company, i) => (
                 <div key={i} className="marquee-item">
-                  <img src={company.logo} alt={`${company.name} logo`} className="marquee-logo" />
+                  <img src={company.logo} alt={`${company.name} logo`} className="marquee-logo" style={company.imgStyle} />
                 </div>
               ))}
               {/* Duplicate for infinite seamless scrolling */}
               {companies.map((company, i) => (
                 <div key={`dup-${i}`} className="marquee-item">
-                  <img src={company.logo} alt={`${company.name} logo`} className="marquee-logo" />
+                  <img src={company.logo} alt={`${company.name} logo`} className="marquee-logo" style={company.imgStyle} />
                 </div>
               ))}
             </div>
