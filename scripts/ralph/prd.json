@@ -58,7 +58,7 @@
         "Event model has meta: Optional[dict] = None in backend/models/event.py"
       ],
       "priority": 4,
-      "passes": false,
+      "passes": true,
       "notes": "Current models at backend/models/score.py. Keep existing models intact, only add new ones."
     },
     {
@@ -76,7 +76,7 @@
         "Semantic blending still works: when semantic_eval is not None, request_quality and response_handling are blended 60/40"
       ],
       "priority": 5,
-      "passes": false,
+      "passes": true,
       "notes": "This is the core refactor. Penalties now use rubric-native values: P1 = 0/-5/-10/-15, P2 = 0/-10, P3 = 0 (enabled later). The compute_score function signature adds optional conv_eval, code_eval, test_results params (all defaulting to None for backward compat)."
     },
     {

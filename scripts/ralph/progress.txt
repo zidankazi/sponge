@@ -26,3 +26,39 @@ Started: 2026-02-28
 - metrics.py imports from vocabulary.py (_is_grounded, _word_overlap)
 - engine.py still imports vocabulary helpers directly for scorer functions
 - compute_headline_metrics is the public name (no underscore prefix)
+
+## Iteration 2 — SE-004: Add enhanced score models
+### What was implemented
+- Added RubricBreakdown, SubCriteriaDetail, PenaltyDetail, TestResult, TestSuiteResult to score.py
+- Extended HeadlineMetrics with ai_apply_without_edit_rate (default 0.0) and test_pass_rate (default -1.0)
+- Added Optional rubric_breakdown, sub_criteria, penalty_detail, test_suite fields to Score
+- Added meta: Optional[dict] to Event model
+
+### Files changed
+- backend/models/score.py (modified)
+- backend/models/event.py (modified)
+
+### Learnings for future iterations
+- All new Score fields are Optional with None defaults — backward compatible
+- HeadlineMetrics new fields have safe defaults (0.0 and -1.0)
+
+## Iteration 3 — SE-005: Refactor engine to 0-25 internal scale
+### What was implemented
+- Replaced 5 scorer functions (0-10 each) with 4 category scorers returning per-sub-criterion dicts
+- _score_problem_solving → {a1, a2, a3, a4}
+- _score_code_quality → {b1, b2, b3, b4}
+- _score_verification → {c1, c2, c3, c4}
+- _score_communication → {d1, d2, d3, d4}
+- _compute_penalties → {p1, p2, p3}
+- total_score = clamp(A + B + C + D + P1 + P2 + P3, 0, 100)
+- Backward-compatible 0-10 breakdown derived: request_timing = round(A/25*10), etc.
+- compute_score now accepts conv_eval, code_eval, test_results (all Optional, unused until SE-011)
+
+### Files changed
+- backend/scoring/engine.py (rewritten)
+
+### Learnings for future iterations
+- Pure semantic sub-criteria (A3, B1, B2, B3, D2, D4) use mid-range defaults until SE-008/009/011
+- B4 metric uses modification rate + evidence-grounded followups
+- Legacy semantic_eval blending adjusts D1 and B4 for backward compat
+- Penalty values are now rubric-native: P1 = 0/-5/-10/-15, P2 = 0/-10, P3 = 0
