@@ -1479,12 +1479,12 @@ body.is-resizing-row * {
 }
 
 .chat-msg--user .chat-msg-avatar {
-  background: var(--bg-surface-3);
+  background: transparent;
   color: var(--cream);
 }
 
 .chat-msg--assistant .chat-msg-avatar {
-  background: var(--bg-surface-3);
+  background: transparent;
   color: var(--cream);
 }
 

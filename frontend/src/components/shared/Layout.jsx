@@ -130,7 +130,8 @@ export default function Layout() {
                       )}
                     </button>
                   </div>
-                  <div className="bottom-tabs-right">
+                  <div className="bottom-tabs-right" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span className="chat-header-badge">Model: Gemini 3 Flash</span>
                     <button className="panel-collapse-btn" onClick={() => setBottomCollapsed(true)} title="Collapse panel">
                       <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
                         <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

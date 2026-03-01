@@ -298,7 +298,7 @@ export default function ChatTerminal({ onCollapse, hideHeader }) {
             <span>AI Assistant</span>
           </div>
           <div className="chat-header-right">
-            <span className="chat-header-badge">Gemini</span>
+            <span className="chat-header-badge">Model: Gemini 3 Flash</span>
             {onCollapse && (
               <button className="panel-collapse-btn" onClick={onCollapse} title="Collapse AI panel">
                 <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
@@ -322,7 +322,13 @@ export default function ChatTerminal({ onCollapse, hideHeader }) {
         {chatHistory.map((msg, i) => (
           <div key={i} className={`chat-msg chat-msg--${msg.role}`}>
             <div className="chat-msg-avatar">
-              {msg.role === 'user' ? userInitial : msg.role === 'error' ? '!' : 'AI'}
+              {msg.role === 'user' ? (
+                <img src="/logos/sponge-pixel.svg" alt="User" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              ) : msg.role === 'error' ? (
+                '!'
+              ) : (
+                <img src="/logos/gemini.png" alt="AI" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              )}
             </div>
             <div className="chat-msg-body">
               {msg.role === 'assistant'
@@ -333,7 +339,9 @@ export default function ChatTerminal({ onCollapse, hideHeader }) {
         ))}
         {isAiLoading && (
           <div className="chat-msg chat-msg--assistant">
-            <div className="chat-msg-avatar">AI</div>
+            <div className="chat-msg-avatar">
+              <img src="/logos/gemini.png" alt="AI" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            </div>
             <div className="chat-msg-body">
               <div className="chat-typing">
                 <span /><span /><span />
