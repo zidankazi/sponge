@@ -1,33 +1,19 @@
-import { SessionProvider, useSession } from './hooks/useSession'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { SessionProvider } from './hooks/useSession'
 import LandingScreen from './components/game/LandingScreen'
-import BriefScreen from './components/game/BriefScreen'
-import Layout from './components/shared/Layout'
-import ResultsScreen from './components/game/ResultsScreen'
-import LeaderboardPage from './pages/LeaderboardPage'
+import DemoPage from './pages/DemoPage'
 import ErrorBanner from './components/ErrorBanner'
-
-function AppInner() {
-  const { view, setView, resetSession } = useSession()
-
-  if (view === 'idle') return <LandingScreen />
-  if (view === 'brief') return <BriefScreen />
-  if (view === 'results') return <ResultsScreen />
-  if (view === 'leaderboard') {
-    return (
-      <LeaderboardPage
-        onBack={() => setView('idle')}
-        onStartNewSession={resetSession}
-      />
-    )
-  }
-  return <Layout />
-}
 
 export default function App() {
   return (
-    <SessionProvider>
-      <ErrorBanner />
-      <AppInner />
-    </SessionProvider>
+    <BrowserRouter>
+      <SessionProvider>
+        <ErrorBanner />
+        <Routes>
+          <Route path="/" element={<LandingScreen />} />
+          <Route path="/demo" element={<DemoPage />} />
+        </Routes>
+      </SessionProvider>
+    </BrowserRouter>
   )
 }
