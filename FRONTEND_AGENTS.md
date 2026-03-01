@@ -24,8 +24,7 @@ Also owns: `pages/SessionPage.jsx`, `hooks/useSession.jsx`, `hooks/useTimer.js`,
 
 | Component | Purpose |
 |-----------|---------|
-| `game/ResultsScreen.jsx` | Post-session score reveal — score circle, breakdown bars, metrics |
-| `game/ScoreReveal.jsx` | Animated score reveal sequence (number count-up, badge reveal) |
+| `game/ResultsScreen.jsx` | Post-session results — score circle, breakdown bars, metrics, interpretation |
 | `game/Leaderboard.jsx` | Leaderboard table with rankings, scores, badges |
 | `game/Badge.jsx` | Badge component — icon + label for each badge tier |
 
@@ -54,7 +53,6 @@ frontend/src/
       ChatMessage.jsx
     game/
       ResultsScreen.jsx
-      ScoreReveal.jsx
       Leaderboard.jsx
       Badge.jsx
     shared/
@@ -95,7 +93,7 @@ Error handling: `safeFetch` wrapper emits errors via `onApiError` subscriber pat
 The frontend consumes these fields from the response:
 - `total_score` (int, 0-100)
 - `breakdown` — legacy 0-10 metric scores (displayed in full breakdown view)
-- `rubric_breakdown` — the real category scores displayed on ScoreReveal: `{ problem_solving, code_quality, verification, communication }` with maxes 12/13/12/13
+- `rubric_breakdown` — category scores: `{ problem_solving, code_quality, verification, communication }` with maxes 12/13/12/13
 - `headline_metrics` — 8 rate metrics (displayed in full breakdown view)
 - `interpretation` (string) — Socratic feedback
 - `badge` (string) — one of "AI Collaborator", "On Your Way", "Needs Work", "Just Vibing"

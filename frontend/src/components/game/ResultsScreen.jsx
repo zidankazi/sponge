@@ -1,7 +1,5 @@
-import { useState } from 'react'
 import { useSession } from '../../hooks/useSession'
 import Badge from './Badge'
-import ScoreReveal from './ScoreReveal'
 
 const SCORE_LABELS = {
   request_timing: 'Request Timing',
@@ -62,26 +60,11 @@ function MetricRow({ metricKey, value, meta }) {
 
 export default function ResultsScreen() {
   const { results, resetSession } = useSession()
-  const [revealed, setRevealed] = useState(false)
 
   if (!results) return null
 
-  const { total_score = 0, breakdown = {}, rubric_breakdown, headline_metrics = {}, interpretation = '', badge = 'Just Vibing' } = results
+  const { total_score = 0, breakdown = {}, headline_metrics = {}, interpretation = '', badge = 'Just Vibing' } = results
 
-  // Phase 1: ScoreReveal (before user clicks Continue)
-  if (!revealed) {
-    return (
-      <ScoreReveal
-        score={total_score}
-        badge={badge}
-        interpretation={interpretation}
-        rubricBreakdown={rubric_breakdown}
-        onComplete={() => setRevealed(true)}
-      />
-    )
-  }
-
-  // Full breakdown
   const grade =
     total_score >= 90 ? 'A' :
       total_score >= 80 ? 'B+' :
@@ -153,9 +136,6 @@ export default function ResultsScreen() {
 
         <div className="results-actions">
           <h3 className="results-actions-title">What&apos;s next?</h3>
-          <button className="results-bottleneck-btn" onClick={() => setRevealed(false)}>
-            Watch score again
-          </button>
           <button className="results-restart" onClick={resetSession}>
             Start New Session
           </button>

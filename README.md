@@ -177,7 +177,7 @@ Test accuracy is **50% of the grade**. The other 50% measures how the candidate 
                                    ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
 │                             SCORE RESPONSE                               │
-│         Score model → ScoreReveal.jsx · badge · interpretation           │
+│         Score model → ResultsScreen.jsx · badge · interpretation          │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -244,10 +244,10 @@ sponge/
 │       ├── components/
 │       │   ├── editor/         FileTree, CodeEditor, ProblemStatement
 │       │   ├── chat/           ChatTerminal, ChatMessage
-│       │   ├── game/           LandingScreen, BriefScreen, ResultsScreen, ScoreReveal
+│       │   ├── game/           LandingScreen, BriefScreen, ResultsScreen
 │       │   └── shared/         Header, Layout
 │       ├── hooks/              useSession, useResizable
-│       ├── api/                client.js — fetch wrapper with mock flags
+│       ├── api/                client.js — fetch wrapper (all live, no mocks)
 │       └── data/               fileTree.js, fileContents.js (RQ source)
 │
 ├── backend/                    FastAPI + Python
