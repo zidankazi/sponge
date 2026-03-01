@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react'
-import { startSession, sendPrompt, logEvent, submitSession } from '../api/client'
+import { startSession, sendPrompt, logEvent, submitSession, runTests as apiRunTests } from '../api/client'
 import fileContents from '../data/fileContents'
 
 const SessionContext = createContext(null)
@@ -21,6 +21,8 @@ export function SessionProvider({ children }) {
   const [checkpoints, setCheckpoints] = useState([])
   const [showHistory, setShowHistory] = useState(false)
   const [lastSavedBuffers, setLastSavedBuffers] = useState(() => ({ ...fileContents }))
+  const [testResults, setTestResults] = useState(null)
+  const [isRunningTests, setIsRunningTests] = useState(false)
   const timerRef = useRef(null)
   const editDebounceRef = useRef(null)
   const chatHistoryRef = useRef(chatHistory)
@@ -163,6 +165,24 @@ export function SessionProvider({ children }) {
     }
   }, [sessionId, username])
 
+  const runSessionTests = useCallback(async () => {
+    if (isRunningTests) return
+    setIsRunningTests(true)
+
+    const allCode = Object.entries(fileBuffersRef.current)
+      .map(([path, content]) => `// --- ${path} ---\n${content}`)
+      .join('\n\n')
+
+    try {
+      const result = await apiRunTests({ session_id: sessionId, file_contents: allCode })
+      setTestResults(result)
+    } catch {
+      // ErrorBanner shows via onApiError
+    } finally {
+      setIsRunningTests(false)
+    }
+  }, [sessionId, isRunningTests])
+
   // Warn before closing tab during active session
   useEffect(() => {
     if (view === 'brief' || view === 'session') {
@@ -205,6 +225,8 @@ export function SessionProvider({ children }) {
         username,
         checkpoints,
         lastSavedBuffers,
+        testResults,
+        isRunningTests,
         showHistory,
         setShowHistory,
         beginSession,
@@ -214,6 +236,7 @@ export function SessionProvider({ children }) {
         updateFileContent,
         sendChat,
         submit,
+        runSessionTests,
         resetSession,
         saveCheckpoint,
         restoreCheckpoint,

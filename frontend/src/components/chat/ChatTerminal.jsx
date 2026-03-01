@@ -256,7 +256,7 @@ function renderInline(text) {
   return parts
 }
 
-export default function ChatTerminal({ onCollapse }) {
+export default function ChatTerminal({ onCollapse, hideHeader }) {
   const { chatHistory, isAiLoading, sendChat, username, fileBuffers, updateFileContent, openFile } = useSession()
   const userInitial = username ? username[0].toUpperCase() : 'Y'
   const [input, setInput] = useState('')
@@ -289,24 +289,26 @@ export default function ChatTerminal({ onCollapse }) {
 
   return (
     <div className="chat-panel">
-      <div className="chat-header">
-        <div className="chat-header-left">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
-            <path d="M2 3h12v8H4l-2 2V3z" />
-          </svg>
-          <span>AI Assistant</span>
+      {!hideHeader && (
+        <div className="chat-header">
+          <div className="chat-header-left">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
+              <path d="M2 3h12v8H4l-2 2V3z" />
+            </svg>
+            <span>AI Assistant</span>
+          </div>
+          <div className="chat-header-right">
+            <span className="chat-header-badge">Gemini</span>
+            {onCollapse && (
+              <button className="panel-collapse-btn" onClick={onCollapse} title="Collapse AI panel">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                  <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
-        <div className="chat-header-right">
-          <span className="chat-header-badge">Gemini</span>
-          {onCollapse && (
-            <button className="panel-collapse-btn" onClick={onCollapse} title="Collapse AI panel">
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-                <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          )}
-        </div>
-      </div>
+      )}
 
       <div className="chat-messages" ref={scrollRef}>
         {chatHistory.length === 0 && (

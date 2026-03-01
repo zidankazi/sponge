@@ -4,7 +4,7 @@ load_dotenv()
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routes import session, prompt, submit, leaderboard
+from routes import session, prompt, submit, leaderboard, run_tests
 
 app = FastAPI(title="Sponge API", version="0.1.0")
 
@@ -20,6 +20,7 @@ app.include_router(session.router)
 app.include_router(prompt.router)
 app.include_router(submit.router)
 app.include_router(leaderboard.router)
+app.include_router(run_tests.router)
 
 
 @app.get("/")

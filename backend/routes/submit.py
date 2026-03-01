@@ -57,7 +57,7 @@ async def submit_session(body: SubmitRequest):
     conv_eval, code_eval, test_results = await asyncio.gather(
         evaluate_conversation(session.conversation_history),
         analyze_final_code(session.final_code),
-        run_correctness_tests(session.final_code),
+        run_correctness_tests(session.final_code, include_hidden=True),
     )
 
     score = compute_score(
