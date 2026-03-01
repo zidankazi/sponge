@@ -2,7 +2,24 @@
   <img src="frontend/public/brand/logo-full.png" width="100%" alt="Sponge — AI-Assisted System Design Interviews" />
 </div>
 
+<<<<<<< HEAD
 <br/>
+=======
+Gamified AI-assisted coding interview practice. Users drop into a real Python codebase (RQ v1.0), collaborate with an AI assistant to add delayed job execution, and get scored on correctness **and** collaboration quality.
+
+## Scoring (0-100)
+
+| Component | Points | What it measures |
+|-----------|--------|------------------|
+| **T. Test Accuracy** | **0-50** | Pass rate across 20 tests (12 visible + 8 hidden) |
+| A. Problem Solving | 0-12 | Understanding, planning, justification, edge cases |
+| B. Code Quality | 0-13 | Clarity, efficiency, AI code ownership |
+| C. Verification | 0-12 | How often they ran tests, debug discipline |
+| D. Communication | 0-13 | Narration, tradeoffs, AI collaboration balance |
+| Penalties | −13 max | AI over-reliance (−8), never ran tests (−5) |
+
+Test accuracy is **50% of the grade**. The other 50% measures how the candidate collaborates with AI.
+>>>>>>> origin/claude/dreamy-euclid
 
 <div align="center">
   <em> Master the AI-native Workflow. 🧽🫧</em>
