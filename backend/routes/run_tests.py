@@ -3,6 +3,7 @@ import os
 import shutil
 import subprocess
 import sys
+import traceback
 from typing import Optional
 
 from fastapi import APIRouter
@@ -11,7 +12,7 @@ from pydantic import BaseModel
 import store
 from models.score import TestSuiteResult
 from models.session import Session
-from scoring.test_runner import run_correctness_tests, RQ_SOURCE, BACKEND_ROOT
+from scoring.test_runner import run_correctness_tests_verbose, RQ_SOURCE, BACKEND_ROOT
 
 router = APIRouter(tags=["run-tests"])
 
@@ -35,21 +36,13 @@ async def run_tests(body: RunTestsRequest):
         store.sessions[body.session_id] = session
 
     try:
-        result = await run_correctness_tests(body.file_contents)
-        if result is None:
-            # Return diagnostic info so we can debug
-            from scoring.test_runner import parse_final_code
-            parsed = parse_final_code(body.file_contents)
-            return {
-                "error": "test_runner returned None",
-                "parsed_file_count": len(parsed),
-                "parsed_files": list(parsed.keys())[:5],
-                "file_contents_length": len(body.file_contents),
-                "file_contents_preview": body.file_contents[:200],
-            }
-        return result
+        return await run_correctness_tests_verbose(body.file_contents)
     except Exception as e:
-        return {"error": f"{type(e).__name__}: {e}"}
+        tb = traceback.format_exc()
+        return {
+            "error": f"{type(e).__name__}: {e}",
+            "traceback": tb[-1500:],
+        }
 
 
 @router.get("/run-tests/debug")

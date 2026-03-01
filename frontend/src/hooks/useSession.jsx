@@ -176,7 +176,8 @@ export function SessionProvider({ children }) {
     try {
       const result = await apiRunTests({ session_id: sessionId, file_contents: allCode })
       if (!result || !result.total) {
-        emitError('Test run failed — try again', 'run-tests', true)
+        const msg = result?.error || 'Test run failed — try again'
+        emitError(msg, 'run-tests', true)
       } else {
         setTestResults(result)
       }

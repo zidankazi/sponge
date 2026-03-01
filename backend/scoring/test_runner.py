@@ -112,15 +112,17 @@ def parse_final_code(final_code: str) -> dict[str, str]:
     return files
 
 
-def _run_tests_sync(final_code: str, include_hidden: bool = False) -> Optional[TestSuiteResult]:
-    """Synchronous test execution — called via asyncio.to_thread."""
+def _run_tests_sync(final_code: str, include_hidden: bool = False) -> TestSuiteResult:
+    """Synchronous test execution — called via asyncio.to_thread.
+
+    Raises on failure instead of returning None so callers can see the error.
+    """
     tmpdir = None
     try:
         # Parse user's code into files
         user_files = parse_final_code(final_code)
         if not user_files:
-            logger.warning("test_runner: No files parsed from final_code")
-            return None
+            raise ValueError("No files parsed from final_code")
 
         # Create temp directory and copy rq-v1.0 into it
         tmpdir = tempfile.mkdtemp(prefix="sponge_test_")
@@ -171,9 +173,9 @@ def _run_tests_sync(final_code: str, include_hidden: bool = False) -> Optional[T
             f"--rootdir={tmpdir}",
         ]
 
-        # Run pytest with timeout
+        # Run pytest with timeout — capture output for diagnostics
         try:
-            subprocess.run(
+            proc = subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
@@ -182,15 +184,19 @@ def _run_tests_sync(final_code: str, include_hidden: bool = False) -> Optional[T
                 env=env,
             )
         except subprocess.TimeoutExpired:
-            logger.warning("test_runner: pytest timed out after %ds", PYTEST_TIMEOUT)
-            return None
+            raise RuntimeError(f"pytest timed out after {PYTEST_TIMEOUT}s")
 
         # Parse JUnit XML results
-        return _parse_junit_xml(xml_path, include_hidden)
+        result = _parse_junit_xml(xml_path, include_hidden)
+        if result is None:
+            raise RuntimeError(
+                f"pytest produced no parseable results. "
+                f"returncode={proc.returncode}, "
+                f"stdout={proc.stdout[-800:] if proc.stdout else ''}, "
+                f"stderr={proc.stderr[-800:] if proc.stderr else ''}"
+            )
+        return result
 
-    except Exception:
-        logger.exception("test_runner: unexpected error")
-        return None
     finally:
         if tmpdir and os.path.exists(tmpdir):
             try:
@@ -286,6 +292,7 @@ async def run_correctness_tests(final_code: str, include_hidden: bool = False) -
 
     Returns TestSuiteResult or None if execution fails for any reason.
     This function never raises — all errors are caught and logged.
+    Used by submit.py where we want safe fallback behavior.
     """
     if not final_code or not final_code.strip():
         logger.warning("test_runner: empty final_code")
@@ -296,3 +303,14 @@ async def run_correctness_tests(final_code: str, include_hidden: bool = False) -
     except Exception:
         logger.exception("test_runner: failed to run tests")
         return None
+
+
+async def run_correctness_tests_verbose(final_code: str, include_hidden: bool = False) -> TestSuiteResult:
+    """Like run_correctness_tests but lets exceptions propagate for debugging.
+
+    Used by the /run-tests endpoint where we want to surface errors to the user.
+    """
+    if not final_code or not final_code.strip():
+        raise ValueError("empty final_code")
+
+    return await asyncio.to_thread(_run_tests_sync, final_code, include_hidden)
