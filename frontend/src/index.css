@@ -182,12 +182,13 @@ a {
 
 .orbit-mascot {
   position: absolute;
-  width: 32px;
+  width: 36px;
   height: auto;
-  opacity: 0.55;
+  opacity: 0.75;
   pointer-events: none;
   z-index: 0;
-  filter: drop-shadow(0 0 6px rgba(180, 120, 90, 0.3));
+  filter: drop-shadow(0 0 6px rgba(245, 212, 66, 0.3));
+  image-rendering: pixelated;
 }
 
 .hero-container {
