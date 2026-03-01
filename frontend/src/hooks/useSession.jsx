@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react'
-import { startSession, sendPrompt, logEvent, submitSession, runTests as apiRunTests } from '../api/client'
+import { startSession, sendPrompt, logEvent, submitSession, runTests as apiRunTests, emitError } from '../api/client'
 import fileContents from '../data/fileContents'
 
 const SessionContext = createContext(null)
@@ -175,7 +175,11 @@ export function SessionProvider({ children }) {
 
     try {
       const result = await apiRunTests({ session_id: sessionId, file_contents: allCode })
-      setTestResults(result)
+      if (!result || !result.total) {
+        emitError('Test run failed — try again', 'run-tests', true)
+      } else {
+        setTestResults(result)
+      }
     } catch {
       // ErrorBanner shows via onApiError
     } finally {

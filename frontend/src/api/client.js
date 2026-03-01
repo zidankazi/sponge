@@ -25,7 +25,7 @@ export function onApiError(fn) {
   errorListeners.add(fn)
   return () => errorListeners.delete(fn)
 }
-function emitError(message, endpoint, retriable = false) {
+export function emitError(message, endpoint, retriable = false) {
   errorListeners.forEach((fn) => fn({ message, endpoint, retriable }))
 }
 
