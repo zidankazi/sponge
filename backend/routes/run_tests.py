@@ -90,9 +90,9 @@ async def debug_test_runner():
         # Step 6: run pytest
         env = os.environ.copy()
         env["RQ_CODEBASE_PATH"] = rq_copy
+        runtime_paths = os.pathsep.join(p for p in sys.path if p)
         extra_paths = rq_copy + os.pathsep + os.path.join(rq_copy, "tests")
-        existing = env.get("PYTHONPATH", "")
-        env["PYTHONPATH"] = extra_paths + (os.pathsep + existing if existing else "")
+        env["PYTHONPATH"] = extra_paths + os.pathsep + runtime_paths
 
         xml_path = os.path.join(tmpdir, "results.xml")
         cmd = [

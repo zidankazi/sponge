@@ -149,12 +149,15 @@ def _run_tests_sync(final_code: str, include_hidden: bool = False) -> Optional[T
             test_files_to_run.append(hidden_dest)
 
         # Build the pytest command
-        # Set RQ_CODEBASE_PATH so test_submission.py imports from the overlay
+        # Set RQ_CODEBASE_PATH so test_submission.py imports from the overlay.
+        # Include sys.path so the subprocess can find packages installed by
+        # the runtime (e.g. on Vercel, sys.executable is the system Python
+        # which doesn't have site-packages — we need to pass them explicitly).
         env = os.environ.copy()
         env["RQ_CODEBASE_PATH"] = rq_copy
+        runtime_paths = os.pathsep.join(p for p in sys.path if p)
         extra_paths = rq_copy + os.pathsep + os.path.join(rq_copy, "tests")
-        existing = env.get("PYTHONPATH", "")
-        env["PYTHONPATH"] = extra_paths + (os.pathsep + existing if existing else "")
+        env["PYTHONPATH"] = extra_paths + os.pathsep + runtime_paths
 
         xml_path = os.path.join(tmpdir, "results.xml")
         python_exe = sys.executable
