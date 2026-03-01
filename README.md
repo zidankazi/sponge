@@ -12,9 +12,7 @@ Gamified AI-assisted coding interview practice. Users drop into a real Python co
 <br/>
 
 <div align="center">
-  <a href="https://youtu.be/vZ8cEIYBHMU">
-    <img src="https://img.youtube.com/vi/vZ8cEIYBHMU/maxresdefault.jpg" width="80%" alt="Sponge Demo Video" />
-  </a>
+  <a href="https://youtu.be/vZ8cEIYBHMU"><strong>🎥 Watch the 3-minute Demo Video</strong></a>
 </div>
 
 <br/>
