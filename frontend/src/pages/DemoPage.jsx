@@ -9,8 +9,11 @@ export default function DemoPage() {
   const started = useRef(false)
   const [failed, setFailed] = useState(false)
 
-  // Auto-start session when landing on /demo
+  // Auto-start session when landing on /demo (or after resetSession)
   useEffect(() => {
+    if (view === 'idle') {
+      started.current = false
+    }
     if (!started.current && view === 'idle') {
       started.current = true
       setFailed(false)
