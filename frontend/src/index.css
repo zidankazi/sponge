@@ -208,6 +208,35 @@ a {
   color: var(--cream);
 }
 
+.rotating-word-container {
+  display: inline-block;
+  position: relative;
+  /* Adjust width to fit the longest word ("engineering.") comfortably */
+  min-width: 380px;
+  vertical-align: bottom;
+  text-align: left;
+}
+
+.rotating-word {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  opacity: 0;
+  transform: translateY(40px) rotateX(-90deg);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: bottom center;
+}
+
+.rotating-word.word-active {
+  opacity: 1;
+  transform: translateY(0) rotateX(0);
+}
+
+.rotating-word.word-exiting {
+  opacity: 0;
+  transform: translateY(-40px) rotateX(90deg);
+}
+
 .hero-subline {
   font-size: 20px;
   line-height: 1.6;
@@ -315,204 +344,69 @@ a {
 
 .brief-screen {
   height: 100%;
-  background: var(--bg-root);
   display: flex;
   flex-direction: column;
+  background: var(--bg-root);
   overflow-y: auto;
 }
 
-/* ── Top bar ── */
-.brief-topbar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 0 40px;
-  height: var(--header-height);
-  background: var(--bg-root);
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.brief-topbar-logo {
-  height: 20px;
-  width: auto;
-  object-fit: contain;
-  display: block;
-}
-
-.brief-topbar-timer {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-left: auto;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  letter-spacing: 0.02em;
-}
-
-.brief-topbar-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 7px 16px;
-  background: var(--green);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  border: none;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s;
-}
-
-.brief-topbar-cta:hover {
-  background: var(--green-light);
-}
-
-.brief-topbar-timer.timer--urgent { color: var(--yellow); }
-.brief-topbar-timer.timer--critical { color: var(--red); }
-
-.brief-topbar-bar {
-  width: 80px;
-  height: 2px;
-  background: var(--border);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.brief-topbar-bar-fill {
-  height: 100%;
-  background: var(--green-light);
-  border-radius: 2px;
-  transition: width 1s linear, background 0.3s;
-}
-
-/* ── Body ── */
 .brief-body {
   flex: 1;
   display: flex;
-  align-items: flex-start;
   justify-content: center;
-  padding: 64px 24px 80px;
+  padding: 80px 40px 120px;
 }
 
 .brief-content {
   width: 100%;
-  max-width: 680px;
-}
-
-.brief-eyebrow {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--green-light);
-  margin-bottom: 12px;
+  max-width: 640px;
 }
 
 .brief-title {
   font-family: 'Inter', sans-serif;
-  font-size: 40px;
-  font-weight: 700;
+  font-size: 64px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
   color: var(--cream);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
   margin: 0 0 48px;
 }
 
-/* ── Sections ── */
-.brief-section {
-  margin-bottom: 36px;
-  padding-bottom: 36px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.brief-section-heading {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  margin: 0 0 12px;
-}
-
-.brief-section-body {
-  font-size: 15px;
-  line-height: 1.7;
+.brief-text {
+  font-size: 17px;
+  line-height: 1.75;
   color: var(--text-secondary);
-  margin: 0;
 }
 
-.brief-list {
-  margin: 12px 0 0;
-  padding-left: 20px;
+.brief-text p {
+  margin: 0 0 24px;
+}
+
+.brief-text ul {
+  margin: 0 0 24px;
+  padding-left: 24px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
-.brief-list li {
-  font-size: 15px;
-  line-height: 1.6;
-  color: var(--text-secondary);
-}
-
-.brief-list code {
+.brief-text code {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 12.5px;
+  font-size: 13px;
   background: var(--bg-surface-2);
   color: var(--cream);
-  padding: 1px 6px;
+  padding: 2px 6px;
   border-radius: var(--radius-sm);
 }
 
-/* ── Footer / CTA ── */
-.brief-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding-top: 36px;
+.brief-text em {
+  color: var(--cream);
+  font-style: italic;
 }
 
-.brief-note {
-  font-size: 14px;
+.brief-aside {
   color: var(--text-dim);
-  margin: 0;
-}
-
-.brief-note strong {
-  color: var(--text-secondary);
-}
-
-.brief-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background: var(--green);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
-  border: none;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s, transform 0.1s;
-}
-
-.brief-cta:hover {
-  background: var(--green-light);
-  transform: translateY(-1px);
-}
-
-.brief-cta:active {
-  transform: translateY(0);
+  font-size: 15px;
 }
 
 /* ═══════════════════════════════════════

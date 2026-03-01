@@ -1,11 +1,28 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSession } from '../../hooks/useSession'
 import '@fontsource/newsreader/400.css' // Regular
 import '@fontsource/newsreader/400-italic.css' // Italic
 
+const ROTATING_WORDS = [
+  'workflow.',
+  'ecosystem.',
+  'stack.',
+  'craft.',
+  'engineering.',
+  'future.'
+]
+
 export default function LandingScreen() {
   const { beginSession } = useSession()
   const [loading, setLoading] = useState(false)
+  const [wordIndex, setWordIndex] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setWordIndex((prev) => (prev + 1) % ROTATING_WORDS.length)
+    }, 2500) // Change word every 2.5s
+    return () => clearInterval(interval)
+  }, [])
 
   const handleStart = async () => {
     setLoading(true)
@@ -19,13 +36,13 @@ export default function LandingScreen() {
   // Only verified-working SVGs (atlassian/cursor/rippling files are corrupt)
   // imgStyle overrides per-logo to compensate for different aspect ratios
   const companies = [
-    { name: 'Google',  logo: '/logos/google.svg'  },
-    { name: 'Meta',    logo: '/logos/meta.svg'    },
-    { name: 'OpenAI',  logo: '/logos/openai.svg'  },
+    { name: 'Google', logo: '/logos/google.svg' },
+    { name: 'Meta', logo: '/logos/meta.svg' },
+    { name: 'OpenAI', logo: '/logos/openai.svg' },
     { name: 'Shopify', logo: '/logos/shopify.svg' },
-    { name: 'Nvidia',  logo: '/logos/nvidia.svg'  },
-    { name: 'Canva',   logo: '/logos/canva.svg',   imgStyle: { height: '48px', width: 'auto' } },
-    { name: 'Oracle',  logo: '/logos/oracle.svg'  },
+    { name: 'Nvidia', logo: '/logos/nvidia.svg' },
+    { name: 'Canva', logo: '/logos/canva.svg', imgStyle: { height: '48px', width: 'auto' } },
+    { name: 'Oracle', logo: '/logos/oracle.svg' },
   ]
 
   return (
@@ -48,8 +65,28 @@ export default function LandingScreen() {
 
         <div className="hero-main">
           <h1 className="hero-tagline">
-            Learn to build, <br />
-            <span className="hero-tagline-italic">unbounded by syntax.</span>
+            Master the <br />
+            <span className="hero-tagline-italic">
+              AI-native{' '}
+              <span className="rotating-word-container">
+                {ROTATING_WORDS.map((word, index) => {
+                  let statusClass = 'word-hidden';
+                  if (index === wordIndex) {
+                    statusClass = 'word-active';
+                  } else if (
+                    index === (wordIndex - 1 + ROTATING_WORDS.length) % ROTATING_WORDS.length
+                  ) {
+                    statusClass = 'word-exiting';
+                  }
+
+                  return (
+                    <span key={word} className={`rotating-word ${statusClass}`}>
+                      {word}
+                    </span>
+                  );
+                })}
+              </span>
+            </span>
           </h1>
           <p className="hero-subline">
             The AI-native environment where your logic matters more than memorized code. We make software engineering accessible to anyone with an idea.
