@@ -31,7 +31,6 @@ from scoring.metrics import (
     compute_headline_metrics,
     _user_prompts, _ai_responses, _events_of, _session_start_ms,
 )
-from scoring.interpretation import _build_interpretation
 
 
 def _clamp(value: float, lo: float, hi: float) -> float:
@@ -606,11 +605,14 @@ def compute_score(
         penalties=max(-10, min(0, round(p_total / 13 * 10))),
     )
 
-    # Interpretation: prefer conv_eval interpretation, then semantic_eval, then build from metrics
+    # Interpretation: prefer conv_eval interpretation, otherwise a brief summary.
+    # Rich feedback is now in the `insights` field (populated by submit route).
     if effective_conv_eval is not None and hasattr(effective_conv_eval, 'interpretation'):
         interpretation = effective_conv_eval.interpretation
+    elif total == 0:
+        interpretation = "No meaningful activity was detected in this session."
     else:
-        interpretation = _build_interpretation(total, breakdown, metrics)
+        interpretation = f"You scored {total}/100. Check the insights below for specific feedback on your session."
 
     # Include test suite results in the score if available
     test_suite = test_results if test_results is not None else None

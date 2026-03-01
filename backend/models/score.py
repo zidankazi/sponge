@@ -54,6 +54,14 @@ class PenaltyDetail(BaseModel):
     p3_critical_miss: int     # 0 or -10
 
 
+class Insight(BaseModel):
+    category: str       # "Problem Solving" | "Code Quality" | "Verification" | "Communication"
+    type: str           # "strength" | "improvement" | "weakness"
+    title: str          # Short punchy title (3-8 words)
+    description: str    # 1-2 sentence observation + actionable suggestion
+    prompt_indices: list[int] = []  # 0-indexed refs into Score.user_prompts
+
+
 class TestResult(BaseModel):
     test_name: str
     passed: bool
@@ -80,3 +88,5 @@ class Score(BaseModel):
     sub_criteria: Optional[SubCriteriaDetail] = None
     penalty_detail: Optional[PenaltyDetail] = None
     test_suite: Optional[TestSuiteResult] = None
+    insights: Optional[list[Insight]] = None
+    user_prompts: Optional[list[str]] = None
