@@ -443,7 +443,24 @@ a {
   letter-spacing: -0.01em;
   text-decoration: none;
   display: inline-block;
+  position: relative;
   cursor: pointer;
+}
+
+.landing-team-member::after {
+  content: '';
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.35);
+  transition: width 0.3s ease;
+}
+
+.landing-team-member:hover::after {
+  width: 100%;
 }
 
 .landing-team-member span {
