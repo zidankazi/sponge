@@ -87,8 +87,8 @@ function ImageIcon() {
 function DefaultFileIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14">
-      <rect x=".5" y=".5" width="13" height="13" rx="2" fill="none" stroke="#3a3f3c" strokeWidth="1"/>
-      <path d="M3 4.5h8M3 7h6M3 9.5h4" stroke="#3a3f3c" strokeWidth="1.2" strokeLinecap="round"/>
+      <rect x=".5" y=".5" width="13" height="13" rx="2" fill="none" stroke="#3a3a3a" strokeWidth="1"/>
+      <path d="M3 4.5h8M3 7h6M3 9.5h4" stroke="#3a3a3a" strokeWidth="1.2" strokeLinecap="round"/>
     </svg>
   )
 }

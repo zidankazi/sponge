@@ -34,8 +34,12 @@ export default function LandingScreen() {
 
         <div className="hero-header">
           <div className="hero-logo">
-            <span className="hero-logo-icon">S</span>
-            <span className="hero-logo-text">sponge</span>
+            <img
+              src="/brand/logo-full.png"
+              alt="Sponge"
+              className="hero-logo-img"
+              height={34}
+            />
           </div>
           <div className="hero-nav">
             <button className="hero-nav-link" onClick={handleStart}>View demo &rarr;</button>

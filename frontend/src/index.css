@@ -1,14 +1,14 @@
 :root {
   /* Base */
-  --bg-root: #0a0c0b;
-  --bg-surface: #111413;
-  --bg-surface-2: #191d1b;
-  --bg-surface-3: #1e2321;
-  --bg-hover: #242a27;
+  --bg-root: #0a0a0a;
+  --bg-surface: #111111;
+  --bg-surface-2: #1a1a1a;
+  --bg-surface-3: #1e1e1e;
+  --bg-hover: #252525;
 
   /* Borders */
-  --border: #2a2f2c;
-  --border-subtle: #1e2321;
+  --border: #2a2a2a;
+  --border-subtle: #1e1e1e;
 
   /* Forest green */
   --green-dark: #2d6a4f;
@@ -131,7 +131,7 @@ a {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding: 0 32px 0 0;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -151,25 +151,11 @@ a {
   gap: 12px;
 }
 
-.hero-logo-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: var(--cream);
-  color: var(--bg-root);
-  font-weight: 800;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 16px;
-}
-
-.hero-logo-text {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--cream);
-  letter-spacing: -0.5px;
+.hero-logo-img {
+  height: 34px;
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
 
 .hero-nav {
@@ -350,25 +336,11 @@ a {
   gap: 8px;
 }
 
-.logo-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  background: var(--cream);
-  color: var(--bg-root);
-  font-size: 14px;
-  font-weight: 700;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.logo-text {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--cream);
-  letter-spacing: -0.3px;
+.nav-logo-img {
+  height: 22px;
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
 
 .header-divider {
@@ -1531,18 +1503,11 @@ a {
   gap: 10px;
 }
 
-.leaderboard-logo-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: var(--green-dark);
-  color: var(--cream);
-  font-size: 16px;
-  font-weight: 700;
-  font-family: 'JetBrains Mono', monospace;
+.leaderboard-logo-img {
+  height: 28px;
+  width: 28px;
+  object-fit: contain;
+  display: block;
 }
 
 .leaderboard-page-title h1 {
