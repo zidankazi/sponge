@@ -1,11 +1,11 @@
 <div align="center">
-  <img src="frontend/public/brand/logo-full.png" width="100%" alt="Sponge — Gamified AI Coding Interviews" />
+  <img src="frontend/public/brand/logo-full.png" width="100%" alt="Sponge — AI-Assisted System Design Interviews" />
 </div>
 
 <br/>
 
 <div align="center">
-  <em>Can you actually use AI — or are you just vibing?</em>
+  <em> Master the AI Native Workflow </em>
 </div>
 
 <br/>
@@ -34,7 +34,7 @@
 
 ## What is Sponge?
 
-**Sponge** is a gamified coding interview platform that measures something no LeetCode problem ever has: *how well you actually use AI as a coding partner.*
+With the rise of agentic development, companies have started to move away from DSA technical interviews **Sponge** aims to measure something no LeetCode problem ever has: *how well you actually use AI as a coding partner.*
 
 You're dropped into a real open-source Python codebase ([RQ](https://github.com/rq/rq)), given a feature to build, and a Gemini-powered AI assistant to collaborate with. When time's up, our scoring engine evaluates your entire session — not whether the code compiles, but whether you **understood, directed, verified, and owned** what the AI produced.
 
@@ -76,17 +76,17 @@ You're dropped into a real open-source Python codebase ([RQ](https://github.com/
 │                  SESSION PROVIDER  (Orchestration Layer)                 │
 │                  useSession hook · React Context · in-memory store       │
 │                                                                          │
-│  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │                         QUERY HYDRATION                          │   │
-│  │                                                                  │   │
-│  │  ┌───────────────────────────┐  ┌─────────────────────────────┐  │   │
-│  │  │   User Action Sequence    │  │       User Features         │  │   │
-│  │  │   (event history)         │  │  username · active_file     │  │   │
-│  │  │                           │  │  conversation_history       │  │   │
-│  │  │  file_open · file_edit    │  │  file_contents (buffers)    │  │   │
-│  │  │  prompt_sent · test_run   │  │                             │  │   │
-│  │  └───────────────────────────┘  └─────────────────────────────┘  │   │
-│  └──────────────────────────────────────────────────────────────────┘   │
+│  ┌──────────────────────────────────────────────────────────────────┐    │
+│  │                         QUERY HYDRATION                          │    │
+│  │                                                                  │    │
+│  │  ┌───────────────────────────┐  ┌─────────────────────────────┐  │    │
+│  │  │   User Action Sequence    │  │       User Features         │  │    │
+│  │  │   (event history)         │  │  username · active_file     │  │    │
+│  │  │                           │  │  conversation_history       │  │    │
+│  │  │  file_open · file_edit    │  │  file_contents (buffers)    │  │    │
+│  │  │  prompt_sent · test_run   │  │                             │  │    │
+│  │  └───────────────────────────┘  └─────────────────────────────┘  │    │
+│  └──────────────────────────────────────────────────────────────────┘    │
 │                                                                          │
 └──────────────────────────────────┬───────────────────────────────────────┘
                                    │
@@ -132,8 +132,8 @@ You're dropped into a real open-source Python codebase ([RQ](https://github.com/
 │  │  (Combine Predictions)│                                               │
 │  │                       │  A  Problem Solving    (0 – 25)               │
 │  └───────────┬───────────┘  B  Code Quality       (0 – 25)               │
-│              │              C  Verification        (0 – 25)               │
-│              ▼              D  Communication       (0 – 25)               │
+│              │              C  Verification        (0 – 25)              │
+│              ▼              D  Communication       (0 – 25)              │
 │  ┌───────────────────────┐                                               │
 │  │  Code + Test Scorer   │  Attenuate blind AI adoption (P3 penalty)     │
 │  │  (Verification Gate)  │  Correctness tests via isolated pytest runner │
@@ -144,7 +144,7 @@ You're dropped into a real open-source Python codebase ([RQ](https://github.com/
                                    ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
 │                               SELECTION                                  │
-│         compute_score() → total 0 – 100 · assign badge tier             │
+│         compute_score() → total 0 – 100 · assign badge tier              │
 └──────────────────────────────────┬───────────────────────────────────────┘
                                    │
                                    ▼
