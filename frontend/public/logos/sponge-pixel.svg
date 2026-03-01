@@ -1,44 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 24" shape-rendering="crispEdges">
-  <!-- 
-    Simplified pixel art recreation of an angled blue/yellow kitchen sponge.
-    The blue scrub pad is on top, yellow sponge body is underneath.
-  -->
-
-  <!-- Black Outline Shadow / Base -->
-  <path d="M14,4 h4 v1 h2 v1 h2 v1 h2 v1 h2 v1 h2 v4 h-1 v1 h-1 v1 h-1 v1 h-1 v1 h-1 v1 h-2 v1 h-3 v1 h-6 v1 h-4 v-1 h-3 v-1 h-2 v-1 h-2 v-1 h-1 v-1 h-1 v-4 h4 v-1 h2 v-1 h1 v-1 h2 v-1 h2 v-1 z" fill="#000000" />
-
-  <!-- Yellow Sponge Body -->
-  <path d="M4,13 h4 v-1 h2 v-1 h1 v-1 h2 v1 h2 v1 h3 v-1 h3 v-1 h3 v-1 h2 v2 h-1 v1 h-1 v1 h-1 v1 h-1 v1 h-1 v1 h-2 v1 h-3 v1 h-6 v-1 h-2 v-1 h-2 v-1 h-1 v-1 h-1 v-1 h-1 z" fill="#fae125" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54 44" shape-rendering="crispEdges">
+  <!-- Yellow body -->
+  <path d="M41,20h2v1h-2zm2,1h1v1h-1zm1,2h1v1h-1zm0,2h1v1h-1zm-2,1h2v1h-2zm-3,1h3v1h-3zm-2,1h2v1h-2zm-2,1h2v1h-2zm-2,1h2v1h-2zm-3,1h3v1h-3zm-4,1h4v1h-4zm-4,0h4v-1h-4zm-3,-1h3v-1h-3zm-2,-1h2v-1h-2zm-3,-1h3v-1h-3zm-2,-1h2v-1h-2zm-2,-1h2v-1h-2zm-1,-1h1v-1h-1zm-1,-1h1v-1h-1zm-1,-1h1v-1h-1zm30,-2h2v1h-2zm2,1h1v1h-1zm1,1h1v2h-1zm0,2h1v1h-1zm-2,1h2v1h-2zm-2,1h2v1h-2zm-2,1h2v1h-2zm-2,1h2v1h-2zm-2,1h2v1h-2zm-3,1h3v1h-3zm-3,1h3v1h-3zm-4,1h4v1h-4zm-4,0h4v-1h-4zm-3,-1h3v-1h-3zm-2,-1h2v-1h-2zm-2,-1h2v-1h-2zm-2,-1h2v-1h-2zm-1,-1h1v-1h-1zm-1,-1h1v-1h-1zm-1,-1h1v-1h-1zm28,-1h2v1h-2zm2,1h1v1h-1zm2,2h1v1h-1zm0,1h1v1h-1zm-2,1h2v1h-2zm-2,1h2v1h-2zm-2,1h2v1h-2zm-2,1h2v1h-2zm-3,1h3v1h-3zm-3,1h3v1h-3zm-4,1h4v1h-4zm-4,0h4v-1h-4zm-3,-1h3v-1h-3zm-2,-1h2v-1h-2zm-2,-1h2v-1h-2zm-1,-1h1v-1h-1zm-1,-1h1v-1h-1zm27,-1h2v1h-2zm2,1h1v1h-1zm2,2h1v1h-1zm0,1h1v1h-1zm-2,1h2v1h-2zm-1,1h1v1h-1zm-2,1h2v1h-2zm-2,1h2v1h-2zm-3,1h3v1h-3zm-3,1h3v1h-3zm-4,1h4v1h-4zm-3,0h3v-1h-3zm-3,-1h3v-1h-3zm-2,-1h2v-1h-2zm-2,-1h2v-1h-2zm-1,-1h1v-1h-1z" fill="#fde628"/>
   
-  <!-- Yellow Sponge Shadow -->
-  <path d="M4,15 h2 v1 h2 v1 h1 v1 h1 v1 h2 v1 h6 v-1 h3 v-1 h2 v-1 h1 v-1 h1 v-1 h1 v-1 h1 v-1 h1 v2 h-1 v1 h-1 v1 h-1 v1 h-1 v1 h-1 v1 h-2 v1 h-3 v1 h-6 v-1 h-2 v-1 h-2 v-1 h-1 v-1 h-1 v-1 h-1 z" fill="#d1b815" />
+  <!-- Yellow dim details -->
+  <path d="M35,23h2v1h-2zm2,2h2v1h-2zm-1,1h1v1h-1zm-3,1h2v1h-2zm-1,-1h1v-1h-1zm-1,-1h1v-1h-1zm0,-1h1v-1h-1zm-2,1h2v1h-2zm-6,4h2v1h-2zm3,0h1v1h-1zm-2,1h2v1h-2zm-1,-1h1v-1h-1zm-1,-1h1v-1h-1zm0,-1h1v-1h-1zm-2,1h2v1h-2zm-6,4h2v1h-2zm4,0h1v1h-1zm-2,1h2v1h-2zm-1,-1h1v-1h-1zm-1,-1h1v-1h-1zm-1,-1h1v-1h-1zm-2,1h2v1h-2z" fill="#bfae0a"/>
 
-  <!-- Sponge Pores (Darker Yellow) -->
-  <rect x="6" y="16" width="1" height="1" fill="#b09b0b" />
-  <rect x="9" y="18" width="2" height="1" fill="#b09b0b" />
-  <rect x="15" y="19" width="1" height="1" fill="#b09b0b" />
-  <rect x="19" y="17" width="2" height="1" fill="#b09b0b" />
-  <rect x="23" y="15" width="1" height="1" fill="#b09b0b" />
-  <rect x="25" y="13" width="1" height="1" fill="#b09b0b" />
-  <rect x="4" y="14" width="1" height="1" fill="#b09b0b" />
-  
-  <rect x="8" y="15" width="1" height="1" fill="#b09b0b" />
-  <rect x="12" y="16" width="1" height="1" fill="#b09b0b" />
-  <rect x="18" y="15" width="1" height="1" fill="#b09b0b" />
-  <rect x="21" y="12" width="1" height="1" fill="#b09b0b" />
+  <!-- Blue main scrub pad -->
+  <path d="M18,9h4v1h-4zm4,1h4v1h-4zm4,1h3v1h-3zm3,1h2v1h-2zm2,1h2v1h-2zm2,1h3v1h-3zm3,1h3v1h-3zm3,1h2v1h-2zm2,1h1v1h-1zm1,2h2v1h-2zm2,1h1v2h-1zm-1,3h2v-1h-2zm-2,-2h1v-2h-1zm-2,-2h2v-1h-2zm-3,-1h3v-1h-3zm-3,-1h3v-1h-3zm-2,-1h2v-1h-2zm-4,-1h4v-1h-4zm-4,-1h4v-1h-4zm-5,-1h5v-1h-5zm-6,-1h6v-1h-6z M17,10h4v1h-4zm4,1h4v1h-4zm4,1h2v1h-2zm2,1h2v1h-2zm2,1h2v1h-2zm2,1h3v1h-3zm3,1h2v1h-2zm2,1h4v3h-4zm1,4h4v1h-4zm4,1h1v2h-1zm-1,3h-2v-2h2zm-2,-3h-2v-1h2zm-2,-1h-3v-1h3zm-3,-1h-3v-1h3zm-3,-1h-2v-1h2zm-2,-1h-4v-1h-4zm-4,-1h-4v-1h-4zm-4,-1h-5v-1h-5zm-5,-1h-6v-1h-6z M14,12h2v1h-2zm2,1h4v1h-4zm4,1h3v1h-3zm3,1h3v1h-3zm3,1h2v1h-2zm2,1h2v1h-2zm2,1h2v1h-2zm2,1h4v2h-4zm-1,3h1v1h-1zm1,1h4v1h-4zm3,1h-1v1h1zm-1,1h2v1h-2zm-3,0h2v-1h-2zm-2,-1h-2v-2h2zm-2,-3h-4v-1h4zm-4,-1h-3v-1h3zm-3,-1h-3v-1h3zm-3,-1h-4v-1h-4zm-4,-1h-3v-1h-3zm-3,-1h-2v-1h-2zm-2,-1h-2v-1h-2z" fill="#014a93"/>
 
-  <!-- Blue Scrub Pad (Top) -->
-  <path d="M14,5 h4 v1 h2 v1 h2 v1 h2 v1 h2 v1 h2 v1 h-2 v1 h-3 v1 h-3 v1 h-3 pos-1 v-1 h-2 v-1 h-2 v-1 h-1 v1 h-2 v1 h-4 v-1 h-2 v-1 h-1 v-1 h-2 v-1 h4 v-1 h2 v-1 h1 v-1 h2 v-1 z" fill="#0b5b9c" />
+  <!-- Light Blue Highlights -->
+  <path d="M6,21h1v1h-1zm1,1h1v1h-1zm1,-1h1v1h-1zm2,-2h1v1h-1zm1,-1h2v1h-2zm3,-2h2v1h-2zm-1,2h1v1h-1zm-1,2h2v1h-2zm1,1h2v1h-2zm-1,3h2v1h-2zm2,2h1v1h-1zm6,-3h1v1h-1zm4,2h1v1h-1zm3,-5h1v1h-1z" fill="#30a2eb"/>
 
-  <!-- Blue Scrub Pad Darker Areas -->
-  <path d="M14,5 h1 v1 h-1 z M16,6 h1 v1 h-1 z M18,7 h1 v1 h-1 z M20,8 h1 v1 h-1 z M22,9 h1 v1 h-1 z M24,10 h1 v1 h-1 z M15,11 h1 v1 h-1 z M12,12 h1 v1 h-1 z M9,11 h1 v1 h-1 z M6,10 h1 v1 h-1 z" fill="#063e6e" />
-  <path d="M21,11 h3 v1 h-3 z M16,13 h3 v1 h-3 z M18,12 h1 v1 h-1 z M10,14 h2 v1 h-2 z" fill="#063e6e" />
-  
-  <!-- Blue Scrub Pad Edge Highlight -->
-  <path d="M16,7 h2 v1 h2 v1 h2 v1 h2 v1 h1 v1" fill="none" stroke="#2a8eea" stroke-width="1" />
-  <path d="M7,12 h3 v1 h1 v1 h2" fill="none" stroke="#2a8eea" stroke-width="1" />
-  <rect x="18" y="9" width="1" height="1" fill="#2a8eea" />
-  <rect x="13" y="10" width="1" height="1" fill="#2a8eea" />
-  <rect x="14" y="12" width="1" height="1" fill="#2a8eea" />
-
+  <!-- Base Shadow / Outline -->
+  <path d="M19,8h6v1h-6zm6,1h3v1h-3zm3,1h3v1h-3zm3,1h2v1h-2zm2,1h2v1h-2zm2,1h2v1h-2zm2,1h2v1h-2zm2,1h2v1h-2zm2,1h1v1h-1zm1,3h2v1h-2zm2,1h1v1h-1zm1,2h1v1h-1zm1,2h2v1h-2zm2,1h1v1h-1zm1,2h1v2h-1zm-1,3h3v1h-3zm-1,1h1v1h-1zm-3,1h3v1h-3zm-1,1h1v1h-1zm-2,1h2v1h-2zm-2,1h2v1h-2zm-1,1h1v1h-1zm-3,1h3v1h-3zm-1,1h1v1h-1zm-2,1h2v1h-2zm-4,1h4v1h-4zm-2,1h2v1h-2zm-3,0h3v1h-3zm-3,0h3v1h-3zm-3,-1h3v1h-3zm-2,0h2v1h-2zm-1,-1h1v1h-1zm-1,0h1v1h-1zm-1,-1h1v1h-1zm0,0h1v1h-1zm-1,-1h1v1h-1zm-1,-1h1v1h-1zm-1,0h1v1h-1zm-1,-1h1v1h-1zm-1,0h1v1h-1zm0,-1h1v1h-1z M4,28h2v-4h-2zm2,4h2v1h-2zm4,2h2v1h-2zm-2,0h2v-1h-2zm-2,-2h2v-1h-2zm-1,-2h1v-1h-1zm-1,-1h1v-1h-1zm0,0h-1v-1h1zm-1,-1h1v-1h-1zm-1,-1h1v-1h-1zm1,-2h-2v-1h2zm-1,-1h-1v-1h1zm-1,-1h-1v-1h1zm2,-1h-3v-1h3zm1,-1h-2v-1h2zm1,-1h-2v-1h2zm2,-1h-3v-1h3zm2,-1h-3v-1h3zm3,-1h-4v-1h4zm3,-1h-4v-1h4zm4,-1h-5v-1h5zm5,-1h-6v-1h6z M6,21h36 M5,22h37 M6,23h36 M5,24h37 M5,25h36 M5,26h35 M5,27h33 M7,28h29 M7,29h28 M8,30h25 M9,31h23 M11,32h20 M14,33h16 M18,34h11 M23,35h5" fill="none" stroke="#000000" stroke-width="1"/>
 </svg>
