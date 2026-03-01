@@ -241,7 +241,7 @@ export default function ChatTerminal({ onCollapse }) {
         {chatHistory.map((msg, i) => (
           <div key={i} className={`chat-msg chat-msg--${msg.role}`}>
             <div className="chat-msg-avatar">
-              {msg.role === 'user' ? userInitial : 'AI'}
+              {msg.role === 'user' ? userInitial : msg.role === 'error' ? '!' : 'AI'}
             </div>
             <div className="chat-msg-body">
               {msg.role === 'assistant'

@@ -1492,6 +1492,16 @@ body.is-resizing-row * {
   color: var(--text-secondary);
 }
 
+.chat-msg--error .chat-msg-avatar {
+  background: rgba(220, 80, 60, 0.15);
+  color: #dc503c;
+}
+
+.chat-msg--error .chat-msg-body {
+  color: #dc503c;
+  font-style: italic;
+}
+
 .chat-paragraph {
   margin-bottom: 4px;
 }
@@ -2544,6 +2554,95 @@ body.is-resizing-row * {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ── Save modal ──────────────────────────────────────────────────── */
+
+.save-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: save-toast-in 0.15s ease;
+}
+
+.save-modal {
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  width: 340px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.save-modal-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cream);
+}
+
+.save-modal-input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 13px;
+  background: var(--bg-surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--cream);
+  outline: none;
+  font-family: var(--font-mono);
+  box-sizing: border-box;
+}
+
+.save-modal-input:focus {
+  border-color: var(--green-light);
+}
+
+.save-modal-input::placeholder {
+  color: var(--text-dim);
+}
+
+.save-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.save-modal-cancel {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.save-modal-cancel:hover {
+  background: var(--bg-surface-3);
+}
+
+.save-modal-confirm {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--green-dark);
+  border: 1px solid var(--green-light);
+  border-radius: var(--radius-md);
+  color: var(--cream);
+  cursor: pointer;
+}
+
+.save-modal-confirm:hover {
+  background: var(--green-light);
+  color: var(--bg-root);
 }
 
 /* ── History drawer ───────────────────────────────────────────────── */
