@@ -5,7 +5,7 @@
 <br/>
 
 <div align="center">
-  <em> Master the AI Native Workflow </em>
+  <em> Master the AI-native Workflow. </em>
 </div>
 
 <br/>
@@ -32,14 +32,19 @@
 
 ---
 
+![AI-powered development](https://www.anthropic.com/_next/image?url=https%3A%2F%2Fwww-cdn.anthropic.com%2Fimages%2F4zrzovbb%2Fwebsite%2Fab5167a53ff0de956bd500b01b30d8aba028d843-4584x2580.png&w=3840&q=75)
+
+> *How you use AI matters more than whether you use it [Anthropic](https://www.anthropic.com/research/AI-assistance-coding-skills) .*
+
 ## What is Sponge?
 
-With the rise of agentic development, companies have started to move away from DSA technical interviews **Sponge** aims to measure something no LeetCode problem ever has: *how well you actually use AI as a coding partner.*
+With the rise of agentic development, the bottleneck is no longer syntax — it's **judgment**. Research shows a striking paradox: AI assistance barely moves the needle on speed, but significantly degrades knowledge retention in engineers who use it passively. The ones who grow are using AI through conceptual inquiry and generation-then-comprehension — not delegation, not blind iteration.
 
-You're dropped into a real open-source Python codebase ([RQ](https://github.com/rq/rq)), given a feature to build, and a Gemini-powered AI assistant to collaborate with. When time's up, our scoring engine evaluates your entire session — not whether the code compiles, but whether you **understood, directed, verified, and owned** what the AI produced.
+The interaction modes that build real skill look a lot less like autocomplete and a lot more like system design. **Sponge measures something no LeetCode problem ever has: how well you actually use AI as a coding partner.**
+
+You're dropped into a real open-source Python codebase **([RQ](https://github.com/rq/rq))**, given a feature to build, and a Gemini-powered AI assistant to collaborate with. When time's up, our scoring engine evaluates your entire session — not whether the code compiles, but whether you **understood, directed, verified, and owned** what the AI produced.
 
 > Most AI coding tools make you faster. Sponge makes you *better*.
-
 ---
 
 ## How It Works
@@ -326,14 +331,6 @@ npm run dev
 ---
 
 ## Built With ❤️ at the QuackHacks '26 🐥
-
-## Team
-
-| Name | Role |
-|------|------|
-| **Sriram** | Backend — FastAPI, Gemini AIDE, scoring engine, session store |
-| **Zidan** | Frontend — editor, file tree, AI chat panel, session flow |
-| **Josh** | Game layer — landing, brief, results screen, score reveal, badges |
 
 ---
 
