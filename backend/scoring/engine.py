@@ -23,190 +23,18 @@ The 5 frontend breakdown fields map to rubric categories:
 total_score = clamp(round((positives + penalties) / 50 * 100), 0, 100)
 """
 
-import re
 from typing import Optional
 from models.score import HeadlineMetrics, Score, ScoreBreakdown
 from models.session import Session
-
-
-# ---------- RQ-specific vocabulary for grounded prompt detection ----------
-
-RQ_TERMS = {
-    # file names
-    "worker.py", "queue.py", "job.py", "registry.py", "timeouts.py",
-    "connections.py", "exceptions.py", "utils.py", "serializers.py",
-    # class / function names
-    "enqueue", "dequeue", "blpop", "hset", "lpush", "rpush",
-    "enqueue_in", "enqueue_at", "dequeue_timeout",
-    "baseworker", "simpleworker", "worker",
-    "baseregistry", "startedregistry", "finishedregistry",
-    "failedregistry", "deferredregistry", "scheduledregistry",
-    "job.create", "job.fetch", "job.restore",
-    # concepts
-    "sorted set", "ttl", "heartbeat", "work horse", "workhorse",
-    "register_birth", "register_death", "clean_registries",
-    "dequeue_job_and_maintain_ttl", "execute_job",
-}
-
-TRADEOFF_TERMS = {
-    "tradeoff", "trade-off", "instead of", "alternatively", "however",
-    "downside", "upside", "pros", "cons", "better", "worse",
-    "simpler", "more complex", "overhead", "performance", "memory",
-    "time complexity", "space complexity", "o(", "big o",
-}
-
-EDGE_CASE_TERMS = {
-    "edge case", "edge-case", "boundary", "corner case", "corner-case",
-    "empty", "none", "null", "zero", "negative", "overflow",
-    "fail", "error", "exception", "invalid", "missing",
-    "timeout", "retry", "duplicate",
-}
-
-
-# ---------- Session data helpers ----------
-
-def _user_prompts(session: Session) -> list[str]:
-    return [t["content"] for t in session.conversation_history if t.get("role") == "user"]
-
-
-def _ai_responses(session: Session) -> list[str]:
-    return [t["content"] for t in session.conversation_history if t.get("role") == "assistant"]
-
-
-def _events_of(session: Session, kind: str):
-    return [e for e in session.events if e.event == kind]
-
-
-def _session_start_ms(session: Session) -> int:
-    return int(session.started_at.timestamp() * 1000)
-
-
-def _is_grounded(prompt: str) -> bool:
-    lower = prompt.lower()
-    return any(term in lower for term in RQ_TERMS)
-
-
-def _has_tradeoff_language(prompt: str) -> bool:
-    lower = prompt.lower()
-    return any(term in lower for term in TRADEOFF_TERMS)
-
-
-def _has_edge_case_language(prompt: str) -> bool:
-    lower = prompt.lower()
-    return any(term in lower for term in EDGE_CASE_TERMS)
-
-
-def _word_overlap(a: str, b: str) -> float:
-    """Jaccard similarity between word sets of two strings."""
-    wa = set(re.findall(r"\w+", a.lower()))
-    wb = set(re.findall(r"\w+", b.lower()))
-    if not wa or not wb:
-        return 0.0
-    return len(wa & wb) / len(wa | wb)
-
-
-# ---------- Headline metric helpers (0.0 – 1.0 each) ----------
-
-def _compute_headline_metrics(session: Session) -> HeadlineMetrics:
-    """
-    All metrics derived purely from the event log and conversation history.
-
-    blind_adoption_rate:
-        Fraction of AI responses NOT followed by any file_edit before the
-        next prompt (or submit). High = bad (user copied without reviewing).
-
-    ai_modification_rate:
-        Fraction of AI responses followed by at least one file_edit.
-
-    test_after_ai_rate:
-        Fraction of AI responses followed by a test_run before the next prompt.
-
-    passive_reprompt_rate:
-        Fraction of consecutive user prompt pairs with Jaccard similarity > 0.6.
-        Signals re-asking the same question without new info.
-
-    grounded_prompt_rate:
-        Fraction of user prompts that mention at least one RQ file or function.
-
-    evidence_grounded_followup_rate:
-        Fraction of follow-up prompts (index ≥ 1) that quote or closely echo
-        something from the preceding AI response (word overlap > 0.15).
-    """
-    prompts = _user_prompts(session)
-    responses = _ai_responses(session)
-    prompt_events = _events_of(session, "prompt_sent")
-    edit_events = _events_of(session, "file_edit")
-    test_events = _events_of(session, "test_run")
-
-    n_turns = min(len(prompts), len(responses))
-
-    # ── blind adoption / modification rates ─────────────────────────────
-    if n_turns == 0:
-        blind_rate = 0.0
-        mod_rate = 0.0
-        test_after_rate = 0.0
-    else:
-        blind_count = 0
-        mod_count = 0
-        test_after_count = 0
-
-        for i, p_event in enumerate(prompt_events):
-            # window: from this prompt_sent to the next prompt_sent (or end)
-            window_start = p_event.ts
-            window_end = prompt_events[i + 1].ts if i + 1 < len(prompt_events) else float("inf")
-
-            edits_in_window = [e for e in edit_events if window_start < e.ts < window_end]
-            tests_in_window = [e for e in test_events if window_start < e.ts < window_end]
-
-            if edits_in_window:
-                mod_count += 1
-            else:
-                blind_count += 1
-
-            if tests_in_window:
-                test_after_count += 1
-
-        n = len(prompt_events) or 1
-        blind_rate = round(blind_count / n, 2)
-        mod_rate = round(mod_count / n, 2)
-        test_after_rate = round(test_after_count / n, 2)
-
-    # ── passive reprompt rate ────────────────────────────────────────────
-    if len(prompts) < 2:
-        passive_rate = 0.0
-    else:
-        similar_pairs = sum(
-            1 for a, b in zip(prompts, prompts[1:])
-            if _word_overlap(a, b) > 0.6
-        )
-        passive_rate = round(similar_pairs / (len(prompts) - 1), 2)
-
-    # ── grounded prompt rate ─────────────────────────────────────────────
-    if not prompts:
-        grounded_rate = 0.0
-    else:
-        grounded_rate = round(sum(1 for p in prompts if _is_grounded(p)) / len(prompts), 2)
-
-    # ── evidence-grounded followup rate ─────────────────────────────────
-    if len(prompts) < 2 or len(responses) < 1:
-        evidence_rate = 0.0
-    else:
-        followups = prompts[1:]
-        preceding_responses = responses[:len(followups)]
-        evidence_count = sum(
-            1 for p, r in zip(followups, preceding_responses)
-            if _word_overlap(p, r) > 0.15
-        )
-        evidence_rate = round(evidence_count / len(followups), 2)
-
-    return HeadlineMetrics(
-        blind_adoption_rate=blind_rate,
-        ai_modification_rate=mod_rate,
-        test_after_ai_rate=test_after_rate,
-        passive_reprompt_rate=passive_rate,
-        grounded_prompt_rate=grounded_rate,
-        evidence_grounded_followup_rate=evidence_rate,
-    )
+from scoring.vocabulary import (
+    RQ_TERMS, TRADEOFF_TERMS, EDGE_CASE_TERMS,
+    _is_grounded, _has_tradeoff_language, _has_edge_case_language, _word_overlap,
+)
+from scoring.metrics import (
+    compute_headline_metrics,
+    _user_prompts, _ai_responses, _events_of, _session_start_ms,
+)
+from scoring.interpretation import _build_interpretation, _has_any_tests_signal
 
 
 # ---------- Rubric category scorers (each returns 0–10) ----------
@@ -538,69 +366,6 @@ def _assign_badge(total: int) -> str:
     return "Just Vibing"
 
 
-# ---------- Interpretation builder ----------
-
-def _build_interpretation(total: int, breakdown: ScoreBreakdown, metrics: HeadlineMetrics) -> str:
-    """
-    Template-based interpretation from the rubric categories and headline metrics.
-    One sentence per dimension, assembled into a paragraph.
-    """
-    parts = []
-
-    # Problem Solving / timing
-    if breakdown.request_timing >= 8:
-        parts.append("You explored the codebase before reaching for AI and framed your questions with clear constraints — strong problem-solving instincts.")
-    elif breakdown.request_timing >= 5:
-        parts.append("You showed reasonable planning before using AI, though earlier codebase exploration would have made your prompts sharper.")
-    else:
-        parts.append("Try exploring relevant files before your first AI prompt — it leads to more targeted questions and better answers.")
-
-    # Communication / request quality
-    if breakdown.request_quality >= 8:
-        parts.append("Your prompts were specific, technically grounded, and showed ownership of the reasoning.")
-    elif breakdown.request_quality >= 5:
-        parts.append("Your prompts were decent but could be more grounded — referencing specific files and explaining tradeoffs helps AI give better answers.")
-    else:
-        parts.append("Work on prompt quality: name the files and functions you're asking about, and explain what you've already tried.")
-
-    # Code Quality / response handling
-    if breakdown.response_handling >= 8:
-        parts.append("You reviewed and modified AI suggestions before applying them — excellent ownership of AI-generated code.")
-    elif breakdown.response_handling >= 5:
-        parts.append("You modified some AI output, but there were instances of blind adoption. Make it a habit to edit every suggestion.")
-    else:
-        parts.append("Most AI suggestions were applied without modification. Reviewing and adapting code before committing it is a key collaboration skill.")
-
-    # Verification
-    if breakdown.verification_discipline >= 8:
-        parts.append("Verification discipline was strong — you ran tests iteratively and used them to validate AI output.")
-    elif breakdown.verification_discipline >= 5:
-        parts.append("You ran some tests, but running them more frequently — especially right after each AI suggestion — would improve your score.")
-    else:
-        parts.append("Testing was minimal. The Meta rubric rewards running tests after every meaningful change, particularly after accepting AI output.")
-
-    # Iterative collaboration
-    if breakdown.iterative_collaboration >= 8:
-        parts.append("Your multi-turn dialogue with AI was productive — you built on responses rather than re-asking the same questions.")
-    elif breakdown.iterative_collaboration >= 5:
-        parts.append("The dialogue was reasonable. Aim for more back-and-forth where each follow-up builds on what the AI said.")
-    else:
-        parts.append("Lean more into iterative AI dialogue — ask for clarification, challenge suggestions, and refine your approach across turns.")
-
-    # Penalties note
-    if metrics.blind_adoption_rate > 0.4:
-        parts.append(f"Penalty applied: {round(metrics.blind_adoption_rate * 100)}% of AI responses were applied without any code edits.")
-    if not _has_any_tests_signal(breakdown):
-        parts.append("Penalty applied: no test runs were detected during the session.")
-
-    return " ".join(parts)
-
-
-def _has_any_tests_signal(breakdown: ScoreBreakdown) -> bool:
-    """Heuristic: if verification_discipline > 0 then tests were run."""
-    return breakdown.verification_discipline > 0
-
-
 # ---------- Public entry point ----------
 
 def compute_score(session: Session, semantic_eval: "Optional[object]" = None) -> Score:
@@ -614,7 +379,7 @@ def compute_score(session: Session, semantic_eval: "Optional[object]" = None) ->
     Falls back to pure metrics if semantic_eval is None.
     """
     # Compute headline metrics first — penalties depend on them
-    metrics = _compute_headline_metrics(session)
+    metrics = compute_headline_metrics(session)
 
     # Base metric scores for the two content-sensitive dimensions
     metric_rq = _score_request_quality(session)
