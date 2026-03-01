@@ -345,7 +345,7 @@ npm run dev
 
 ---
 
-## Built With ❤️ at the QuackHacks '26 🐥
+## Built With ❤️ at QuackHacks '26 🐥
 
 ---
 
