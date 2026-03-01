@@ -93,7 +93,7 @@
         "Tests can be collected by pytest (they don't need to pass against unmodified rq — they test the user's additions)"
       ],
       "priority": 6,
-      "passes": false,
+      "passes": true,
       "notes": "RQ test patterns: use self.testconn for Redis, Queue(connection=self.testconn), Worker([q], connection=self.testconn), worker.work(burst=True). Fixtures: say_hello, do_nothing from rq-v1.0/tests/fixtures.py. RQTestCase base at rq-v1.0/tests/__init__.py. The tests must add rq-v1.0 and rq-v1.0/tests to sys.path. These tests will FAIL against the unmodified rq-v1.0 (that's the point — they test the user's implementation)."
     },
     {
@@ -110,7 +110,7 @@
         "python -c 'from scoring.test_runner import run_correctness_tests' succeeds (run from backend/)"
       ],
       "priority": 7,
-      "passes": false,
+      "passes": true,
       "notes": "For local dev, runs pytest as subprocess. Use tempfile.mkdtemp() for isolation. shutil.copytree() to clone rq-v1.0. Run: pytest test_submission.py --tb=line -q and parse stdout. The test_submission.py from SE-006 should be copied into the temp dir. Clean up with shutil.rmtree() in finally block. Use asyncio.to_thread() to run the subprocess in a non-blocking way."
     },
     {
@@ -128,7 +128,7 @@
         "python -c 'from scoring.semantic import evaluate_conversation, ConversationSemanticEval' succeeds (run from backend/)"
       ],
       "priority": 8,
-      "passes": false,
+      "passes": true,
       "notes": "Current semantic.py returns SemanticEval with only prompt_quality_score and response_engagement_score. The new ConversationSemanticEval replaces it. The system prompt should be structured as a rubric document with scoring anchors per dimension."
     },
     {
@@ -144,7 +144,7 @@
         "python -c 'from scoring.code_analysis import analyze_final_code, CodeSemanticEval' succeeds (run from backend/)"
       ],
       "priority": 9,
-      "passes": false,
+      "passes": true,
       "notes": "Reuses the _get_client() and _parse_response() patterns from semantic.py. The code analysis prompt should reference the rubric's B1/B2/B3 criteria and list the specific requirements for P3 detection."
     },
     {
@@ -161,7 +161,7 @@
         "python -c 'from routes.submit import router' succeeds (run from backend/)"
       ],
       "priority": 10,
-      "passes": false,
+      "passes": true,
       "notes": "Current submit.py only calls evaluate_conversation and compute_score. The asyncio.gather pattern: conv_eval, code_eval, test_results = await asyncio.gather(evaluate_conversation(...), analyze_final_code(...), run_correctness_tests(...)). Each returns None on failure."
     },
     {
@@ -180,7 +180,7 @@
         "All sub-criteria blending formulas match the plan's Section 4"
       ],
       "priority": 11,
-      "passes": false,
+      "passes": true,
       "notes": "This is the most complex story. Refer to the approved plan at .claude/plans/concurrent-jingling-parnas.md Section 4 for exact formulas. Key formulas: A1 = clamp(0.4*metric + 0.6*semantic, floor, 6), A2 = clamp(0.3*metric + 0.7*semantic, floor, 7), A3 = pure semantic, etc."
     },
     {
@@ -201,7 +201,7 @@
         "pytest backend/tests/test_scoring.py -v passes with all tests green"
       ],
       "priority": 12,
-      "passes": false,
+      "passes": true,
       "notes": "Fixtures should have realistic event patterns. Gold: 5+ file_opens before first prompt, 4+ test_runs, edits after each AI response, 8+ conversation turns with RQ terms. Medium: 2 file_opens, 2 test_runs, some blind adoption. Weak: 1 file_open, 0 test_runs, short generic prompts, no edits. Mock Gemini with unittest.mock.patch on the evaluate_conversation and analyze_final_code functions."
     }
   ]
