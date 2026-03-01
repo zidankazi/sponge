@@ -15,7 +15,7 @@ export default function BriefScreen() {
   return (
     <div className="brief-screen">
 
-      {/* Slim top bar with logo + live timer */}
+      {/* Slim top bar with logo + live timer + CTA always visible */}
       <div className="brief-topbar">
         <img
           src="/brand/logo-full.png"
@@ -33,6 +33,12 @@ export default function BriefScreen() {
         <div className="brief-topbar-bar">
           <div className="brief-topbar-bar-fill" style={{ width: `${pct}%` }} />
         </div>
+        <button className="brief-topbar-cta" onClick={startCoding}>
+          Start coding
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
       </div>
 
       {/* Main content */}
