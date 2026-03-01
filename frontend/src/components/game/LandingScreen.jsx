@@ -28,13 +28,10 @@ function OrbitingMascot() {
     const ctx = canvas.getContext('2d')
     let animId
 
-    // Big ellipse that fully wraps around all three names
-    const radiusX = 480
-    const radiusY = 80
-    const speed = 0.008
+    const speed = 0.006
     const mascotSize = 32
-    const maxDots = 50
-    const dotSpacing = 3 // only record a dot every N frames
+    const maxDots = 60
+    const dotSpacing = 2 // record a dot every N frames for denser trail
 
     const resize = () => {
       const parent = canvas.parentElement
@@ -49,6 +46,10 @@ function OrbitingMascot() {
       angleRef.current += speed
       frameCount.current++
       const a = angleRef.current
+
+      // Ellipse radii scale with the container so the orbit wraps around the text
+      const radiusX = canvas.width * 0.45
+      const radiusY = canvas.height * 0.42
 
       const cx = canvas.width / 2
       const cy = canvas.height / 2
@@ -79,8 +80,8 @@ function OrbitingMascot() {
         const dot = trailRef.current[i]
         // i=0 is oldest, i=total-1 is newest
         const t = i / total
-        const opacity = t * 0.4 // 0 → 0.4
-        const radius = 1 + t * 2 // 1px → 3px
+        const opacity = t * 0.35
+        const radius = 1 + t * 2.5
 
         ctx.beginPath()
         ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2)
@@ -99,7 +100,7 @@ function OrbitingMascot() {
   }, [])
 
   return (
-    <div className="orbit-container">
+    <>
       <canvas ref={canvasRef} className="orbit-trail" />
       <img
         ref={mascotRef}
@@ -107,7 +108,7 @@ function OrbitingMascot() {
         alt=""
         className="orbit-mascot"
       />
-    </div>
+    </>
   )
 }
 
@@ -361,9 +362,9 @@ export default function LandingScreen() {
 
       {/* ── Second viewport: Team Credits ── */}
       <div className="landing-section" ref={teamRef}>
+        <OrbitingMascot />
         <div className="landing-section-inner">
           <p className="landing-section-label">BUILT BY</p>
-          <OrbitingMascot />
           <div className="landing-team">
             <a href="https://www.zidankazi.com/" target="_blank" rel="noreferrer" className="landing-team-member">
               <TeamNameReveal name="Zidan Kazi" containerRef={scrollRef} staggerIndex={0} />
