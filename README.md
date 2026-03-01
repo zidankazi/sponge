@@ -183,6 +183,8 @@ You're dropped into a real open-source Python codebase **([RQ](https://github.co
 | <img src="https://cdn.simpleicons.org/python/3776AB" width="18"/> | **Python 3.11** | Runtime |
 | <img src="https://cdn.simpleicons.org/fastapi/009688" width="18"/> | **FastAPI** | REST API framework |
 | <img src="https://cdn.simpleicons.org/pydantic/E92063" width="18"/> | **Pydantic v2** | Data validation & schemas |
+| <img src="https://icons.veryicon.com/png/o/miscellaneous/gwidc_1/redis.png" width="18"/> | **fakeredis** | Environment containerization |
+| <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ18M1yPSLd5dvjC6BhTzqkEO2oIuPOaU5yeQ&s" width="18"/> | **Pytest** | Code testing |
 | <img src="https://cdn.simpleicons.org/python/3776AB" width="18"/> | **python-dotenv** | Environment config |
 
 ### 🤖 AI
