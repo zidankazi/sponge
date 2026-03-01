@@ -25,6 +25,9 @@ export default function LandingScreen() {
   const scrollRef = useRef(null)
   const socialProofRef = useRef(null)
   const teamRef = useRef(null)
+  const mascot1Ref = useRef(null)
+  const mascot2Ref = useRef(null)
+  const mascot3Ref = useRef(null)
 
   useEffect(() => {
     let timeout
@@ -60,13 +63,12 @@ export default function LandingScreen() {
       const el = socialProofRef.current
       const rect = el.getBoundingClientRect()
       const windowH = window.innerHeight
-      // 0 when element is at bottom of viewport, 1 when at center, back to 0 at top
       const center = (windowH / 2)
       const elCenter = rect.top + rect.height / 2
       const dist = Math.abs(elCenter - center)
       const maxDist = windowH / 2
       const progress = 1 - Math.min(dist / maxDist, 1)
-      const scale = 1 + progress * 0.15 // scale from 1.0 to 1.15
+      const scale = 1 + progress * 0.15
       el.style.transform = `scale(${scale})`
     }
 
@@ -84,6 +86,23 @@ export default function LandingScreen() {
       const opacity = 0.3 + progress * 0.7
       el.style.transform = `scale(${scale})`
       el.style.opacity = opacity
+    }
+
+    // Claude mascots — each drifts at a different parallax rate
+    if (mascot1Ref.current) {
+      const y = scrollTop * -0.15
+      const rotate = scrollTop * 0.02
+      mascot1Ref.current.style.transform = `translateY(${y}px) rotate(${rotate}deg)`
+    }
+    if (mascot2Ref.current) {
+      const y = scrollTop * -0.3
+      const rotate = scrollTop * -0.015
+      mascot2Ref.current.style.transform = `translateY(${y}px) rotate(${rotate}deg)`
+    }
+    if (mascot3Ref.current) {
+      const y = scrollTop * -0.08
+      const rotate = scrollTop * 0.01
+      mascot3Ref.current.style.transform = `translateY(${y}px) rotate(${rotate}deg)`
     }
   }, [])
 
@@ -116,6 +135,11 @@ export default function LandingScreen() {
 
   return (
     <div className="landing" ref={scrollRef}>
+      {/* ── Floating Claude mascots ── */}
+      <img ref={mascot1Ref} src="/logos/claude.svg" alt="" className="claude-float claude-float--1" />
+      <img ref={mascot2Ref} src="/logos/claude.svg" alt="" className="claude-float claude-float--2" />
+      <img ref={mascot3Ref} src="/logos/claude.svg" alt="" className="claude-float claude-float--3" />
+
       {/* ── First viewport: Hero ── */}
       <div className="hero-container">
 

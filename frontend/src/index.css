@@ -125,6 +125,44 @@ a {
   color: var(--text);
   overflow-y: auto;
   overflow-x: hidden;
+  position: relative;
+}
+
+/* ── Floating Claude mascots ── */
+.claude-float {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.04;
+  will-change: transform;
+  filter: brightness(0) invert(1);
+}
+
+/* Top-right of hero area — small, tilted slightly */
+.claude-float--1 {
+  width: 64px;
+  height: auto;
+  top: 18%;
+  right: 8%;
+  opacity: 0.05;
+}
+
+/* Mid-left, between hero and social proof — larger, more faded */
+.claude-float--2 {
+  width: 100px;
+  height: auto;
+  top: 65%;
+  left: 5%;
+  opacity: 0.035;
+}
+
+/* Near team section — medium */
+.claude-float--3 {
+  width: 48px;
+  height: auto;
+  top: 130%;
+  right: 15%;
+  opacity: 0.06;
 }
 
 .hero-container {
@@ -611,13 +649,12 @@ a {
 }
 
 .layout-sidebar {
-  width: var(--sidebar-width);
-  min-width: var(--sidebar-width);
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--border);
   background: var(--bg-surface);
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .layout-main {
@@ -625,6 +662,7 @@ a {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-width: 0;
 }
 
 .layout-editor {
@@ -634,9 +672,137 @@ a {
 }
 
 .layout-chat {
-  height: 280px;
-  min-height: 200px;
+  min-height: 0;
   border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+/* ─── Resize handles ─── */
+
+.resize-handle {
+  flex-shrink: 0;
+  background: transparent;
+  position: relative;
+  z-index: 10;
+}
+
+.resize-handle::after {
+  content: '';
+  position: absolute;
+  background: transparent;
+  transition: background 0.15s;
+  border-radius: 1px;
+}
+
+.resize-handle:hover::after,
+body.is-resizing .resize-handle::after {
+  background: var(--blue, #3b82f6);
+}
+
+.resize-handle--horizontal {
+  width: 4px;
+  cursor: col-resize;
+  margin-left: -1px;
+}
+
+.resize-handle--horizontal::after {
+  top: 0;
+  bottom: 0;
+  left: 1px;
+  width: 2px;
+}
+
+.resize-handle--vertical {
+  height: 4px;
+  cursor: row-resize;
+  margin-top: -1px;
+}
+
+.resize-handle--vertical::after {
+  left: 0;
+  right: 0;
+  top: 1px;
+  height: 2px;
+}
+
+/* Drag state — prevent Monaco iframe from stealing mouse events */
+body.is-resizing {
+  user-select: none;
+}
+
+body.is-resizing iframe,
+body.is-resizing .monaco-editor {
+  pointer-events: none;
+}
+
+body.is-resizing-col,
+body.is-resizing-col * {
+  cursor: col-resize !important;
+}
+
+body.is-resizing-row,
+body.is-resizing-row * {
+  cursor: row-resize !important;
+}
+
+/* ─── Collapsed panel bars ─── */
+
+.collapsed-panel-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  flex-shrink: 0;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  transition: color 0.15s;
+}
+
+.collapsed-panel-bar:hover {
+  color: var(--text-secondary);
+}
+
+.collapsed-panel-bar--chat {
+  border-bottom: none;
+  border-top: 1px solid var(--border);
+}
+
+.collapsed-panel-chevron {
+  margin-left: auto;
+  opacity: 0.5;
+}
+
+/* ─── Panel collapse/expand button ─── */
+
+.panel-collapse-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+}
+
+.panel-collapse-btn:hover {
+  color: var(--text-secondary);
+  background: var(--bg-hover);
 }
 
 /* ═══════════════════════════════════════
@@ -653,12 +819,18 @@ a {
 .problem-header {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
   color: var(--text-dim);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
+}
+
+.problem-header-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .problem-title {
@@ -965,6 +1137,12 @@ a {
   color: var(--text-secondary);
   border-radius: var(--radius-sm);
   font-weight: 500;
+}
+
+.chat-header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .chat-messages {
