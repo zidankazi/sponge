@@ -8,7 +8,7 @@ const TOTAL_TIME = 60 * 60 // 60 minutes in seconds
 
 export function SessionProvider({ children }) {
   const [sessionId, setSessionId] = useState(null)
-  const [view, setView] = useState('idle') // idle | brief | session | results | leaderboard
+  const [view, setView] = useState('idle') // idle | brief | session | results
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME)
   const [activeFile, setActiveFile] = useState('rq/job.py')
   const [openFiles, setOpenFiles] = useState(['rq/job.py'])
