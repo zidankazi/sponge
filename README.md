@@ -1,75 +1,448 @@
-# Sponge
+<div align="center">
+  <img src="frontend/public/brand/logo-full.png" width="100%" alt="Sponge — Gamified AI Coding Interviews" />
+</div>
 
-Gamified AI-assisted coding interview practice. Users drop into a real Python codebase, collaborate with an AI assistant to build a feature, and get scored on how well they used AI — not whether the code works.
+<br/>
 
-## Quick Start
+<div align="center">
+  <em>Can you actually use AI — or are you just vibing?</em>
+</div>
 
-### Frontend (React + Vite)
+<br/>
 
-```bash
-cd frontend
-npm install
-npm run dev
+<div align="center">
+
+[![Live Demo](https://img.shields.io/badge/▶%20Live%20Demo-sponge--alpha.vercel.app-6C47FF?style=for-the-badge)](https://sponge-alpha.vercel.app)
+[![GitHub](https://img.shields.io/badge/GitHub-zidankazi%2Fsponge-181717?style=for-the-badge&logo=github)](https://github.com/zidankazi/sponge)
+
+</div>
+
+<div align="center">
+
+![React](https://img.shields.io/badge/React_18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Monaco](https://img.shields.io/badge/Monaco_Editor-0078D4?style=for-the-badge&logo=visual-studio-code&logoColor=white)
+![Python](https://img.shields.io/badge/Python_3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![Pydantic](https://img.shields.io/badge/Pydantic_v2-E92063?style=for-the-badge&logo=pydantic&logoColor=white)
+![Gemini](https://img.shields.io/badge/Gemini_2.5_Flash-4285F4?style=for-the-badge&logo=google&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
+
+</div>
+
+---
+
+## What is Sponge?
+
+**Sponge** is a gamified coding interview platform that measures something no LeetCode problem ever has: *how well you actually use AI as a coding partner.*
+
+You're dropped into a real open-source Python codebase ([RQ](https://github.com/rq/rq)), given a feature to build, and a Gemini-powered AI assistant to collaborate with. When time's up, our scoring engine evaluates your entire session — not whether the code compiles, but whether you **understood, directed, verified, and owned** what the AI produced.
+
+> Most AI coding tools make you faster. Sponge makes you *better*.
+
+---
+
+## How It Works
+
+```
+  📋  READ THE BRIEF          💬  CODE WITH AI           🏆  GET YOUR SCORE
+  ─────────────────          ────────────────           ──────────────────
+  A real open-source    →    Chat with Gemini,    →    60-second scoring
+  Python codebase.           edit files in a            across 4 rubric
+  60 minutes. One            VS Code-style IDE.         dimensions. Earn
+  feature to ship.           Every move tracked.        your badge.
 ```
 
-Runs on `http://localhost:5173`.
+---
 
-### Backend (FastAPI)
+## Screenshots
 
-```bash
-cd backend
-pip install -r requirements.txt
-uvicorn main:app --reload
+### 🏠 Landing Screen
+*Enter your name and start the interview*
+
+<!-- TODO: replace src with screenshots/landing.png -->
+<img src="https://placehold.co/1280x760/0f0f13/6C47FF?text=Landing+Screen" alt="Sponge — Landing Screen" width="100%" />
+
+---
+
+### 📋 Brief Screen
+*Read the problem statement before the clock starts*
+
+<!-- TODO: replace src with screenshots/brief.png -->
+<img src="https://placehold.co/1280x760/0f0f13/6C47FF?text=Brief+Screen" alt="Sponge — Brief Screen" width="100%" />
+
+---
+
+### 💻 Session — Editor + AI Chat
+*VS Code-style editor with live AI assistant, file tree, and countdown timer*
+
+<!-- TODO: replace src with screenshots/session.png -->
+<img src="https://placehold.co/1280x760/0f0f13/6C47FF?text=Session+%E2%80%94+Editor+%2B+AI+Chat" alt="Sponge — Session View" width="100%" />
+
+---
+
+### 🏆 Results & Score Reveal
+*See your final score, rubric breakdown, badge, and personalised feedback*
+
+<div align="center">
+  <table><tr>
+    <!-- TODO: replace src with screenshots/results.png -->
+    <td><img src="https://placehold.co/620x700/0f0f13/6C47FF?text=Results+Screen" alt="Sponge — Results Screen" width="100%" /></td>
+    <!-- TODO: replace src with screenshots/score-reveal.png -->
+    <td><img src="https://placehold.co/620x700/0f0f13/6C47FF?text=Score+Reveal" alt="Sponge — Score Reveal" width="100%" /></td>
+  </tr></table>
+</div>
+
+---
+
+## System Architecture
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                          INTERVIEW REQUEST                               │
+│              User submits username · session begins                      │
+└──────────────────────────────────┬───────────────────────────────────────┘
+                                   │
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                  SESSION PROVIDER  (Orchestration Layer)                 │
+│                  useSession hook · React Context · in-memory store       │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                         QUERY HYDRATION                          │   │
+│  │                                                                  │   │
+│  │  ┌───────────────────────────┐  ┌─────────────────────────────┐  │   │
+│  │  │   User Action Sequence    │  │       User Features         │  │   │
+│  │  │   (event history)         │  │  username · active_file     │  │   │
+│  │  │                           │  │  conversation_history       │  │   │
+│  │  │  file_open · file_edit    │  │  file_contents (buffers)    │  │   │
+│  │  │  prompt_sent · test_run   │  │                             │  │   │
+│  │  └───────────────────────────┘  └─────────────────────────────┘  │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+└──────────────────────────────────┬───────────────────────────────────────┘
+                                   │
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                           CANDIDATE SOURCES                              │
+│                                                                          │
+│  ┌──────────────────────────┐  ┌──────────────────────────────────────┐  │
+│  │      AIDE ENGINE         │  │       CODEBASE RETRIEVAL             │  │
+│  │  (Gemini 2.5 Flash)      │  │       (rq-v1.0  Reference)           │  │
+│  │                          │  │                                      │  │
+│  │  Grounded AI responses   │  │  Active file + full file buffers     │  │
+│  │  aware of your edits &   │  │  injected as context window —        │  │
+│  │  conversation history    │  │  ML-similarity over real source      │  │
+│  └──────────────────────────┘  └──────────────────────────────────────┘  │
+└──────────────────────────────────┬───────────────────────────────────────┘
+                                   │
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                               HYDRATION                                  │
+│   POST /prompt — active_file · file_contents · conversation_history      │
+└──────────────────────────────────┬───────────────────────────────────────┘
+                                   │
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                               FILTERING                                  │
+│   Remove: empty events · invalid sessions · malformed requests           │
+└──────────────────────────────────┬───────────────────────────────────────┘
+                                   │
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                                SCORING                                   │
+│                                                                          │
+│  ┌───────────────────────┐                                               │
+│  │   Semantic Scorer     │  Gemini evaluates 12 conversation dimensions  │
+│  │   (ML Predictions)    │  P(understanding) · P(ownership)              │
+│  │                       │  P(testing) · P(tradeoffs) · P(narration)...  │
+│  └───────────┬───────────┘                                               │
+│              │                                                           │
+│              ▼                                                           │
+│  ┌───────────────────────┐                                               │
+│  │    Rubric Scorer      │  Weighted Score = Σ ( weight × P(dimension) ) │
+│  │  (Combine Predictions)│                                               │
+│  │                       │  A  Problem Solving    (0 – 25)               │
+│  └───────────┬───────────┘  B  Code Quality       (0 – 25)               │
+│              │              C  Verification        (0 – 25)               │
+│              ▼              D  Communication       (0 – 25)               │
+│  ┌───────────────────────┐                                               │
+│  │  Code + Test Scorer   │  Attenuate blind AI adoption (P3 penalty)     │
+│  │  (Verification Gate)  │  Correctness tests via isolated pytest runner │
+│  └───────────────────────┘                                               │
+│                                                                          │
+└──────────────────────────────────┬───────────────────────────────────────┘
+                                   │
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                               SELECTION                                  │
+│         compute_score() → total 0 – 100 · assign badge tier             │
+└──────────────────────────────────┬───────────────────────────────────────┘
+                                   │
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                        FILTERING  (Post-Scoring)                         │
+│         interpretation.py — narrative feedback · badge assignment        │
+└──────────────────────────────────┬───────────────────────────────────────┘
+                                   │
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                             SCORE RESPONSE                               │
+│         Score model → ScoreReveal.jsx · badge · interpretation           │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
-Runs on `http://localhost:8000`.
+---
 
-Create a `.env` file in `backend/` with:
-```
-GEMINI_API_KEY=your_key_here
-```
+## Tech Stack
 
-## Team & Branches
+### 🖥 Frontend
+| | Library | Purpose |
+|---|---|---|
+| <img src="https://cdn.simpleicons.org/react/61DAFB" width="18"/> | **React 18** | UI framework |
+| <img src="https://cdn.simpleicons.org/vite/646CFF" width="18"/> | **Vite 5** | Build tool & dev server |
+| <img src="https://cdn.simpleicons.org/visualstudiocode/0078D4" width="18"/> | **Monaco Editor** | In-browser VS Code-style IDE |
+| <img src="https://cdn.simpleicons.org/reactrouter/CA4245" width="18"/> | **React Router v7** | Client-side routing |
 
-| Person | Domain | Branch |
-|--------|--------|--------|
-| Zidan | Core frontend — editor, file tree, AI chat, session flow | `zidan/editor` |
-| Designer | Game layer — results, leaderboard, score reveal, badges | `designer/game` |
-| Backend | FastAPI — Gemini API, scoring, session storage, leaderboard | `backend/core` |
+### ⚙️ Backend
+| | Library | Purpose |
+|---|---|---|
+| <img src="https://cdn.simpleicons.org/python/3776AB" width="18"/> | **Python 3.11** | Runtime |
+| <img src="https://cdn.simpleicons.org/fastapi/009688" width="18"/> | **FastAPI** | REST API framework |
+| <img src="https://cdn.simpleicons.org/pydantic/E92063" width="18"/> | **Pydantic v2** | Data validation & schemas |
+| <img src="https://cdn.simpleicons.org/python/3776AB" width="18"/> | **python-dotenv** | Environment config |
 
-- `main` — stable, demo-ready only. PRs to main when fully working.
-- Work on your branch, push often, PR when ready.
+### 🤖 AI
+| | Library | Purpose |
+|---|---|---|
+| <img src="https://cdn.simpleicons.org/google/4285F4" width="18"/> | **google-genai** | Gemini 2.5 Flash — AIDE chat + semantic scoring |
 
-## Claude Code Setup
+### ☁️ Infrastructure
+| | Tool | Purpose |
+|---|---|---|
+| <img src="https://cdn.simpleicons.org/vercel/000000" width="18"/> | **Vercel** | Frontend + Backend hosting |
 
-Every team member uses Claude Code. Before working:
+---
 
-1. Claude reads `AGENTS.md` first (full project context)
-2. Then reads `FRONTEND_AGENTS.md` or `BACKEND_AGENTS.md` for your domain
-3. After every big change, update the relevant AGENTS doc so everyone stays in sync
+## Scoring Rubric
+
+Every session is scored across **4 rubric categories** (0–25 each), powered by a 3-layer evaluation pipeline running concurrently:
+
+| # | Dimension | What We Measure | Max |
+|---|-----------|----------------|-----|
+| **A** | 🧩 **Problem Solving** | Did you understand the task, decompose it clearly, and justify your approach? | 25 |
+| **B** | 💻 **Code Quality** | Is the implementation correct, efficient, and idiomatic? | 25 |
+| **C** | ✅ **Verification** | Did you test your code, run it, and catch edge cases before moving on? | 25 |
+| **D** | 💬 **Communication** | Did you narrate intent, discuss tradeoffs, and ask grounded follow-up questions? | 25 |
+
+**Penalties** are applied for blind copy-paste (P3), no test runs (P2), and over-reliance on AI (P1).
+
+**Badges:** `Novice` → `On Your Way` → `AI Collaborator` → `Expert`
+
+---
 
 ## Project Structure
 
 ```
 sponge/
-  frontend/           React + Vite
-    src/
-      components/
-        editor/       FileTree, CodeEditor, ProblemStatement
-        chat/         ChatTerminal, ChatMessage
-        game/         LandingScreen, ResultsScreen, ScoreReveal, Leaderboard, Badge
-        shared/       Header, Layout, Button, Timer
-      pages/          SessionPage, LeaderboardPage
-      hooks/          useSession, useTimer
-      api/            client.js (mocked, swap for real fetch when backend is ready)
-      data/           fileTree.js, fileContents.js (RQ source files)
-  backend/            FastAPI + Python
-    routes/           session, prompt, submit, leaderboard
-    scoring/          scoring engine (backend partner's domain)
-    models/           session, event, score
-    gemini/           Gemini API client
-  rq-v1.0/            The codebase users work in (DO NOT MODIFY)
-  AGENTS.md           Project context for Claude Code
-  FRONTEND_AGENTS.md  Frontend context
-  BACKEND_AGENTS.md   Backend context
+├── frontend/                   React + Vite
+│   ├── public/
+│   │   ├── brand/              Logos, favicons, PWA manifest
+│   │   └── logos/              Sponsor & AI tool logos
+│   └── src/
+│       ├── components/
+│       │   ├── editor/         FileTree, CodeEditor, ProblemStatement
+│       │   ├── chat/           ChatTerminal, ChatMessage
+│       │   ├── game/           LandingScreen, BriefScreen, ResultsScreen, ScoreReveal
+│       │   └── shared/         Header, Layout
+│       ├── hooks/              useSession, useResizable
+│       ├── api/                client.js — fetch wrapper with mock flags
+│       └── data/               fileTree.js, fileContents.js (RQ source)
+│
+├── backend/                    FastAPI + Python
+│   ├── routes/                 session, prompt, submit, leaderboard
+│   ├── scoring/                engine, semantic, code_analysis, test_runner,
+│   │                           metrics, interpretation, vocabulary
+│   ├── models/                 Session, Event, Score (Pydantic v2)
+│   ├── gemini/                 client, config, fallback, system_prompt
+│   └── store.py                In-memory session store
+│
+└── rq-v1.0/                    Reference codebase users work in (read-only)
 ```
+
+---
+
+## Setup & Installation
+
+### Prerequisites
+- Node.js ≥ 18
+- Python ≥ 3.11
+- A [Google AI Studio](https://aistudio.google.com/) API key
+
+### Backend
+
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate       # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+Create `backend/.env`:
+```env
+GEMINI_API_KEY=your_key_here
+```
+
+```bash
+uvicorn main:app --reload
+# → http://localhost:8000
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+```
+
+Create `frontend/.env.local`:
+```env
+VITE_API_URL=http://localhost:8000
+```
+
+```bash
+npm run dev
+# → http://localhost:5173
+```
+
+---
+
+## API Reference
+
+<details>
+<summary><strong>View all endpoints</strong></summary>
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/` | Health check |
+| `POST` | `/session/start` | Create a new session → `{ session_id }` |
+| `POST` | `/session/event` | Log a frontend event (fire-and-forget) |
+| `POST` | `/prompt` | Send prompt to Gemini AIDE → `{ response_text }` |
+| `POST` | `/submit` | Close session, run scoring → full `Score` model |
+| `GET` | `/leaderboard` | Fetch all completed sessions sorted by score |
+
+**POST `/prompt`** body:
+```json
+{
+  "session_id": "sponge_abc123",
+  "prompt_text": "How do I add a ScheduledJobRegistry?",
+  "conversation_history": [...],
+  "active_file": "rq/queue.py",
+  "file_contents": { "rq/queue.py": "...", "rq/registry.py": "..." }
+}
+```
+
+**POST `/submit`** returns:
+```json
+{
+  "total_score": 78,
+  "breakdown": { "problem_solving": 20, "code_quality": 18, "verification": 22, "communication": 21 },
+  "headline_metrics": { "ai_apply_without_edit_rate": 0.12, "test_pass_rate": 0.83, ... },
+  "interpretation": "Strong ownership of AI suggestions...",
+  "badge": "AI Collaborator"
+}
+```
+
+</details>
+
+---
+
+## Built With ❤️ at the Hackathon
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="100">
+        <img src="frontend/public/logos/claude.svg" height="32" alt="Claude"/><br/>
+        <sub>Claude</sub>
+      </td>
+      <td align="center" width="100">
+        <img src="frontend/public/logos/gemini.svg" height="32" alt="Gemini"/><br/>
+        <sub>Gemini</sub>
+      </td>
+      <td align="center" width="100">
+        <img src="frontend/public/logos/cursor.svg" height="32" alt="Cursor"/><br/>
+        <sub>Cursor</sub>
+      </td>
+      <td align="center" width="100">
+        <img src="frontend/public/logos/atlassian.svg" height="32" alt="Atlassian"/><br/>
+        <sub>Atlassian</sub>
+      </td>
+      <td align="center" width="100">
+        <img src="frontend/public/logos/shopify.svg" height="32" alt="Shopify"/><br/>
+        <sub>Shopify</sub>
+      </td>
+      <td align="center" width="100">
+        <img src="frontend/public/logos/canva.svg" height="32" alt="Canva"/><br/>
+        <sub>Canva</sub>
+      </td>
+      <td align="center" width="100">
+        <img src="frontend/public/logos/nvidia.svg" height="32" alt="NVIDIA"/><br/>
+        <sub>NVIDIA</sub>
+      </td>
+      <td align="center" width="100">
+        <img src="frontend/public/logos/google.svg" height="32" alt="Google"/><br/>
+        <sub>Google</sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" width="100">
+        <img src="frontend/public/logos/openai.svg" height="32" alt="OpenAI"/><br/>
+        <sub>OpenAI</sub>
+      </td>
+      <td align="center" width="100">
+        <img src="frontend/public/logos/meta.svg" height="32" alt="Meta"/><br/>
+        <sub>Meta</sub>
+      </td>
+      <td align="center" width="100">
+        <img src="frontend/public/logos/oracle.svg" height="32" alt="Oracle"/><br/>
+        <sub>Oracle</sub>
+      </td>
+      <td align="center" width="100">
+        <img src="frontend/public/logos/rippling.png" height="32" alt="Rippling"/><br/>
+        <sub>Rippling</sub>
+      </td>
+      <td align="center" width="100">
+        <img src="frontend/public/logos/langchain.png" height="32" alt="LangChain"/><br/>
+        <sub>LangChain</sub>
+      </td>
+      <td align="center" width="100">
+        <img src="frontend/public/logos/elevenlabs.png" height="32" alt="ElevenLabs"/><br/>
+        <sub>ElevenLabs</sub>
+      </td>
+    </tr>
+  </table>
+</div>
+
+---
+
+## Team
+
+| Name | Role |
+|------|------|
+| **Sriram** | Backend — FastAPI, Gemini AIDE, scoring engine, session store |
+| **Zidan** | Frontend — editor, file tree, AI chat panel, session flow |
+| **Josh** | Game layer — landing, brief, results screen, score reveal, badges |
+
+---
+
+## Attribution
+
+- **[RQ (Redis Queue)](https://github.com/rq/rq)** — open-source Python job queue library used as the interview codebase (`rq-v1.0/`)
+- **[Gemini 2.5 Flash](https://deepmind.google/technologies/gemini/)** — Google DeepMind, used via `google-genai` SDK for AIDE chat and semantic scoring
+- **[Monaco Editor](https://microsoft.github.io/monaco-editor/)** — Microsoft, in-browser code editor
+- **[FastAPI](https://fastapi.tiangolo.com/)** — Sebastián Ramírez, backend web framework
+- **[Pydantic](https://docs.pydantic.dev/)** — Samuel Colvin, data validation
+- **[Vite](https://vitejs.dev/)** — Evan You, frontend build tool
+- **[React](https://react.dev/)** — Meta, UI framework
+- **[Vercel](https://vercel.com/)** — hosting for both frontend and backend
